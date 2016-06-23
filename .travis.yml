@@ -1,0 +1,11 @@
+language: cpp
+os:
+  - linux
+  - osx
+compiler:
+  - clang
+  - gcc
+before_script:
+cmake .
+script:
+  make && ctest . 
