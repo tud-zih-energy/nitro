@@ -6,6 +6,6 @@ compiler:
   - clang
   - gcc
 before_script:
-cmake .
+  - cmake .
 script:
-  make && ctest . 
+  - make && ctest . 
