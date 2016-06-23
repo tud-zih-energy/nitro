@@ -30,6 +30,7 @@
 #define INCLUDE_NITRO_DL_EXCEPTION_HPP
 
 #include <stdexcept>
+#include <string>
 
 namespace nitro
 {
