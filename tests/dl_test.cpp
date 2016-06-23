@@ -1,7 +1,7 @@
-#include <nitro/dl/dl.hpp>
+#define CATCH_CONFIG_MAIN
+#include <catch.hpp>
 
-#include <cassert>
-#include <iostream>
+#include <nitro/dl/dl.hpp>
 
 #ifdef __APPLE__
 #define LIB_SUFFIX "dylib"
@@ -11,14 +11,24 @@
 #define LIB_SUFFIX "so"
 #endif
 
-int main()
+TEST_CASE("library symbols can be loaded and used", "[dl]")
 {
-
     nitro::dl::dl test_library("libnitro_test_lib." LIB_SUFFIX);
 
-    auto cos = test_library.load<double(double)>("nitro_cos");
+    SECTION("nitro_cos is loadable")
+    {
+        REQUIRE_NOTHROW(auto cos = test_library.load<double(double)>("nitro_cos"));
+    }
 
-    assert(cos(0) == 1.0);
+    SECTION("nitro_cos is callable")
+    {
+        auto cos = test_library.load<double(double)>("nitro_cos");
 
-    return 0;
+        REQUIRE(cos(0) == 1.0);
+    }
+
+    SECTION("undefined symbol throws")
+    {
+        REQUIRE_THROWS(test_library.load<double(double)>("nitro_not_defined"));
+    }
 }
