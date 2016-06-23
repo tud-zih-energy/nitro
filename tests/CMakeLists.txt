@@ -9,5 +9,8 @@ include_directories(${CMAKE_CURRENT_SOURCE_DIR}/Catch/include)
 
 add_library(nitro_test_lib SHARED nitro_test_lib.cpp)
 
-NitroTest(dl_test)
+NitroTest(dl_test.cpp)
 set_tests_properties(dl_test PROPERTIES ENVIRONMENT "LD_LIBRARY_PATH=${CMAKE_CURRENT_BINARY_DIR}")
+
+NitroTest(env_get_test.cpp)
+set_tests_properties(env_get_test PROPERTIES ENVIRONMENT "TEST_1=THIS_WAS_SET")

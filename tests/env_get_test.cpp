@@ -1,17 +1,11 @@
+#define CATCH_CONFIG_MAIN
+#include <catch.hpp>
+
 #include <nitro/env/get.hpp>
 
-#include <cassert>
-#include <iostream>
-
-int main()
+TEST_CASE("environment variabls read", "[env]")
 {
-    auto set = nitro::env::get("TEST_1");
+    REQUIRE(nitro::env::get("TEST_1") == "THIS_WAS_SET");
 
-    assert(set == "THIS_WAS_SET");
-
-    auto not_set = nitro::env::get("TEST_2", "THIS_WAS_NOT_SET");
-
-    assert(set == "THIS_WAS_NOT_SET");
-
-    return 0;
+    REQUIRE(nitro::env::get("TEST_2", "THIS_WAS_NOT_SET") == "THIS_WAS_NOT_SET");
 }
