@@ -4,6 +4,7 @@ os:
   - osx
 compiler:
   - clang
+  - gcc
 before_script:
   - cmake .
 script:
