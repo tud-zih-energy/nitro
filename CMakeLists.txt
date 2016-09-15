@@ -27,6 +27,17 @@ project(NitroCXXLibraries)
 
 cmake_minimum_required(VERSION 2.8)
 
+# Intialize git submodules if not done already
+file(GLOB SUBMODULE_FILES "common/*")
+list(LENGTH SUBMODULE_FILES COUNT_COMMON)
+file(GLOB SUBMODULE_FILES "tests/Catch/*")
+list(LENGTH SUBMODULE_FILES COUNT_CATCH)
+if(${COUNT_COMMON} EQUAL 0 OR ${COUNT_CATCH} EQUAL 0)
+    message(STATUS "Initializing git submodule")
+    execute_process(COMMAND "git" "submodule" "init" WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}")
+    execute_process(COMMAND "git" "submodule" "update" WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}")
+endif()
+
 include(common/DefaultBuildType.cmake)
 
 include(Nitro.cmake)

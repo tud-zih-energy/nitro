@@ -15,3 +15,5 @@ target_link_libraries(dl_test ${CMAKE_DL_LIBS})
 
 NitroTest(env_get_test.cpp)
 set_tests_properties(env_get_test PROPERTIES ENVIRONMENT "TEST_1=THIS_WAS_SET")
+
+NitroTest(broken_options_test.cpp)
