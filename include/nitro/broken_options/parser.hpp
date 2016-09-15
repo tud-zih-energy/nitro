@@ -75,7 +75,7 @@ namespace broken_options
                 }
 
                 if (only_positionals ||
-                    (current_arg.size() >= 2 && current_arg.substr(0, 2) != "--"))
+                    (current_arg.size() >= 1 && current_arg.substr(0, 1) != "-"))
                 {
                     positionals.push_back(current_arg);
 

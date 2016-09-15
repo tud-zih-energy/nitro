@@ -123,7 +123,7 @@ namespace broken_options
         {
             if (short_)
             {
-                return arg == std::string("-") + *short_ || arg == std::string("--") + name_;
+                return (arg == std::string("-") + *short_) || arg == std::string("--") + name_;
             }
             return arg == std::string("--") + name_;
         }
