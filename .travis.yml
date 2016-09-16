@@ -32,6 +32,7 @@ matrix:
         - brew install cmake
     - os: osx
       osx_image: xcode8
+      before_install:
         - brew update
         - brew install cmake
 before_script:
