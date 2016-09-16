@@ -27,8 +27,13 @@ matrix:
           sources: *sources
     - os: osx
       osx_image: xcode7
+      before_install:
+        - brew update
+        - brew install cmake
     - os: osx
       osx_image: xcode8
+        - brew update
+        - brew install cmake
 before_script:
   - cmake .
 script:
