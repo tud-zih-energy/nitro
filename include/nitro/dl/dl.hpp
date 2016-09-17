@@ -32,6 +32,8 @@
 #include <nitro/dl/exception.hpp>
 #include <nitro/dl/symbol.hpp>
 
+#include <nitro/except/raise.hpp>
+
 #include <dlfcn.h>
 
 #include <memory>
@@ -73,7 +75,7 @@ namespace dl
                 std::stringstream msg;
                 msg << "Couldn't open library '" << filename << '\'';
 
-                throw nitro::dl::exception(msg.str(), dlerror());
+                raise<nitro::dl::exception>(msg.str());
             }
         }
 

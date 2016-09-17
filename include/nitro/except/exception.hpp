@@ -26,33 +26,27 @@
  * WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef INCLUDE_NITRO_DL_EXCEPTION_HPP
-#define INCLUDE_NITRO_DL_EXCEPTION_HPP
+#ifndef INCLUDE_NITRO_EXCEPT_EXCEPTION_HPP
+#define INCLUDE_NITRO_EXCEPT_EXCEPTION_HPP
 
 #include <nitro/except/exception.hpp>
 
+#include <sstream>
+#include <string>
+
 namespace nitro
 {
-namespace dl
+namespace except
 {
 
-    class exception : public nitro::except::exception
+    class exception : public std::runtime_error
     {
     public:
-        explicit exception(const std::string& what)
-        : nitro::except::exception(what), dlerror_(dlerror())
+        explicit exception(const std::string& arg) : std::runtime_error(arg)
         {
         }
-
-        const std::string& dlerror() const
-        {
-            return dlerror_;
-        }
-
-    private:
-        std::string dlerror_;
     };
 }
-} // namespace nitr::args
+}
 
-#endif // INCLUDE_NITRO_DL_EXCEPTION_HPP
+#endif // INCLUDE_NITRO_EXCEPT_EXCEPTION_HPP

@@ -26,33 +26,54 @@
  * WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef INCLUDE_NITRO_DL_EXCEPTION_HPP
-#define INCLUDE_NITRO_DL_EXCEPTION_HPP
+#ifndef INCLUDE_NITRO_EXCEPT_RAISE_HPP
+#define INCLUDE_NITRO_EXCEPT_RAISE_HPP
 
 #include <nitro/except/exception.hpp>
 
+#include <sstream>
+#include <string>
+
 namespace nitro
 {
-namespace dl
+namespace except
 {
-
-    class exception : public nitro::except::exception
+    namespace detail
     {
-    public:
-        explicit exception(const std::string& what)
-        : nitro::except::exception(what), dlerror_(dlerror())
-        {
-        }
 
-        const std::string& dlerror() const
+        template <typename Arg, typename... Args>
+        class make_exception
         {
-            return dlerror_;
-        }
+        public:
+            void operator()(std::stringstream& msg, Arg arg, Args... args)
+            {
+                msg << arg;
+                make_exception<Args...>()(msg, args...);
+            }
+        };
 
-    private:
-        std::string dlerror_;
-    };
+        template <typename Arg>
+        class make_exception<Arg>
+        {
+        public:
+            void operator()(std::stringstream& msg, Arg arg)
+            {
+                msg << arg;
+            }
+        };
+    }
+
+    template <typename Exception = nitro::except::exception, typename... Args>
+    [[noreturn]] inline void raise(Args... args)
+    {
+        std::stringstream msg;
+
+        detail::make_exception<Args...>()(msg, args...);
+
+        throw Exception(msg.str());
+    }
 }
-} // namespace nitr::args
 
-#endif // INCLUDE_NITRO_DL_EXCEPTION_HPP
+using except::raise;
+}
+#endif // INCLUDE_NITRO_EXCEPT_RAISE_HPP

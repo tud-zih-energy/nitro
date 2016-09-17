@@ -29,6 +29,8 @@
 #ifndef INCLUDE_NITRO_LANG_OPTIONAL_HPP
 #define INCLUDE_NITRO_LANG_OPTIONAL_HPP
 
+#include <nitro/except/raise.hpp>
+
 #include <memory>
 
 namespace nitro
@@ -84,8 +86,7 @@ namespace lang
                 return *data_;
             }
 
-            // TODO
-            throw "No value set";
+            raise("No value set");
         }
 
     private:

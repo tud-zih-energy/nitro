@@ -26,33 +26,80 @@
  * WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef INCLUDE_NITRO_DL_EXCEPTION_HPP
-#define INCLUDE_NITRO_DL_EXCEPTION_HPP
+#ifndef INCLUDE_NITRO_LANG_STRING_REF_HPP
+#define INCLUDE_NITRO_LANG_STRING_REF_HPP
 
-#include <nitro/except/exception.hpp>
+#include <nitro/except/raise.hpp>
 
 namespace nitro
 {
-namespace dl
+namespace lang
 {
 
-    class exception : public nitro::except::exception
+    class string_ref
     {
+
+        using pointer_type = const char*;
+
     public:
-        explicit exception(const std::string& what)
-        : nitro::except::exception(what), dlerror_(dlerror())
+        using iterator = const char*;
+
+        string_ref(std::string& str) : ptr_(str.c_str())
         {
         }
 
-        const std::string& dlerror() const
+        string_ref(const char* const pstr) : ptr_(pstr)
         {
-            return dlerror_;
         }
+
+    public:
+        char at(std::size_t i) const
+        {
+            if (i >= size())
+            {
+                raise("Index to large for given string");
+            }
+
+            return (*this)[i];
+        }
+
+        char operator[](std::size_t i) const noexcept
+        {
+            return ptr_[i];
+        }
+
+        std::size_t size() const noexcept
+        {
+            return strlen(const_cast<pointer_type>(ptr_));
+        }
+
+        iterator begin() const noexcept
+        {
+            return ptr_;
+        }
+
+        iterator end() const noexcept
+        {
+            return ptr_ + size();
+        }
+
+    public:
+        operator std::string() const
+        {
+            return { ptr_ };
+        }
+
+        friend inline std::ostream& operator<<(std::ostream& s, const string_ref& str);
 
     private:
-        std::string dlerror_;
+        pointer_type ptr_;
     };
-}
-} // namespace nitr::args
 
-#endif // INCLUDE_NITRO_DL_EXCEPTION_HPP
+    inline std::ostream& operator<<(std::ostream& s, const string_ref& str)
+    {
+        return s << str.ptr_;
+    }
+}
+}
+
+#endif // INCLUDE_NITRO_LANG_STRING_REF_HPP

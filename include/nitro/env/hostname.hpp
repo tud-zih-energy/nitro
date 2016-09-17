@@ -29,6 +29,8 @@
 #ifndef INCLUDE_NITRO_ENV_HOSTNAME_HPP
 #define INCLUDE_NITRO_ENV_HOSTNAME_HPP
 
+#include <nitro/except/raise.hpp>
+
 extern "C" {
 #include <limits.h>
 #include <unistd.h>
@@ -54,7 +56,7 @@ namespace env
         char c_hostname[HOST_NAME_MAX + 1];
         if (gethostname(c_hostname, HOST_NAME_MAX + 1))
         {
-            throw std::runtime_error("Failed to get local hostname");
+            raise("Failed to get local hostname");
         }
 
         return c_hostname;

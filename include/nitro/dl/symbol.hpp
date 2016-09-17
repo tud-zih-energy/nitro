@@ -31,6 +31,8 @@
 
 #include <nitro/dl/exception.hpp>
 
+#include <nitro/except/raise.hpp>
+
 #include <dlfcn.h>
 
 #include <memory>
@@ -96,7 +98,7 @@ namespace dl
                 std::stringstream msg;
                 msg << "Couldn't open symbol '" << name << '\'';
 
-                throw nitro::dl::exception(msg.str(), error);
+                raise<nitro::dl::exception>(msg.str());
             }
         }
 
