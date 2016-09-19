@@ -68,7 +68,12 @@ namespace dl
          * }
          */
         dl(const std::string& filename)
-        : handle(dlopen(filename.c_str(), RTLD_NOW), [](void* handle) { dlclose(handle); })
+        : handle(dlopen(filename.c_str(), RTLD_NOW), [](void* handle) {
+              if (handle != nullptr)
+              {
+                  dlclose(handle);
+              }
+          })
         {
             if (handle == nullptr)
             {
