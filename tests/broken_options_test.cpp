@@ -43,7 +43,7 @@ TEST_CASE("Simple named arguments can get parsed from command line", "[broken_op
         REQUIRE(options.as<int>("opt1") == 12);
     }
 
-    SECTION("Setting default value works")
+    SECTION("Missing values for option with default doesn't throw")
     {
         int argc = 1;
         const char* argv[] = { "" };
