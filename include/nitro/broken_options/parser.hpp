@@ -29,8 +29,11 @@
 #ifndef INCLUDE_NITRO_BROKEN_OPTIONS_PARSER_HPP
 #define INCLUDE_NITRO_BROKEN_OPTIONS_PARSER_HPP
 
+#include <nitro/broken_options/multi_option.hpp>
 #include <nitro/broken_options/option.hpp>
 #include <nitro/broken_options/options.hpp>
+
+#include <nitro/except/raise.hpp>
 
 #include <map>
 #include <string>
@@ -55,9 +58,30 @@ namespace broken_options
             return options_.at(name);
         }
 
+        broken_options::multi_option& multi_option(const std::string& name,
+                                                   const std::string& description = std::string(""))
+        {
+            if (multi_options_.count(name) == 0)
+            {
+                multi_options_.emplace(std::piecewise_construct, std::forward_as_tuple(name),
+                                       std::forward_as_tuple(name, description));
+            }
+            return multi_options_.at(name);
+        }
+
+        void ignore_unknown(bool ignore = true)
+        {
+            force_positional_ = ignore;
+        }
+
         options parse(int argc, const char* argv[])
         {
             for (auto& option : options_)
+            {
+                option.second.update();
+            }
+
+            for (auto& option : multi_options_)
             {
                 option.second.update();
             }
@@ -72,6 +96,8 @@ namespace broken_options
                 if (current_arg == "--")
                 {
                     only_positionals = true;
+
+                    continue;
                 }
 
                 if (only_positionals ||
@@ -85,19 +111,79 @@ namespace broken_options
                 bool match_found = false;
                 for (auto& option : options_)
                 {
-                    if (option.second.matches(current_arg))
+                    auto sep = current_arg.find("=");
+                    if (sep != std::string::npos)
                     {
-                        match_found = true;
+                        auto key = current_arg.substr(0, sep);
 
-                        option.second.update_value(std::string(argv[++i]));
+                        if (option.second.matches(key))
+                        {
+                            match_found = true;
 
+                            option.second.update_value(current_arg.substr(sep + 1));
+
+                            break;
+                        }
+                    }
+                    else
+                    {
+                        if (option.second.matches(current_arg))
+                        {
+                            match_found = true;
+
+                            option.second.update_value(std::string(argv[++i]));
+
+                            break;
+                        }
+                    }
+                }
+
+                for (auto& option : multi_options_)
+                {
+                    if (match_found)
+                    {
+                        // could already be set in previous loop
                         break;
                     }
+
+                    auto sep = current_arg.find("=");
+                    if (sep != std::string::npos)
+                    {
+                        auto key = current_arg.substr(0, sep);
+
+                        if (option.second.matches(key))
+                        {
+                            match_found = true;
+
+                            option.second.update_value(current_arg.substr(sep + 1));
+
+                            break;
+                        }
+                    }
+                    else
+                    {
+                        if (option.second.matches(current_arg))
+                        {
+                            match_found = true;
+
+                            option.second.update_value(std::string(argv[++i]));
+
+                            break;
+                        }
+                    }
+                }
+
+                if (force_positional_)
+                {
+                    positionals.push_back(current_arg);
+                    positionals.emplace_back(argv[++i]);
+
+                    continue;
                 }
 
                 if (!match_found)
                 {
-                    throw "Argument could not be parsed.";
+                    raise("Argument could not be parsed.");
                 }
             }
 
@@ -106,11 +192,19 @@ namespace broken_options
                 option.second.check();
             }
 
-            return options(options_, std::vector<std::string>());
+            for (auto& option : multi_options_)
+            {
+                option.second.check();
+            }
+
+            return options(options_, multi_options_, positionals);
         }
 
     private:
         std::map<std::string, broken_options::option> options_;
+        std::map<std::string, broken_options::multi_option> multi_options_;
+
+        bool force_positional_ = false;
     };
 }
 } // namespace nitr::broken_options

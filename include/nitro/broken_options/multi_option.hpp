@@ -26,62 +26,64 @@
  * WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef INCLUDE_NITRO_BROKEN_OPTIONS_OPTION_HPP
-#define INCLUDE_NITRO_BROKEN_OPTIONS_OPTION_HPP
+#ifndef INCLUDE_NITRO_BROKEN_OPTIONS_MULTI_OPTION_HPP
+#define INCLUDE_NITRO_BROKEN_OPTIONS_MULTI_OPTION_HPP
 
 #include <nitro/broken_options/fwd.hpp>
 
+#include <nitro/except/raise.hpp>
 #include <nitro/lang/optional.hpp>
 
 #include <memory>
 #include <sstream>
 #include <string>
+#include <vector>
 
 namespace nitro
 {
 namespace broken_options
 {
-    class option
+    class multi_option
     {
     public:
-        option(const std::string name, const std::string& description)
-        : name_(name), description_(description), data_(nullptr)
+        multi_option(const std::string name, const std::string& description)
+        : name_(name), description_(description), ref_(nullptr)
         {
         }
 
     public:
-        option& default_value(const std::string& new_default)
+        multi_option& default_value(const std::vector<std::string>& new_default)
         {
             default_ = new_default;
 
             return *this;
         }
 
-        option& short_name(const std::string& short_name)
+        multi_option& short_name(const std::string& short_name)
         {
             short_ = short_name;
 
             return *this;
         }
 
-        option& ref(std::string& target)
+        multi_option& ref(std::vector<std::string>& target)
         {
-            data_ = &target;
+            ref_ = &target;
 
             return *this;
         }
 
     public:
-        const std::string& get() const
+        const std::string& get(std::size_t i) const
         {
-            return *value_;
+            return value_[i];
         }
 
         template <typename T>
-        T as() const
+        T as(std::size_t i) const
         {
             std::stringstream str;
-            str << *value_;
+            str << value_[i];
 
             T result;
 
@@ -92,33 +94,36 @@ namespace broken_options
             return result;
         }
 
+        std::size_t count() const
+        {
+            return value_.size();
+        }
+
     private:
         void update_value(const std::string& data)
         {
-            if (value_)
+            if (ref_)
             {
-                raise("option was already given: ", name_);
+                ref_->push_back(data);
             }
 
-            if (data_)
-            {
-                *data_ = data;
-            }
-
-            value_ = data;
+            value_.push_back(data);
         }
 
         void update()
         {
-            if (default_)
+            if (default_.size())
             {
-                update_value(*default_);
+                for (auto& item : default_)
+                {
+                    update_value(item);
+                }
             }
         }
 
         void check()
         {
-            if (!value_)
+            if (value_.empty())
             {
                 raise("missing value for required option");
             }
@@ -138,12 +143,12 @@ namespace broken_options
     private:
         std::string name_;
         std::string description_;
-        nitro::lang::optional<std::string> default_;
+        std::vector<std::string> default_;
         nitro::lang::optional<std::string> short_;
-        nitro::lang::optional<std::string> value_;
-        std::string* data_;
+        std::vector<std::string> value_;
+        std::vector<std::string>* ref_;
     };
 }
 } // namespace nitr::broken_options
 
-#endif // INCLUDE_NITRO_BROKEN_OPTIONS_OPTION_HPP
+#endif // INCLUDE_NITRO_BROKEN_OPTIONS_MULTI_OPTION_HPP

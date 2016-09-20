@@ -29,6 +29,7 @@
 #ifndef INCLUDE_NITRO_BROKEN_OPTIONS_OPTIONS_HPP
 #define INCLUDE_NITRO_BROKEN_OPTIONS_OPTIONS_HPP
 
+#include <nitro/broken_options/multi_option.hpp>
 #include <nitro/broken_options/option.hpp>
 
 #include <experimental/optional>
@@ -45,8 +46,9 @@ namespace broken_options
     {
     public:
         options(const std::map<std::string, option>& option_map,
+                const std::map<std::string, multi_option>& multi_option_map,
                 const std::vector<std::string>& positionals)
-        : options_(option_map), positionals_(positionals)
+        : options_(option_map), multi_options_(multi_option_map), positionals_(positionals)
         {
         }
 
@@ -60,6 +62,23 @@ namespace broken_options
         T as(const std::string& name) const
         {
             return options_.at(name).as<T>();
+        }
+
+    public:
+        std::size_t count(const std::string& name) const
+        {
+            return multi_options_.at(name).count();
+        }
+
+        const std::string& get(const std::string& name, std::size_t i) const
+        {
+            return multi_options_.at(name).get(i);
+        }
+
+        template <typename T>
+        T as(const std::string& name, std::size_t i) const
+        {
+            return multi_options_.at(name).as<T>(i);
         }
 
     public:
@@ -84,6 +103,7 @@ namespace broken_options
 
     private:
         std::map<std::string, option> options_;
+        std::map<std::string, multi_option> multi_options_;
         std::vector<std::string> positionals_;
     };
 }
