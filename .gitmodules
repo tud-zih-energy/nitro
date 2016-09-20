@@ -1,9 +1,6 @@
 [submodule "common"]
 	path = common
 	url = https://github.com/score-p/scorep_plugin_common.git
-[submodule "Catch"]
-	path = Catch
-	url = https://github.com/philsquared/Catch.git
 [submodule "tests/Catch"]
 	path = tests/Catch
 	url = https://github.com/philsquared/Catch.git
