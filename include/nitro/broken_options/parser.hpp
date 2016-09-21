@@ -29,6 +29,7 @@
 #ifndef INCLUDE_NITRO_BROKEN_OPTIONS_PARSER_HPP
 #define INCLUDE_NITRO_BROKEN_OPTIONS_PARSER_HPP
 
+#include <nitro/broken_options/argument.hpp>
 #include <nitro/broken_options/multi_option.hpp>
 #include <nitro/broken_options/option.hpp>
 #include <nitro/broken_options/options.hpp>
@@ -50,6 +51,16 @@ namespace broken_options
         broken_options::option& option(const std::string& name,
                                        const std::string& description = std::string(""))
         {
+            if (multi_options_.count(name) > 0)
+            {
+                raise("Trying to redefine multi_option as option. Name:", name);
+            }
+
+            if (toggles_.count(name) > 0)
+            {
+                raise("Trying to redefine toggle as multi_option. Name:", name);
+            }
+
             if (options_.count(name) == 0)
             {
                 options_.emplace(std::piecewise_construct, std::forward_as_tuple(name),
@@ -61,12 +72,43 @@ namespace broken_options
         broken_options::multi_option& multi_option(const std::string& name,
                                                    const std::string& description = std::string(""))
         {
+            if (options_.count(name) > 0)
+            {
+                raise("Trying to redefine option as multi_option. Name:", name);
+            }
+
+            if (toggles_.count(name) > 0)
+            {
+                raise("Trying to redefine toggle as multi_option. Name:", name);
+            }
+
             if (multi_options_.count(name) == 0)
             {
                 multi_options_.emplace(std::piecewise_construct, std::forward_as_tuple(name),
                                        std::forward_as_tuple(name, description));
             }
             return multi_options_.at(name);
+        }
+
+        broken_options::toggle& toggle(const std::string& name,
+                                       const std::string& description = std::string(""))
+        {
+            if (options_.count(name) > 0)
+            {
+                raise("Trying to redefine option as multi_option. Name:", name);
+            }
+
+            if (multi_options_.count(name) > 0)
+            {
+                raise("Trying to redefine multi_option as option. Name:", name);
+            }
+
+            if (toggles_.count(name) == 0)
+            {
+                toggles_.emplace(std::piecewise_construct, std::forward_as_tuple(name),
+                                 std::forward_as_tuple(name, description));
+            }
+            return toggles_.at(name);
         }
 
         void ignore_unknown(bool ignore = true)
@@ -82,6 +124,11 @@ namespace broken_options
             }
 
             for (auto& option : multi_options_)
+            {
+                option.second.update();
+            }
+
+            for (auto& option : toggles_)
             {
                 option.second.update();
             }
@@ -173,6 +220,24 @@ namespace broken_options
                     }
                 }
 
+                for (auto& option : toggles_)
+                {
+                    if (match_found)
+                    {
+                        // could already be set in previous loop
+                        break;
+                    }
+
+                    if (option.second.matches(current_arg))
+                    {
+                        match_found = true;
+
+                        option.second.update_value(current_arg);
+
+                        break;
+                    }
+                }
+
                 if (force_positional_)
                 {
                     positionals.push_back(current_arg);
@@ -197,12 +262,18 @@ namespace broken_options
                 option.second.check();
             }
 
-            return options(options_, multi_options_, positionals);
+            for (auto& option : toggles_)
+            {
+                option.second.check();
+            }
+
+            return options(options_, multi_options_, toggles_, positionals);
         }
 
     private:
         std::map<std::string, broken_options::option> options_;
         std::map<std::string, broken_options::multi_option> multi_options_;
+        std::map<std::string, broken_options::toggle> toggles_;
 
         bool force_positional_ = false;
     };

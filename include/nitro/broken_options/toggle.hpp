@@ -26,8 +26,8 @@
  * WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef INCLUDE_NITRO_BROKEN_OPTIONS_OPTION_HPP
-#define INCLUDE_NITRO_BROKEN_OPTIONS_OPTION_HPP
+#ifndef INCLUDE_NITRO_BROKEN_OPTIONS_TOGGLE_HPP
+#define INCLUDE_NITRO_BROKEN_OPTIONS_TOGGLE_HPP
 
 #include <nitro/broken_options/fwd.hpp>
 
@@ -41,23 +41,16 @@ namespace nitro
 {
 namespace broken_options
 {
-    class option
+    class toggle
     {
     public:
-        option(const std::string name, const std::string& description)
-        : name_(name), description_(description), data_(nullptr)
+        toggle(const std::string name, const std::string& description)
+        : name_(name), description_(description), ref_(nullptr), given_(false)
         {
         }
 
     public:
-        option& default_value(const std::string& new_default)
-        {
-            default_ = new_default;
-
-            return *this;
-        }
-
-        option& short_name(const std::string& short_name)
+        toggle& short_name(const std::string& short_name)
         {
             if (short_ && *short_ != short_name)
             {
@@ -69,64 +62,36 @@ namespace broken_options
             return *this;
         }
 
-        option& ref(std::string& target)
+        toggle& ref(bool& target)
         {
-            data_ = &target;
+            ref_ = &target;
 
             return *this;
         }
 
     public:
-        const std::string& get() const
+        bool given() const
         {
-            return *value_;
-        }
-
-        template <typename T>
-        T as() const
-        {
-            std::stringstream str;
-            str << *value_;
-
-            T result;
-
-            str >> result;
-
-            // TODO error handling
-
-            return result;
+            return given_;
         }
 
     private:
-        void update_value(const std::string& data)
+        void update_value(const std::string&)
         {
-            if (value_)
+            if (ref_ != nullptr)
             {
-                raise("option was already given: ", name_);
+                *ref_ = true;
             }
 
-            if (data_)
-            {
-                *data_ = data;
-            }
-
-            value_ = data;
+            given_ = true;
         }
 
         void update()
         {
-            if (default_)
-            {
-                update_value(*default_);
-            }
         }
 
         void check()
         {
-            if (!value_)
-            {
-                raise("missing value for required option");
-            }
         }
 
         bool matches(const std::string& arg)
@@ -143,12 +108,11 @@ namespace broken_options
     private:
         std::string name_;
         std::string description_;
-        nitro::lang::optional<std::string> default_;
         nitro::lang::optional<std::string> short_;
-        nitro::lang::optional<std::string> value_;
-        std::string* data_;
+        bool* ref_;
+        bool given_;
     };
 }
 } // namespace nitr::broken_options
 
-#endif // INCLUDE_NITRO_BROKEN_OPTIONS_OPTION_HPP
+#endif // INCLUDE_NITRO_BROKEN_OPTIONS_TOGGLE_HPP

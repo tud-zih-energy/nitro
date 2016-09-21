@@ -61,6 +61,11 @@ namespace broken_options
 
         multi_option& short_name(const std::string& short_name)
         {
+            if (short_ && *short_ != short_name)
+            {
+                raise("Trying to redefine short name");
+            }
+
             short_ = short_name;
 
             return *this;
