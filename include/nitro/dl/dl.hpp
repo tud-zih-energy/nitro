@@ -80,7 +80,7 @@ namespace dl
                 std::stringstream msg;
                 msg << "Couldn't open library '" << filename << '\'';
 
-                raise<nitro::dl::exception>(msg.str());
+                raise<nitro::dl::exception>(dlerror(), msg.str());
             }
         }
 

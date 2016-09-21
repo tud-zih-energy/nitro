@@ -39,9 +39,13 @@ namespace dl
     class exception : public nitro::except::exception
     {
     public:
-        explicit exception(const std::string& what)
-        : nitro::except::exception(what), dlerror_(dlerror())
+        explicit exception(char* dle, const std::string& what)
+        : nitro::except::exception(what), dlerror_()
         {
+            if (dle != nullptr)
+            {
+                dlerror_ = std::string(dle);
+            }
         }
 
         const std::string& dlerror() const

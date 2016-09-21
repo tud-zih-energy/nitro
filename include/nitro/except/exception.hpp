@@ -39,10 +39,45 @@ namespace nitro
 namespace except
 {
 
+    namespace detail
+    {
+
+        template <typename Arg, typename... Args>
+        class make_exception
+        {
+        public:
+            void operator()(std::stringstream& msg, Arg arg, Args... args)
+            {
+                msg << arg;
+                make_exception<Args...>()(msg, args...);
+            }
+        };
+
+        template <typename Arg>
+        class make_exception<Arg>
+        {
+        public:
+            void operator()(std::stringstream& msg, Arg arg)
+            {
+                msg << arg;
+            }
+        };
+
+        template <typename... Args>
+        inline std::string make_string(Args... args)
+        {
+            std::stringstream msg;
+
+            detail::make_exception<Args...>()(msg, args...);
+            return msg.str();
+        }
+    }
+
     class exception : public std::runtime_error
     {
     public:
-        explicit exception(const std::string& arg) : std::runtime_error(arg)
+        template <typename... Args>
+        explicit exception(Args... args) : std::runtime_error(detail::make_string(args...))
         {
         }
     };

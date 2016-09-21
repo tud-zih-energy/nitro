@@ -99,7 +99,7 @@ namespace dl
                 std::stringstream msg;
                 msg << "Couldn't open symbol '" << name << '\'';
 
-                raise<nitro::dl::exception>(msg.str());
+                raise<nitro::dl::exception>(error, msg.str());
             }
         }
 
