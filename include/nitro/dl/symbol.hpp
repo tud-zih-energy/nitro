@@ -82,7 +82,8 @@ namespace dl
          * \param name the name of the symbol which is to be called
          *
          */
-        symbol(std::shared_ptr<void> library, const std::string& name) : library(library)
+        symbol(std::shared_ptr<void> library, const std::string& name)
+        : handle(nullptr), library(library)
         {
             // clear previous errors
             dlerror();
