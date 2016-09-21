@@ -42,6 +42,9 @@ include(common/DefaultBuildType.cmake)
 
 include(Nitro.cmake)
 
+SET(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -Wall -Wextra -Weffc++ -pedantic")
+
+
 include(CTest)
 
 add_subdirectory(tests)
