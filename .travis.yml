@@ -35,4 +35,4 @@ matrix:
 before_script:
   - cmake .
 script:
-  - make && ctest . 
+  - make && ctest -V . 
