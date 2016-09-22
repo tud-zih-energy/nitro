@@ -235,7 +235,12 @@ namespace broken_options
                 if (force_positional_)
                 {
                     positionals.push_back(current_arg.name());
-                    positionals.emplace_back(argv[++i]);
+
+                    argument next_argument(argv[++i]);
+                    if (next_argument.is_value())
+                    {
+                        positionals.emplace_back(next_argument.data());
+                    }
 
                     continue;
                 }

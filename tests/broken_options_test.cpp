@@ -285,6 +285,20 @@ TEST_CASE("Giving values with an '=' should work ")
 
         REQUIRE(options.as<int>("opt1") == 12);
     }
+
+    SECTION("for toggles")
+    {
+        int argc = 2;
+        const char* argv[] = { "", "-o=12" };
+
+        nitro::broken_options::parser parser;
+
+        parser.toggle("opt1").short_name("o");
+
+        auto options = parser.parse(argc, argv);
+
+        REQUIRE(options.given("opt1"));
+    }
 }
 
 TEST_CASE("Defining an option twice should return the same object twice")
@@ -305,6 +319,16 @@ TEST_CASE("Defining an option twice should return the same object twice")
 
         auto obj1 = &parser.multi_option("opt1");
         auto obj2 = &parser.multi_option("opt1");
+
+        REQUIRE(obj1 == obj2);
+    }
+
+    SECTION("for toggles")
+    {
+        nitro::broken_options::parser parser;
+
+        auto obj1 = &parser.toggle("opt1");
+        auto obj2 = &parser.toggle("opt1");
 
         REQUIRE(obj1 == obj2);
     }
@@ -330,6 +354,15 @@ TEST_CASE("Trying to redefine short_name")
         REQUIRE_THROWS(parser.multi_option("opt1").short_name("p"));
     }
 
+    SECTION("for toggle should throw")
+    {
+        nitro::broken_options::parser parser;
+
+        parser.toggle("opt1").short_name("o");
+
+        REQUIRE_THROWS(parser.toggle("opt1").short_name("p"));
+    }
+
     SECTION("for options with same short name should NOT throw")
     {
         nitro::broken_options::parser parser;
@@ -346,6 +379,15 @@ TEST_CASE("Trying to redefine short_name")
         parser.multi_option("opt1").short_name("o");
 
         REQUIRE_NOTHROW(parser.multi_option("opt1").short_name("o"));
+    }
+
+    SECTION("for toggle with same short name should NOT throw")
+    {
+        nitro::broken_options::parser parser;
+
+        parser.toggle("opt1").short_name("o");
+
+        REQUIRE_NOTHROW(parser.toggle("opt1").short_name("o"));
     }
 }
 
