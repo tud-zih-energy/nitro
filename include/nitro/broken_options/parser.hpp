@@ -138,19 +138,18 @@ namespace broken_options
 
             for (int i = 1; i < argc; i++)
             {
-                std::string current_arg = argv[i];
+                argument current_arg(argv[i]);
 
-                if (current_arg == "--")
+                if (current_arg.is_double_dash())
                 {
                     only_positionals = true;
 
                     continue;
                 }
 
-                if (only_positionals ||
-                    (current_arg.size() >= 1 && current_arg.substr(0, 1) != "-"))
+                if (only_positionals || current_arg.is_value())
                 {
-                    positionals.push_back(current_arg);
+                    positionals.push_back(current_arg.data());
 
                     continue;
                 }
@@ -158,23 +157,21 @@ namespace broken_options
                 bool match_found = false;
                 for (auto& option : options_)
                 {
-                    auto sep = current_arg.find("=");
-                    if (sep != std::string::npos)
-                    {
-                        auto key = current_arg.substr(0, sep);
 
-                        if (option.second.matches(key))
+                    if (current_arg.has_value())
+                    {
+                        if (option.second.matches(current_arg.name()))
                         {
                             match_found = true;
 
-                            option.second.update_value(current_arg.substr(sep + 1));
+                            option.second.update_value(current_arg.value());
 
                             break;
                         }
                     }
                     else
                     {
-                        if (option.second.matches(current_arg))
+                        if (option.second.matches(current_arg.data()))
                         {
                             match_found = true;
 
@@ -193,23 +190,20 @@ namespace broken_options
                         break;
                     }
 
-                    auto sep = current_arg.find("=");
-                    if (sep != std::string::npos)
+                    if (current_arg.has_value())
                     {
-                        auto key = current_arg.substr(0, sep);
-
-                        if (option.second.matches(key))
+                        if (option.second.matches(current_arg.name()))
                         {
                             match_found = true;
 
-                            option.second.update_value(current_arg.substr(sep + 1));
+                            option.second.update_value(current_arg.value());
 
                             break;
                         }
                     }
                     else
                     {
-                        if (option.second.matches(current_arg))
+                        if (option.second.matches(current_arg.name()))
                         {
                             match_found = true;
 
@@ -228,11 +222,11 @@ namespace broken_options
                         break;
                     }
 
-                    if (option.second.matches(current_arg))
+                    if (option.second.matches(current_arg.name()))
                     {
                         match_found = true;
 
-                        option.second.update_value(current_arg);
+                        option.second.update_value(current_arg.name());
 
                         break;
                     }
@@ -240,7 +234,7 @@ namespace broken_options
 
                 if (force_positional_)
                 {
-                    positionals.push_back(current_arg);
+                    positionals.push_back(current_arg.name());
                     positionals.emplace_back(argv[++i]);
 
                     continue;
