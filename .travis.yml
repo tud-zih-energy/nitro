@@ -34,6 +34,6 @@ before_script:
   - cmake --version
   - cmake .
 script:
-  - CXX --version
+  - $CXX --version
   - make
   - ctest -V . 
