@@ -1,30 +1,30 @@
-dist: trusty
-language: generic
-addons:
-  apt:
-    sources:
-      - george-edison55-precise-backports # cmake 3.2.3 / doxygen 1.8.3
-    packages:
-      - cmake
-      - cmake-data
+language: cpp
 matrix:
   include:
     - os: linux
-      env: COMPILER_NAME=gcc CXX=g++-5 CC=gcc-5
+      dist: trusty
+      env: CXX=g++-5 CC=gcc-5
       addons:
         apt:
           packages:
             - g++-5
+            - cmake
+            - cmake-data
           sources: &sources
             - llvm-toolchain-precise-3.8
             - ubuntu-toolchain-r-test
+            - george-edison55-precise-backports
     - os: linux
-      env: COMPILER_NAME=clang CXX=clang++-3.8 CC=clang-3.8
+      dist: trusty
+      env: CXX=clang++-3.8 CC=clang-3.8
       addons:
         apt:
           packages:
             - clang-3.8
+            - cmake
+            - cmake-data
           sources: *sources
+            - george-edison55-precise-backports
     - os: osx
       osx_image: xcode7
       before_install:
@@ -33,6 +33,9 @@ matrix:
     - os: osx
       osx_image: xcode8
 before_script:
-  - cmake --version && cmake .
+  - cmake --version
+  - cmake .
 script:
-  - make && ctest -V . 
+  - CXX --version
+  - make
+  - ctest -V . 
