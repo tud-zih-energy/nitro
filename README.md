@@ -1,4 +1,4 @@
-[![Build Status](https://travis-ci.com/bmario/nitro.svg?token=SSZ4hmKonbZbfzjmjjEk&branch=master)](https://travis-ci.com/bmario/nitro)
+[![Build Status](https://travis-ci.org/tud-zih-energy/nitro.svg?branch=master)](https://travis-ci.org/tud-zih-energy/nitro)
 
 # nitro
 
