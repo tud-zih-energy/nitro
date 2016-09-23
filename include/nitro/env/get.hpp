@@ -30,9 +30,7 @@
 #define INCLUDE_NITRO_ENV_GET_HPP
 
 #include <cstdlib>
-#include <mutex>
 #include <string>
-#include <thread>
 
 namespace nitro
 {
@@ -40,11 +38,7 @@ namespace env
 {
     inline std::string get(std::string name, std::string default_ = "")
     {
-        static std::mutex getenv_mutex;
-
-        std::lock_guard<std::mutex> my_lock(getenv_mutex);
-
-        char* tmp = getenv(name.c_str());
+        char* tmp = std::getenv(name.c_str());
 
         if (tmp == nullptr)
         {
