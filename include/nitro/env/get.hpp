@@ -31,7 +31,6 @@
 
 #include <cstdlib>
 #include <string>
-#include <thread>
 
 namespace nitro
 {
