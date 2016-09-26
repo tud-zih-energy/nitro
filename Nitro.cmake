@@ -23,6 +23,16 @@
 # IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF
 # THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
+# Intialize git submodules if not done already
+file(GLOB SUBMODULE_FILES "${CMAKE_CURRENT_LIST_DIR}/common/*")
+list(LENGTH SUBMODULE_FILES COUNT_COMMON)
+
+if(${COUNT_COMMON} EQUAL 0)
+    message(STATUS "Initializing git submodule")
+    execute_process(COMMAND "git" "submodule" "init" WORKING_DIRECTORY "${CMAKE_CURRENT_LIST_DIR}")
+    execute_process(COMMAND "git" "submodule" "update" WORKING_DIRECTORY "${CMAKE_CURRENT_LIST_DIR}")
+endif()
+
 include(${CMAKE_CURRENT_LIST_DIR}/common/UnsetIfUpdated.cmake)
 
 UnsetIfUpdated(MIN_LOG_LEVEL CMAKE_BUILD_TYPE)
