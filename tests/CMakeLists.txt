@@ -21,3 +21,5 @@ NitroTest(broken_options_test.cpp)
 NitroTest(tuple_operators_test.cpp)
 
 NitroTest(reverse_test.cpp)
+
+NitroTest(enumerate_test.cpp)
