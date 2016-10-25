@@ -73,14 +73,12 @@ namespace lang
 
             auto begin() const
             {
-                using std::rbegin;
-                return rbegin(container_);
+                return container_.crbegin();
             }
 
             auto end() const
             {
-                using std::rend;
-                return rend(container_);
+                return container_.crend();
             }
 
         private:
@@ -115,9 +113,9 @@ namespace lang
     }
 
     template <typename T>
-    inline auto reverse(std::initializer_list<T> l)
+    inline auto reverse(std::initializer_list<T>&& l)
     {
-        return reverse(std::vector<T>(l));
+        return reverse(std::vector<T>(std::move(l)));
     }
 }
 } // namespace nitr::lang
