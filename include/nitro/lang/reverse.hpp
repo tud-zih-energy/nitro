@@ -91,11 +91,11 @@ namespace lang
     template <typename T>
     inline auto reverse(const T& container)
     {
-        using std::crbegin;
-        using std::crend;
+        using std::rbegin;
+        using std::rend;
 
-        return detail::reverse_proxy<T, decltype(crbegin(container))>(crbegin(container),
-                                                                      crend(container));
+        return detail::reverse_proxy<T, decltype(rbegin(container))>(rbegin(container),
+                                                                     rend(container));
     }
 
     template <typename T>
