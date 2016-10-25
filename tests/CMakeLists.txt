@@ -19,3 +19,5 @@ set_tests_properties(env_get_test PROPERTIES ENVIRONMENT "TEST_1=THIS_WAS_SET")
 NitroTest(broken_options_test.cpp)
 
 NitroTest(tuple_operators_test.cpp)
+
+NitroTest(reverse_test.cpp)
