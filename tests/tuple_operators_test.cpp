@@ -1,15 +1,15 @@
 #define CATCH_CONFIG_MAIN
 #include <catch.hpp>
 
-#include <nitro/tuple_operators.hpp>
+#include <nitro/lang/tuple_operators.hpp>
 
-struct my_int : nitro::tuple_operators<my_int>
+struct my_int : nitro::lang::tuple_operators<my_int>
 {
     my_int(int i) : value_(i)
     {
     }
 
-    auto as_tuple() const
+    auto as_tuple()
     {
         return std::tie(value_);
     }
