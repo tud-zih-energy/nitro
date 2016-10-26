@@ -73,6 +73,11 @@ namespace lang
             return strlen(const_cast<pointer_type>(ptr_));
         }
 
+        bool empty() const
+        {
+            return ptr_ == nullptr ? true : ptr_[0] == '\0';
+        }
+
         iterator begin() const noexcept
         {
             return ptr_;
