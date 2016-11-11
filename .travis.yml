@@ -30,17 +30,17 @@ matrix:
             - cmake-data
           sources: *sources
     - os: linux
-      env: CXX="clang++" CC="clang"
+      env: CXX="clang++-3.7" CC="clang-3.7"
       compiler: clang
       addons:
         apt:
           packages:
-            - clang
+            - clang-3.7
             - g++-5
             - cmake
             - cmake-data
           sources:
-            - llvm-toolchain-precise
+            - llvm-toolchain-precise-3.7
             - ubuntu-toolchain-r-test
             - george-edison55-precise-backports
     - os: linux
@@ -55,20 +55,6 @@ matrix:
             - cmake-data
           sources:
             - llvm-toolchain-precise-3.8
-            - ubuntu-toolchain-r-test
-            - george-edison55-precise-backports
-    - os: linux
-      env: CXX="clang++-3.9" CC="clang-3.9"
-      compiler: clang
-      addons:
-        apt:
-          packages:
-            - clang-3.9
-            - g++-5
-            - cmake
-            - cmake-data
-          sources:
-            - llvm-toolchain-precise-3.9
             - ubuntu-toolchain-r-test
             - george-edison55-precise-backports
     - os: osx
