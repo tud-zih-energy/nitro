@@ -2,4 +2,26 @@
 
 # nitro
 
-Collection of various, modern C++ libraries
+Collection of various, modern C++ libraries and helpers.
+
+## Currently available modules
+
+*   `nitro::broken_options` - Yet another library for argument parsing
+*   `nitro::dl` - A typesafe wrapper for `dlopen()`
+*   `nitro::env` - A platform-dependent libray for getting information about the environment, e.g., hostname
+*   `nitro::lang` - A collection of various classes used to supplement the standard library
+*   `nitro::log` - A lightweight logging library with support for compile-time filtering
+*   `nitro::meta` - A collection of template meta functions
+
+## Supported Compiler and Platforms
+
+With the exception of the `dl` and `env` module, which are platform dependent, every other Nitro moduel should build with a C++14 compliant compiler.
+
+The currently tested compilers are:
+
+*   gcc 4.9
+*   gcc 5
+*   gcc 6
+*   clang 3.6
+*   clang 3.7
+*   clang 3.8
