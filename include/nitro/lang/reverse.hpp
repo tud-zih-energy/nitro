@@ -29,6 +29,7 @@
 #ifndef INCLUDE_NITRO_LANG_REVERSE_HPP
 #define INCLUDE_NITRO_LANG_REVERSE_HPP
 
+#include <functional>
 #include <vector>
 
 namespace nitro
@@ -89,27 +90,27 @@ namespace lang
     template <typename T>
     inline auto reverse(const T& container)
     {
-        using std::rbegin;
-        using std::rend;
-
-        return detail::reverse_proxy<T, decltype(rbegin(container))>(rbegin(container),
-                                                                     rend(container));
+        return detail::reverse_proxy<T, decltype(container.rbegin())>(container.rbegin(),
+                                                                      container.rend());
     }
 
     template <typename T>
     inline auto reverse(T& container)
     {
-        using std::rbegin;
-        using std::rend;
-
-        return detail::reverse_proxy<T, decltype(rbegin(container))>(rbegin(container),
-                                                                     rend(container));
+        return detail::reverse_proxy<T, decltype(container.rbegin())>(container.rbegin(),
+                                                                      container.rend());
     }
 
     template <typename T>
     inline auto reverse(T&& container)
     {
         return detail::reverse<T>(std::move(container));
+    }
+
+    template <typename T, unsigned Size>
+    inline auto reverse(T (&container)[Size])
+    {
+        return reverse(std::vector<std::reference_wrapper<T>>(container, container + Size));
     }
 
     template <typename T>
