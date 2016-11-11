@@ -153,14 +153,14 @@ namespace lang
 
             auto begin() const
             {
-                return typename enumerate_proxy<decltype(container_.cbegin())>::iterator(
-                    container_.cbegin(), 0);
+                return typename enumerate_proxy<decltype(container_.begin())>::iterator(
+                    container_.begin(), 0);
             }
 
             auto end() const
             {
-                return typename enumerate_proxy<decltype(container_.cbegin())>::iterator(
-                    container_.cend(), 0);
+                return typename enumerate_proxy<decltype(container_.begin())>::iterator(
+                    container_.end(), 0);
             }
 
         private:
@@ -171,11 +171,11 @@ namespace lang
     template <typename T>
     inline auto enumerate(const T& container)
     {
-        using std::cbegin;
-        using std::cend;
+        using std::begin;
+        using std::end;
 
-        return detail::enumerate_proxy<decltype(cbegin(container))>(cbegin(container),
-                                                                    cend(container));
+        return detail::enumerate_proxy<decltype(begin(container))>(begin(container),
+                                                                   end(container));
     }
 
     template <typename T>
