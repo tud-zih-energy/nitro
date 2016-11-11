@@ -4,7 +4,9 @@
 
 Collection of various, modern C++ libraries and helpers.
 
-## Currently available modules
+## Modules
+
+Currently the following modules are available:
 
 *   `nitro::broken_options` - Yet another library for argument parsing
 *   `nitro::dl` - A typesafe wrapper for `dlopen()`
@@ -15,13 +17,18 @@ Collection of various, modern C++ libraries and helpers.
 
 ## Supported Compiler and Platforms
 
-With the exception of the `dl` and `env` module, which are platform dependent, every other Nitro moduel should build with a C++14 compliant compiler.
+With the exception of the `dl` and `env` module, which are platform dependent, every other Nitro module should build with a C++14 compliant compiler.
 
 The currently tested compilers are:
 
+On Linux:
 *   gcc 4.9
 *   gcc 5
 *   gcc 6
 *   clang 3.6
 *   clang 3.7
 *   clang 3.8
+
+On MacOS:
+*   XCode 7
+*   XCode 8
