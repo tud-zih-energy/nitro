@@ -112,19 +112,6 @@ namespace lang
             return as_tuple(x) >= as_tuple(y);
         }
 
-        inline friend auto as_tuple(T& t)
-        {
-            return t.as_tuple();
-        }
-
-        inline friend auto as_tuple(const T& t)
-        {
-            // In order to safe our users a second overload, we do this.
-            // (ノಠ益ಠ)ノ彡┻━┻
-            // should be safe though, as the const is moved into the tuple
-            return helper::constify(const_cast<T&>(t).as_tuple());
-        }
-
         template <class Archive>
         inline void serialize(Archive& ar, __attribute__((unused)) const unsigned int file_version)
         {
@@ -133,6 +120,21 @@ namespace lang
             helper::serialize(ar, static_cast<T*>(this)->as_tuple());
         }
     };
+
+    template <typename T>
+    inline auto as_tuple(T& t)
+    {
+        return t.as_tuple();
+    }
+
+    template <typename T>
+    inline auto as_tuple(const T& t)
+    {
+        // In order to safe our users a second overload, we do this.
+        // (ノಠ益ಠ)ノ彡┻━┻
+        // should be safe though, as the const is moved into the tuple
+        return helper::constify(const_cast<T&>(t).as_tuple());
+    }
 }
 }
 
