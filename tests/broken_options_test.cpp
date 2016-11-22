@@ -3,6 +3,17 @@
 
 #include <nitro/broken_options/parser.hpp>
 
+TEST_CASE("Using argc, argv from main does compile")
+{
+    int argc;
+    char** argv = nullptr;
+
+    nitro::broken_options::parser parser;
+
+    decltype(parser.parse(argc, argv))* foo;
+    (void)foo;
+}
+
 TEST_CASE("Simple named arguments can get parsed from command line", "[broken_options]")
 {
     SECTION("Trying to parse unknown arguments will throw")

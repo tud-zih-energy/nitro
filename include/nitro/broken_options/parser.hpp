@@ -116,7 +116,7 @@ namespace broken_options
             force_positional_ = ignore;
         }
 
-        options parse(int argc, const char* argv[])
+        options parse(int argc, const char* const argv[])
         {
             for (auto& option : options_)
             {
