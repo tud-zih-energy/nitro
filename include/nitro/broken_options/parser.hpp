@@ -247,7 +247,7 @@ namespace broken_options
 
                 if (!match_found)
                 {
-                    raise("Argument could not be parsed.");
+                    raise("Argument '", current_arg.data(), "' could not be parsed.");
                 }
             }
 
