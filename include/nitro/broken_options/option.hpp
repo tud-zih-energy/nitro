@@ -44,7 +44,7 @@ namespace broken_options
     class option
     {
     public:
-        option(const std::string name, const std::string& description)
+        option(const std::string& name, const std::string& description)
         : name_(name), description_(description), data_(nullptr)
         {
         }

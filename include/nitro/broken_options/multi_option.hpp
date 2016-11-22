@@ -46,7 +46,7 @@ namespace broken_options
     class multi_option
     {
     public:
-        multi_option(const std::string name, const std::string& description)
+        multi_option(const std::string& name, const std::string& description)
         : name_(name), description_(description), ref_(nullptr)
         {
         }
