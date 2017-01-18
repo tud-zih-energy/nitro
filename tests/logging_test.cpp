@@ -1,4 +1,4 @@
-//#define CATCH_CONFIG_MAIN
+#define CATCH_CONFIG_MAIN
 #include <catch.hpp>
 
 #ifdef NITRO_LOG_MIN_SEVERITY
