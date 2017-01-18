@@ -31,6 +31,10 @@
 
 #include <nitro/except/raise.hpp>
 
+#include <string>
+
+#include <cstring>
+
 namespace nitro
 {
 namespace lang
@@ -44,7 +48,7 @@ namespace lang
     public:
         using iterator = const char*;
 
-        string_ref(std::string& str) : ptr_(str.c_str())
+        string_ref(const std::string& str) : ptr_(str.c_str())
         {
         }
 
@@ -70,7 +74,7 @@ namespace lang
 
         std::size_t size() const noexcept
         {
-            return strlen(const_cast<pointer_type>(ptr_));
+            return std::strlen(const_cast<pointer_type>(ptr_));
         }
 
         bool empty() const
@@ -88,10 +92,15 @@ namespace lang
             return ptr_ + size();
         }
 
+        std::string str() const
+        {
+            return { ptr_ };
+        }
+
     public:
         operator std::string() const
         {
-            return { ptr_ };
+            return str();
         }
 
         explicit operator bool() const
@@ -100,10 +109,26 @@ namespace lang
         }
 
         friend inline std::ostream& operator<<(std::ostream& s, const string_ref& str);
+        friend inline bool operator==(const string_ref& a, const string_ref& b);
+        friend inline bool operator!=(const string_ref& a, const string_ref& b);
 
     private:
         pointer_type ptr_;
     };
+
+    inline bool operator==(const string_ref& a, const string_ref& b)
+    {
+        if (a.ptr_ == nullptr || b.ptr_ == nullptr)
+        {
+            return false;
+        }
+        return std::strcmp(a.ptr_, b.ptr_) == 0;
+    }
+
+    inline bool operator!=(const string_ref& a, const string_ref& b)
+    {
+        return !(a == b);
+    }
 
     inline std::ostream& operator<<(std::ostream& s, const string_ref& str)
     {

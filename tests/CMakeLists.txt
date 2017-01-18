@@ -25,3 +25,5 @@ NitroTest(reverse_test.cpp)
 NitroTest(enumerate_test.cpp)
 
 NitroTest(logging_test.cpp)
+
+NitroTest(string_ref_test.cpp)
