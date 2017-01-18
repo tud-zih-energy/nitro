@@ -83,9 +83,7 @@ matrix:
             - ubuntu-toolchain-r-test
             - george-edison55-precise-backports
     - os: osx
-      osx_image: xcode7
-      before_install:
-        - brew install cmake
+      osx_image: xcode7.3
     - os: osx
       osx_image: xcode8
 before_script:
