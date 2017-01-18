@@ -57,6 +57,11 @@ namespace broken_options
             return *this;
         }
 
+        bool has_default() const
+        {
+            return static_cast<bool>(default_);
+        }
+
         option& short_name(const std::string& short_name)
         {
             if (short_ && *short_ != short_name)

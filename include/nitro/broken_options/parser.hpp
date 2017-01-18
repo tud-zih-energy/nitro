@@ -36,6 +36,7 @@
 
 #include <nitro/except/raise.hpp>
 
+#include <iostream>
 #include <map>
 #include <string>
 #include <vector>
@@ -48,17 +49,24 @@ namespace broken_options
     class parser
     {
     public:
+        parser(const std::string& app_name = std::string("main"),
+               const std::string& about = std::string(""))
+        : app_name_(app_name), about_(about)
+        {
+        }
+
+    public:
         broken_options::option& option(const std::string& name,
                                        const std::string& description = std::string(""))
         {
             if (multi_options_.count(name) > 0)
             {
-                raise("Trying to redefine multi_option as option. Name:", name);
+                raise("Trying to redefine multi_option as option. Name: ", name);
             }
 
             if (toggles_.count(name) > 0)
             {
-                raise("Trying to redefine toggle as multi_option. Name:", name);
+                raise("Trying to redefine toggle as multi_option. Name: ", name);
             }
 
             if (options_.count(name) == 0)
@@ -74,12 +82,12 @@ namespace broken_options
         {
             if (options_.count(name) > 0)
             {
-                raise("Trying to redefine option as multi_option. Name:", name);
+                raise("Trying to redefine option as multi_option. Name: ", name);
             }
 
             if (toggles_.count(name) > 0)
             {
-                raise("Trying to redefine toggle as multi_option. Name:", name);
+                raise("Trying to redefine toggle as multi_option. Name: ", name);
             }
 
             if (multi_options_.count(name) == 0)
@@ -95,12 +103,12 @@ namespace broken_options
         {
             if (options_.count(name) > 0)
             {
-                raise("Trying to redefine option as multi_option. Name:", name);
+                raise("Trying to redefine option as multi_option. Name: ", name);
             }
 
             if (multi_options_.count(name) > 0)
             {
-                raise("Trying to redefine multi_option as option. Name:", name);
+                raise("Trying to redefine multi_option as option. Name: ", name);
             }
 
             if (toggles_.count(name) == 0)
@@ -269,7 +277,52 @@ namespace broken_options
             return options(options_, multi_options_, toggles_, positionals);
         }
 
+    public:
+        std::ostream& usage(std::ostream& s = std::cout)
+        {
+            std::string short_list;
+            std::string option_list;
+
+            for (auto toggle : toggles_)
+            {
+                if (toggle.second.has_short_name())
+                {
+                    short_list += toggle.second.short_name();
+                }
+            }
+
+            s << "usage: " << app_name_;
+
+            if (!short_list.empty())
+            {
+                s << " [-" << short_list << "]";
+            }
+
+            if (!option_list.empty())
+            {
+                s << " " << option_list;
+            }
+
+            s << std::endl << std::endl;
+
+            if (!about_.empty())
+            {
+                s << about_ << std::endl << std::endl;
+            }
+
+            s << "optional arguments:" << std::endl;
+            for (auto toggle : toggles_)
+            {
+                s << "  " << toggle.second.name() << " \t- " << toggle.second.description();
+            }
+
+            return s;
+        }
+
     private:
+        std::string app_name_;
+        std::string about_;
+
         std::map<std::string, broken_options::option> options_;
         std::map<std::string, broken_options::multi_option> multi_options_;
         std::map<std::string, broken_options::toggle> toggles_;

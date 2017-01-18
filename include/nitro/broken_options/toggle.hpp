@@ -70,9 +70,29 @@ namespace broken_options
         }
 
     public:
+        const std::string& short_name() const
+        {
+            return *short_;
+        }
+
+        bool has_short_name() const
+        {
+            return static_cast<bool>(short_);
+        }
+
         bool given() const
         {
             return given_;
+        }
+
+        const std::string& name() const
+        {
+            return name_;
+        }
+
+        const std::string& description() const
+        {
+            return description_;
         }
 
     private:

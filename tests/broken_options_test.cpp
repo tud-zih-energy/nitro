@@ -14,6 +14,22 @@ TEST_CASE("Using argc, argv from main does compile")
     (void)foo;
 }
 
+TEST_CASE("Usage descriptions work")
+{
+    SECTION("Description for optinos work")
+    {
+        nitro::broken_options::parser parser("app_name", "about");
+
+        std::stringstream s;
+
+        parser.toggle("tog", "some toggle").short_name("t");
+
+        parser.usage(s);
+
+        REQUIRE(s.str() == "");
+    }
+}
+
 TEST_CASE("Simple named arguments can get parsed from command line", "[broken_options]")
 {
     SECTION("Trying to parse unknown arguments will throw")
@@ -430,5 +446,19 @@ TEST_CASE("Toggles should work", "[broken_options]")
         auto options = parser.parse(argc, argv);
 
         REQUIRE(options.given("opt2"));
+    }
+
+    SECTION("when not given")
+    {
+        int argc = 1;
+        const char* argv[] = { "" };
+
+        nitro::broken_options::parser parser;
+
+        parser.toggle("opt2").short_name("o");
+
+        auto options = parser.parse(argc, argv);
+
+        REQUIRE(!options.given("opt2"));
     }
 }
