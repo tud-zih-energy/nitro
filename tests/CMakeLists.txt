@@ -23,3 +23,5 @@ NitroTest(tuple_operators_test.cpp)
 NitroTest(reverse_test.cpp)
 
 NitroTest(enumerate_test.cpp)
+
+NitroTest(logging_test.cpp)

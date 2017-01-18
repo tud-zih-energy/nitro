@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015-2016, Technische Universität Dresden, Germany
+ * Copyright (c) 2015-2017, Technische Universität Dresden, Germany
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without modification, are permitted
@@ -29,12 +29,15 @@
 #ifndef INCLUDE_NITRO_LOG_STREAM_HPP
 #define INCLUDE_NITRO_LOG_STREAM_HPP
 
-#include <sstream>
-
-#include <memory>
-
+#include <nitro/log/attribute/tag.hpp>
+#include <nitro/log/detail/has_attribute.hpp>
 #include <nitro/log/detail/set_attribute.hpp>
 #include <nitro/log/severity.hpp>
+
+#include <nitro/lang/string_ref.hpp>
+
+#include <memory>
+#include <sstream>
 
 namespace nitro
 {
@@ -54,9 +57,17 @@ namespace log
         {
             typedef nitro::log::logger<Record, Formatter, Sink, Filter> logger;
 
+            static_assert(detail::has_attribute<tag_attribute, Record>::value,
+                          "Record must have a tag attribute!");
+
         public:
-            smart_stream() : r(new Record), s(new std::stringstream())
+            smart_stream(lang::string_ref tag) : r(new Record), s(new std::stringstream())
             {
+                if (tag)
+                {
+                    r->tag() = tag;
+                }
+
                 detail::set_severity<Record>()(*r, Severity);
             }
 
@@ -110,10 +121,20 @@ namespace log
 
         class null_stream
         {
+        public:
+            null_stream(lang::string_ref)
+            {
+            }
         };
 
         template <typename T>
         null_stream operator<<(null_stream&& s, const T&)
+        {
+            return s;
+        }
+
+        template <typename T>
+        null_stream& operator<<(null_stream& s, const T&)
         {
             return s;
         }
@@ -138,9 +159,9 @@ namespace log
               typename Sink, template <typename> class Filter>
     struct actual_stream
     {
-        typedef
+        using type =
             typename detail::actual_stream<Severity >= severity_level::NITRO_LOG_MIN_SEVERITY,
-                                           Record, Formatter, Sink, Filter, Severity>::type type;
+                                           Record, Formatter, Sink, Filter, Severity>::type;
     };
 }
 } // namespace nitro::log

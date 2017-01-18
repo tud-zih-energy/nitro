@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015-2016, Technische Universität Dresden, Germany
+ * Copyright (c) 2015-2017, Technische Universität Dresden, Germany
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without modification, are permitted
@@ -32,6 +32,8 @@
 #include <nitro/log/severity.hpp>
 #include <nitro/log/stream.hpp>
 
+#include <nitro/lang/string_ref.hpp>
+
 namespace nitro
 {
 namespace log
@@ -57,45 +59,51 @@ namespace log
         }
 
         static typename actual_stream<severity_level::trace, Record, Formater, Sink, Filter>::type
-        trace()
+        trace(lang::string_ref tag = nullptr)
         {
-            return typename actual_stream<severity_level::trace, Record, Formater, Sink,
-                                          Filter>::type();
+            return
+                typename actual_stream<severity_level::trace, Record, Formater, Sink, Filter>::type(
+                    tag);
         }
 
         static typename actual_stream<severity_level::debug, Record, Formater, Sink, Filter>::type
-        debug()
+        debug(lang::string_ref tag = nullptr)
         {
-            return typename actual_stream<severity_level::debug, Record, Formater, Sink,
-                                          Filter>::type();
+            return
+                typename actual_stream<severity_level::debug, Record, Formater, Sink, Filter>::type(
+                    tag);
         }
 
         static typename actual_stream<severity_level::info, Record, Formater, Sink, Filter>::type
-        info()
+        info(lang::string_ref tag = nullptr)
         {
-            return typename actual_stream<severity_level::info, Record, Formater, Sink,
-                                          Filter>::type();
+            return
+                typename actual_stream<severity_level::info, Record, Formater, Sink, Filter>::type(
+                    tag);
         }
 
         static typename actual_stream<severity_level::warn, Record, Formater, Sink, Filter>::type
-        warn()
+        warn(lang::string_ref tag = nullptr)
         {
-            return typename actual_stream<severity_level::warn, Record, Formater, Sink,
-                                          Filter>::type();
+            return
+                typename actual_stream<severity_level::warn, Record, Formater, Sink, Filter>::type(
+                    tag);
         }
 
         static typename actual_stream<severity_level::error, Record, Formater, Sink, Filter>::type
-        error()
+        error(lang::string_ref tag = nullptr)
         {
-            return typename actual_stream<severity_level::error, Record, Formater, Sink,
-                                          Filter>::type();
+            return
+                typename actual_stream<severity_level::error, Record, Formater, Sink, Filter>::type(
+                    tag);
         }
 
         static typename actual_stream<severity_level::fatal, Record, Formater, Sink, Filter>::type
-        fatal()
+        fatal(lang::string_ref tag = nullptr)
         {
-            return typename actual_stream<severity_level::fatal, Record, Formater, Sink,
-                                          Filter>::type();
+            return
+                typename actual_stream<severity_level::fatal, Record, Formater, Sink, Filter>::type(
+                    tag);
         }
     };
 }
