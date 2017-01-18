@@ -94,6 +94,11 @@ namespace lang
             return { ptr_ };
         }
 
+        explicit operator bool() const
+        {
+            return !empty();
+        }
+
         friend inline std::ostream& operator<<(std::ostream& s, const string_ref& str);
 
     private:
