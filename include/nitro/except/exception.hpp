@@ -29,9 +29,8 @@
 #ifndef INCLUDE_NITRO_EXCEPT_EXCEPTION_HPP
 #define INCLUDE_NITRO_EXCEPT_EXCEPTION_HPP
 
-#include <nitro/except/exception.hpp>
-
 #include <sstream>
+#include <stdexcept>
 #include <string>
 
 namespace nitro
