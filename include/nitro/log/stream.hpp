@@ -43,6 +43,7 @@ namespace nitro
 {
 namespace log
 {
+    class tag_attribute;
 
     template <typename Record, template <typename> class Formatter, typename Sink,
               template <typename> class Filter>
@@ -51,23 +52,45 @@ namespace log
     namespace detail
     {
 
+        template <typename Record, bool has_tag>
+        class set_tag_attribute
+        {
+        public:
+            void operator()(Record&, lang::string_ref)
+            {
+            }
+        };
+
+        template <typename Record>
+        class set_tag_attribute<Record, true>
+        {
+        public:
+            void operator()(Record& r, lang::string_ref tag)
+            {
+                if (tag)
+                {
+                    r.tag() = tag;
+                }
+            }
+        };
+
+        template <typename Record>
+        void set_tag(Record& r, lang::string_ref tag)
+        {
+            set_tag_attribute<Record, detail::has_attribute<tag_attribute, Record>::value>()(r,
+                                                                                             tag);
+        }
+
         template <typename Record, template <typename> class Formatter, typename Sink,
                   template <typename> class Filter, severity_level Severity>
         class smart_stream
         {
             typedef nitro::log::logger<Record, Formatter, Sink, Filter> logger;
 
-            static_assert(detail::has_attribute<tag_attribute, Record>::value,
-                          "Record must have a tag attribute!");
-
         public:
             smart_stream(lang::string_ref tag) : r(new Record), s()
             {
-                if (tag)
-                {
-                    r->tag() = tag;
-                }
-
+                detail::set_tag(*r, tag);
                 detail::set_severity<Record>()(*r, Severity);
 
                 if (logger::will_log(*r))
