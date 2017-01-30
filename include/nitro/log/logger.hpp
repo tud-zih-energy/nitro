@@ -48,14 +48,21 @@ namespace log
         logger() = default;
 
     public:
+        static self& instance()
+        {
+            static self instance_;
+
+            return instance_;
+        }
+
+        static bool will_log(Record& r)
+        {
+            return instance().Filter<Record>::filter(r);
+        }
+
         static void log(Record& r)
         {
-            static self instance;
-
-            if (instance.Filter<Record>::filter(r))
-            {
-                instance.Sink::sink(instance.Formater<Record>::format(r));
-            }
+            instance().Sink::sink(instance().Formater<Record>::format(r));
         }
 
         static typename actual_stream<severity_level::trace, Record, Formater, Sink, Filter>::type

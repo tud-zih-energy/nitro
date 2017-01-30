@@ -61,7 +61,7 @@ namespace log
                           "Record must have a tag attribute!");
 
         public:
-            smart_stream(lang::string_ref tag) : r(new Record), s(new std::stringstream())
+            smart_stream(lang::string_ref tag) : r(new Record), s()
             {
                 if (tag)
                 {
@@ -69,6 +69,15 @@ namespace log
                 }
 
                 detail::set_severity<Record>()(*r, Severity);
+
+                if (logger::will_log(*r))
+                {
+                    s.reset(new std::stringstream());
+                }
+                else
+                {
+                    r.reset();
+                }
             }
 
             smart_stream(smart_stream&& ss) : r(std::move(ss.r)), s(std::move(ss.s))
@@ -94,6 +103,11 @@ namespace log
                 return *s;
             }
 
+            operator bool() const
+            {
+                return static_cast<bool>(s);
+            }
+
         private:
             std::unique_ptr<Record> r;
             std::unique_ptr<std::stringstream> s;
@@ -104,7 +118,10 @@ namespace log
         smart_stream<Record, Formatter, Sink, Filter, Severity>
         operator<<(smart_stream<Record, Formatter, Sink, Filter, Severity>&& s, const T& t)
         {
-            s.sstr() << t;
+            if (s)
+            {
+                s.sstr() << t;
+            }
 
             return std::move(s);
         }
@@ -114,7 +131,10 @@ namespace log
         smart_stream<Record, Formatter, Sink, Filter, Severity>&
         operator<<(smart_stream<Record, Formatter, Sink, Filter, Severity>& s, const T& t)
         {
-            s.sstr() << t;
+            if (s)
+            {
+                s.sstr() << t;
+            }
 
             return s;
         }
