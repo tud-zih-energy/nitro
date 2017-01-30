@@ -29,9 +29,7 @@
 #ifndef INCLUDE_NITRO_LOG_MPI_RANK_ATTRIBUTE_HPP
 #define INCLUDE_NITRO_LOG_MPI_RANK_ATTRIBUTE_HPP
 
-#include <boost/mpi/communicator.hpp>
-#include <boost/mpi/environment.hpp>
-#include <boost/mpi/intercommunicator.hpp>
+#include <mpi.h>
 
 namespace nitro
 {
@@ -46,11 +44,16 @@ namespace log
     public:
         mpi_rank_attribute() : mpi_rank_(0), mpi_size_(1)
         {
-            if (boost::mpi::environment::initialized() && !boost::mpi::environment::finalized())
+            int init = 0;
+            int fini = 0;
+
+            MPI_Initialized(&init);
+            MPI_Finalized(&fini);
+
+            if (init && !fini)
             {
-                boost::mpi::communicator comm;
-                mpi_rank_ = comm.rank();
-                mpi_size_ = comm.size();
+                MPI_Comm_rank(MPI_COMM_WORLD, &mpi_rank_);
+                MPI_Comm_size(MPI_COMM_WORLD, &mpi_size_);
             }
         }
 
