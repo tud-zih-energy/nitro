@@ -41,12 +41,16 @@ namespace log
         std::chrono::nanoseconds my_timestamp;
 
     public:
-        timestamp_attribute()
-        : my_timestamp(std::chrono::high_resolution_clock::now().time_since_epoch())
+        timestamp_attribute() : my_timestamp()
         {
         }
 
         std::chrono::nanoseconds timestamp() const
+        {
+            return my_timestamp;
+        }
+
+        std::chrono::nanoseconds& timestamp()
         {
             return my_timestamp;
         }

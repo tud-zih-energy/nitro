@@ -36,6 +36,7 @@
 
 #include <nitro/lang/string_ref.hpp>
 
+#include <chrono>
 #include <memory>
 #include <sstream>
 
@@ -44,6 +45,7 @@ namespace nitro
 namespace log
 {
     class tag_attribute;
+    class timestamp_attribute;
 
     template <typename Record, template <typename> class Formatter, typename Sink,
               template <typename> class Filter>
@@ -51,6 +53,32 @@ namespace log
 
     namespace detail
     {
+
+        template <typename Record, bool has_timestamp>
+        class set_timestamp_attribute
+        {
+        public:
+            void operator()(Record&)
+            {
+            }
+        };
+
+        template <typename Record>
+        class set_timestamp_attribute<Record, true>
+        {
+        public:
+            void operator()(Record& r)
+            {
+                r.timestamp() = std::chrono::high_resolution_clock::now().time_since_epoch();
+            }
+        };
+
+        template <typename Record>
+        void set_timestamp(Record& r)
+        {
+            set_timestamp_attribute<Record,
+                                    detail::has_attribute<timestamp_attribute, Record>::value>()(r);
+        }
 
         template <typename Record, bool has_tag>
         class set_tag_attribute
@@ -95,6 +123,7 @@ namespace log
 
                 if (logger::will_log(*r))
                 {
+                    detail::set_timestamp(*r);
                     s.reset(new std::stringstream());
                 }
                 else
