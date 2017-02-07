@@ -26,8 +26,8 @@
  * WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef INCLUDE_NITRO_LOG_MPI_RANK_ATTRIBUTE_HPP
-#define INCLUDE_NITRO_LOG_MPI_RANK_ATTRIBUTE_HPP
+#ifndef INCLUDE_NITRO_LOG_RANK_ATTRIBUTE_HPP
+#define INCLUDE_NITRO_LOG_RANK_ATTRIBUTE_HPP
 
 #include <mpi.h>
 
@@ -36,57 +36,29 @@ namespace nitro
 namespace log
 {
 
-    class mpi_rank_attribute
+    class rank_attribute
     {
-        static int& get_mpi_rank()
+        static int& get_rank()
         {
-            static int mpi_rank_ = -1;
+            static int rank_ = -1;
 
-            return mpi_rank_;
-        }
-
-        static int& get_mpi_size()
-        {
-            static int mpi_size_ = -1;
-
-            return mpi_size_;
+            return rank_;
         }
 
     public:
-        static void initialize()
+        rank_attribute() = default;
+
+        static void initialize(int rank)
         {
-            int init = 0;
-            int fini = 0;
-
-            MPI_Initialized(&init);
-            MPI_Finalized(&fini);
-
-            if (init && !fini)
-            {
-                MPI_Comm_rank(MPI_COMM_WORLD, &get_mpi_rank());
-                MPI_Comm_size(MPI_COMM_WORLD, &get_mpi_size());
-            }
+            get_rank() = rank;
         }
 
-        mpi_rank_attribute()
+        int rank() const
         {
-            if (get_mpi_rank() == -1)
-            {
-                initialize();
-            }
-        }
-
-        int mpi_size() const
-        {
-            return get_mpi_size();
-        }
-
-        int mpi_rank() const
-        {
-            return get_mpi_rank();
+            return get_rank();
         }
     };
 }
 } // namespace nitro::log
 
-#endif // INCLUDE_NITRO_LOG_MPI_RANK_ATTRIBUTE_HPP
+#endif // INCLUDE_NITRO_LOG_RANK_ATTRIBUTE_HPP
