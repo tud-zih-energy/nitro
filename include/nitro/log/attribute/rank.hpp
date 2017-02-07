@@ -29,35 +29,33 @@
 #ifndef INCLUDE_NITRO_LOG_RANK_ATTRIBUTE_HPP
 #define INCLUDE_NITRO_LOG_RANK_ATTRIBUTE_HPP
 
-#include <mpi.h>
-
 namespace nitro
 {
 namespace log
 {
 
-    class rank_attribute
+class rank_attribute
+{
+    static int &get_rank()
     {
-        static int& get_rank()
-        {
-            static int rank_ = -1;
+        static int rank_ = -1;
 
-            return rank_;
-        }
+        return rank_;
+    }
 
-    public:
-        rank_attribute() = default;
+public:
+    rank_attribute() = default;
 
-        static void initialize(int rank)
-        {
-            get_rank() = rank;
-        }
+    static void initialize(int rank)
+    {
+        get_rank() = rank;
+    }
 
-        int rank() const
-        {
-            return get_rank();
-        }
-    };
+    int rank() const
+    {
+        return get_rank();
+    }
+};
 }
 } // namespace nitro::log
 
