@@ -144,7 +144,7 @@ namespace lang
 
         inline auto hash() const
         {
-            return hash_tuple(as_tuple(static_cast<const T&>(*this)));
+            return nitro::lang::hash(as_tuple(static_cast<const T&>(*this)));
         }
 
         template <class Archive>

@@ -28,9 +28,13 @@
 
 #pragma once
 
+#include <nitro/meta/std_hashable.hpp>
+
 #include <functional>
+#include <memory>
 #include <tuple>
 #include <type_traits>
+#include <utility>
 
 namespace nitro
 {
@@ -42,13 +46,25 @@ namespace lang
     {
     };
 
+    template <typename... T>
+    inline auto hash(const std::tuple<T...>& t);
+
+    template <typename T, typename U>
+    inline auto hash(const std::pair<T, U>& t);
+
     template <typename T>
-    inline typename std::enable_if<!std::is_base_of<hashable, T>::value, std::size_t>::type
+    inline typename std::enable_if<meta::std_hashable<T>::value, std::size_t>::type
     hash(const T& t);
 
     template <typename T>
     inline typename std::enable_if<std::is_base_of<hashable, T>::value, std::size_t>::type
     hash(const T& t);
+
+    template <typename T>
+    inline auto hash(const std::unique_ptr<T>& p);
+
+    template <typename T>
+    inline auto hash(const std::shared_ptr<T>& p);
 
     namespace detail
     {
@@ -73,17 +89,36 @@ namespace lang
         }
     }
 
-    template <typename T>
-    inline auto hash_tuple(const T& t)
+    template <typename... T>
+    inline auto hash(const std::tuple<T...>& t)
     {
         std::size_t seed = 0;
         detail::hash_combine_tuple<0>(seed, t);
         return seed;
     }
 
+    template <typename T, typename U>
+    inline auto hash(const std::pair<T, U>& t)
+    {
+        std::size_t seed = hash(t.first);
+        detail::hash_combine_impl(seed, hash(t.second));
+        return seed;
+    }
+
     template <typename T>
-    inline typename std::enable_if<!std::is_base_of<hashable, T>::value, std::size_t>::type
-    hash(const T& t)
+    inline auto hash(const std::unique_ptr<T>& p)
+    {
+        return hash(*p);
+    }
+
+    template <typename T>
+    inline auto hash(const std::shared_ptr<T>& p)
+    {
+        return hash(*p);
+    }
+
+    template <typename T>
+    inline typename std::enable_if<meta::std_hashable<T>::value, std::size_t>::type hash(const T& t)
     {
         return std::hash<T>()(t);
     }
@@ -96,7 +131,7 @@ namespace lang
     }
 
     template <typename T>
-    struct hash_c
+    struct hash_wrapper
     {
         auto operator()(const T& t) const
         {

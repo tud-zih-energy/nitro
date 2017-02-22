@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015-2017, Technische Universität Dresden, Germany
+ * Copyright (c) 2015-2016, Technische Universität Dresden, Germany
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without modification, are permitted
@@ -28,19 +28,21 @@
 
 #pragma once
 
-#include <nitro/lang/hash.hpp>
+#include <nitro/meta/variadic.hpp>
 
-#include <unordered_map>
-#include <unordered_set>
+#include <string>
+#include <type_traits>
 
 namespace nitro
 {
-namespace lang
+namespace meta
 {
-    template <typename Key, typename T>
-    using unordered_map = std::unordered_map<Key, T, nitro::lang::hash_wrapper<Key>>;
-
     template <typename T>
-    using unordered_set = std::unordered_set<T, nitro::lang::hash_wrapper<T>>;
+    struct std_hashable
+    {
+        const static bool value =
+            std::is_integral<T>::value || std::is_floating_point<T>::value ||
+            is_variadic_member<T, std::string, std::wstring, std::u16string, std::u32string>::value;
+    };
 }
 }
