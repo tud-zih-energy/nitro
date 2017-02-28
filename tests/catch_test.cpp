@@ -4,6 +4,7 @@
 #include <nitro/lang/catch.hpp>
 
 #include <stdexcept>
+#include <string>
 
 template <typename E, typename... Args>
 void throw_it(const std::string& what)
@@ -28,5 +29,10 @@ TEST_CASE("exceptions will be catched", "[lang]")
     {
         REQUIRE_THROWS(
             nitro::lang::make_catch<std::runtime_error>(throw_it<std::logic_error>, "Something"));
+    }
+
+    SECTION("throwing something else than std::exception, should not be catched")
+    {
+        REQUIRE_THROWS(nitro::lang::make_catch(throw_it<std::string>, "Something"));
     }
 }
