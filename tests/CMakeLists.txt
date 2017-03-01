@@ -29,3 +29,5 @@ NitroTest(logging_test.cpp)
 NitroTest(string_ref_test.cpp)
 
 NitroTest(catch_test.cpp)
+
+NitroTest(quaint_ptr_test.cpp)
