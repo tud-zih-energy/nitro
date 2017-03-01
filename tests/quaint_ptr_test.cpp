@@ -34,6 +34,28 @@ public:
     }
 };
 
+class C
+{
+public:
+    C(int i) : i(i)
+    {
+        std::cout << "C(int)" << std::endl;
+    }
+
+    C(const C&) = delete;
+    C(C&&)
+    {
+        std::cout << "C(C&&)" << std::endl;
+    }
+
+    ~C()
+    {
+        std::cout << "~C()" << std::endl;
+    }
+
+    int i;
+};
+
 TEST_CASE("quaint_ptr can be used", "[lang]")
 {
     SECTION("can be made and destruct")
@@ -54,5 +76,12 @@ TEST_CASE("quaint_ptr can be used", "[lang]")
 
         ptrs.push_back(nitro::lang::make_quaint<A>());
         ptrs.push_back(nitro::lang::make_quaint<B>());
+    }
+
+    SECTION("can be used with move-only types")
+    {
+        C c(42);
+
+        auto p = nitro::lang::make_quaint<C>(std::move(c));
     }
 }

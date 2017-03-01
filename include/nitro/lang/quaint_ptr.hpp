@@ -38,9 +38,10 @@ namespace lang
     using quaint_ptr = std::unique_ptr<void, std::function<void(void*)>>;
 
     template <typename T, typename... Args>
-    auto make_quaint(const Args&... args) -> quaint_ptr
+    auto make_quaint(Args&&... args) -> quaint_ptr
     {
-        return { new T(args...), [](void* ptr) { delete static_cast<T*>(ptr); } };
+        return { new T(std::forward<Args>(args)...),
+                 [](void* ptr) { delete static_cast<T*>(ptr); } };
     }
 }
 }
