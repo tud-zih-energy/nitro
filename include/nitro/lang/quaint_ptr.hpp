@@ -35,7 +35,52 @@ namespace nitro
 {
 namespace lang
 {
-    using quaint_ptr = std::unique_ptr<void, std::function<void(void*)>>;
+    class quaint_ptr : private std::unique_ptr<void, std::function<void(void*)>>
+    {
+        using base = std::unique_ptr<void, std::function<void(void*)>>;
+
+    public:
+        quaint_ptr() = default;
+
+        quaint_ptr(const quaint_ptr&) = delete;
+        quaint_ptr& operator=(const quaint_ptr&) = delete;
+
+        quaint_ptr(quaint_ptr&&) = default;
+        quaint_ptr& operator=(quaint_ptr&&) = default;
+
+    private:
+        template <typename T, typename D>
+        quaint_ptr(T* ptr, D d) : base(ptr, std::move(d))
+        {
+        }
+
+        template <typename T, typename D>
+        quaint_ptr(T* ptr, D& d) : base(ptr, d)
+        {
+        }
+
+    public:
+        using base::operator bool;
+        using base::get_deleter;
+        using base::get;
+
+        using base::operator=;
+
+    public:
+        template <typename T>
+        T& as() const
+        {
+            return *static_cast<T*>(get());
+        }
+
+        void reset()
+        {
+            base::reset(nullptr);
+        }
+
+        template <typename T, typename... Args>
+        friend quaint_ptr make_quaint(Args&&... args);
+    };
 
     template <typename T, typename... Args>
     auto make_quaint(Args&&... args) -> quaint_ptr

@@ -14,6 +14,11 @@ public:
         std::cout << "A()" << std::endl;
     }
 
+    A(const A&)
+    {
+        std::cout << "A(const A&)" << std::endl;
+    }
+
     ~A()
     {
         std::cout << "~A()" << std::endl;
@@ -83,5 +88,21 @@ TEST_CASE("quaint_ptr can be used", "[lang]")
         C c(42);
 
         auto p = nitro::lang::make_quaint<C>(std::move(c));
+    }
+
+    SECTION("can be accessed with as<>()")
+    {
+        auto p = nitro::lang::make_quaint<A>();
+
+        auto a = p.as<A>();
+    }
+
+    SECTION("can be resetted")
+    {
+        auto p = nitro::lang::make_quaint<A>();
+
+        p.reset();
+
+        CHECK(p.get() == nullptr);
     }
 }
