@@ -36,9 +36,12 @@
 
 #include <nitro/lang/string_ref.hpp>
 
+#include <nitro/meta/callable.hpp>
+
 #include <chrono>
 #include <memory>
 #include <sstream>
+#include <type_traits>
 
 namespace nitro
 {
@@ -166,7 +169,39 @@ namespace log
         };
 
         template <typename Record, template <typename> class Formatter, typename Sink,
-                  template <typename> class Filter, typename T, severity_level Severity>
+                  template <typename> class Filter, typename T, severity_level Severity,
+                  typename std::enable_if<nitro::meta::is_callable<T, std::string()>::value,
+                                          int>::type = 0>
+        smart_stream<Record, Formatter, Sink, Filter, Severity>&
+        operator<<(smart_stream<Record, Formatter, Sink, Filter, Severity>& s, T t)
+        {
+            if (s)
+            {
+                s.sstr() << t();
+            }
+
+            return s;
+        }
+
+        template <typename Record, template <typename> class Formatter, typename Sink,
+                  template <typename> class Filter, typename T, severity_level Severity,
+                  typename std::enable_if<nitro::meta::is_callable<T, std::string()>::value,
+                                          int>::type = 0>
+        smart_stream<Record, Formatter, Sink, Filter, Severity>
+        operator<<(smart_stream<Record, Formatter, Sink, Filter, Severity>&& s, T t)
+        {
+            if (s)
+            {
+                s.sstr() << t();
+            }
+
+            return std::move(s);
+        }
+
+        template <typename Record, template <typename> class Formatter, typename Sink,
+                  template <typename> class Filter, typename T, severity_level Severity,
+                  typename std::enable_if<!nitro::meta::is_callable<T, std::string()>::value,
+                                          int>::type = 0>
         smart_stream<Record, Formatter, Sink, Filter, Severity>
         operator<<(smart_stream<Record, Formatter, Sink, Filter, Severity>&& s, const T& t)
         {
@@ -179,7 +214,9 @@ namespace log
         }
 
         template <typename Record, template <typename> class Formatter, typename Sink,
-                  template <typename> class Filter, typename T, severity_level Severity>
+                  template <typename> class Filter, typename T, severity_level Severity,
+                  typename std::enable_if<!nitro::meta::is_callable<T, std::string()>::value,
+                                          int>::type = 0>
         smart_stream<Record, Formatter, Sink, Filter, Severity>&
         operator<<(smart_stream<Record, Formatter, Sink, Filter, Severity>& s, const T& t)
         {

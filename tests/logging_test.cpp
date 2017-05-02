@@ -139,3 +139,96 @@ TEST_CASE("With tag works", "[log]")
         }
     }
 }
+
+TEST_CASE("Logging lambdas works", "[log]")
+{
+    SECTION("As one statement")
+    {
+        logging::fatal() << []() { return "test"; };
+        logging::error() << []() { return "test"; };
+        logging::warn() << []() { return "test"; };
+        logging::info() << []() { return "test"; };
+        logging::debug() << []() { return "test"; };
+        logging::trace() << []() { return "test"; };
+    }
+
+    SECTION("As multiple statements")
+    {
+        {
+            auto log = logging::fatal();
+            log << []() { return "test"; };
+        }
+
+        {
+            auto log = logging::error();
+            log << []() { return "test"; };
+        }
+
+        {
+            auto log = logging::warn();
+            log << []() { return "test"; };
+        }
+
+        {
+            auto log = logging::info();
+            log << []() { return "test"; };
+        }
+
+        {
+            auto log = logging::debug();
+            log << []() { return "test"; };
+        }
+
+        {
+            auto log = logging::trace();
+            log << []() { return "test"; };
+        }
+    }
+
+    SECTION("Evaluation of the lambda is lazy")
+    {
+        int i = 0;
+
+        logging::fatal() << [&i]() {
+            ++i;
+            return "test";
+        };
+
+        CHECK(i == 1);
+
+        logging::error() << [&i]() {
+            ++i;
+            return "test";
+        };
+
+        CHECK(i == 2);
+
+        logging::warn() << [&i]() {
+            ++i;
+            return "test";
+        };
+
+        CHECK(i == 3);
+
+        logging::info() << [&i]() {
+            ++i;
+            return "test";
+        };
+
+        CHECK(i == 4);
+
+        logging::debug() << [&i]() {
+            ++i;
+            return "test";
+        };
+
+        CHECK(i == 4);
+
+        logging::trace() << [&i]() {
+            ++i;
+            return "test";
+        };
+
+        CHECK(i == 4);
+    }
+}
