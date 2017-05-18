@@ -32,6 +32,7 @@
 #include <nitro/except/raise.hpp>
 
 #include <memory>
+#include <utility>
 
 namespace nitro
 {
