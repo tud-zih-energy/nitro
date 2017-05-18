@@ -56,6 +56,10 @@ namespace lang
         {
         }
 
+        optional(T&& data) : data_(std::make_unique<T>(std::forward(data)))
+        {
+        }
+
         optional& operator=(const optional& other)
         {
             if (other)
@@ -69,6 +73,13 @@ namespace lang
         optional& operator=(const T& data)
         {
             data_ = std::make_unique<T>(data);
+
+            return *this;
+        }
+
+        optional& operator=(T&& data)
+        {
+            data_ = std::make_unique<T>(std::forward(data));
 
             return *this;
         }
