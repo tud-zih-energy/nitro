@@ -57,7 +57,7 @@ namespace lang
         {
         }
 
-        optional(T&& data) : data_(std::make_unique<T>(std::forward(data)))
+        optional(T&& data) : data_(std::make_unique<T>(std::move(data)))
         {
         }
 
@@ -80,7 +80,7 @@ namespace lang
 
         optional& operator=(T&& data)
         {
-            data_ = std::make_unique<T>(std::forward(data));
+            data_ = std::make_unique<T>(std::move(data));
 
             return *this;
         }
