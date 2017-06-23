@@ -1,3 +1,7 @@
+#ifndef NITRO_LOG_MIN_SEVERITY
+#error "NITRO_LOG_MIN_SEVERITY should be set by the build system, but isn't!"
+#endif
+
 #define CATCH_CONFIG_MAIN
 #include <catch.hpp>
 

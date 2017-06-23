@@ -23,9 +23,9 @@
 # IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF
 # THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-project(NitroCXXLibraries)
+project(Nitro)
 
-cmake_minimum_required(VERSION 3.1)
+cmake_minimum_required(VERSION 3.3)
 
 # Intialize git submodules if not done already
 file(GLOB SUBMODULE_FILES "common/*")
@@ -40,10 +40,96 @@ endif()
 
 include(common/DefaultBuildType.cmake)
 
-include(Nitro.cmake)
+# Intialize git submodules if not done already
+file(GLOB SUBMODULE_FILES "${CMAKE_CURRENT_LIST_DIR}/common/*")
+list(LENGTH SUBMODULE_FILES COUNT_COMMON)
 
-SET(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -Wall -Wextra -pedantic")
+if(${COUNT_COMMON} EQUAL 0)
+    message(STATUS "Initializing git submodule")
+    execute_process(COMMAND "git" "submodule" "init" WORKING_DIRECTORY "${CMAKE_CURRENT_LIST_DIR}")
+endif()
+message(STATUS "Updating git submodule")
+execute_process(COMMAND "git" "submodule" "update" WORKING_DIRECTORY "${CMAKE_CURRENT_LIST_DIR}")
 
+include(${CMAKE_CURRENT_LIST_DIR}/common/UnsetIfUpdated.cmake)
+UnsetIfUpdated(MIN_LOG_LEVEL CMAKE_BUILD_TYPE)
+
+if (NOT MIN_LOG_LEVEL)
+    if (CMAKE_BUILD_TYPE STREQUAL "Debug")
+        set(MIN_LOG_LEVEL "trace" CACHE STRING
+                "The minimum required severity level of log messages to be compiled into the binary.")
+    else()
+        set(MIN_LOG_LEVEL "debug" CACHE STRING
+                "The minimum required severity level of log messages to be compiled into the binary.")
+    endif()
+
+    set_property(CACHE MIN_LOG_LEVEL PROPERTY "STRINGS" "fatal" "error" "warn" "info" "debug"
+            "trace")
+endif()
+
+set(Nitro_VERSION 1.0)
+
+add_library(NitroCore INTERFACE)
+target_include_directories(NitroCore INTERFACE
+    $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
+    $<INSTALL_INTERFACE:include>
+)
+target_compile_features(NitroCore
+    INTERFACE
+        cxx_std_14
+)
+
+add_library(NitroDl INTERFACE)
+target_link_libraries(NitroDl
+    INTERFACE
+        Nitro::Core
+        ${CMAKE_DL_LIBS}
+)
+
+add_library(NitroLog INTERFACE)
+target_link_libraries(NitroLog
+    INTERFACE
+        Nitro::Core
+)
+target_compile_definitions(NitroLog INTERFACE NITRO_LOG_MIN_SEVERITY=${MIN_LOG_LEVEL})
+
+add_library(NitroAll INTERFACE)
+target_link_libraries(NitroAll
+    INTERFACE
+        Nitro::Core
+        Nitro::Log
+        Nitro::Dl
+)
+
+add_library(Nitro::Nitro ALIAS NitroAll)
+add_library(Nitro::Core ALIAS NitroCore)
+add_library(Nitro::Dl ALIAS NitroDl)
+add_library(Nitro::Log ALIAS NitroLog)
+
+install(DIRECTORY
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/nitro
+    DESTINATION include
+)
+install(TARGETS NitroCore NitroAll NitroDl NitroLog EXPORT NitroTargets
+    LIBRARY DESTINATION lib
+    ARCHIVE DESTINATION lib
+    RUNTIME DESTINATION bin
+    INCLUDES DESTINATION include
+)
+install(EXPORT NitroTargets
+    FILE NitroTargets.cmake
+    NAMESPACE Nitro::
+    DESTINATION lib/cmake/Nitro
+)
+
+include(CMakePackageConfigHelpers)
+write_basic_package_version_File("NitroConfigVersion.cmake"
+    VERSION ${Nitro_VERSION}
+    COMPATIBILITY SameMajorVersion
+)
+install(FILES "NitroConfig.cmake" "${CMAKE_CURRENT_BINARY_DIR}/NitroConfigVersion.cmake"
+    DESTINATION lib/cmake/Nitro
+)
 
 include(CTest)
 
