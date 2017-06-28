@@ -1,4 +1,4 @@
-# Copyright (c) 2016, Technische Universität Dresden, Germany
+# Copyright (c) 2016-2017, Technische Universität Dresden, Germany
 # All rights reserved.
 #
 # Redistribution and use in source and binary forms, with or without modification, are permitted
@@ -25,7 +25,7 @@
 
 project(Nitro)
 
-cmake_minimum_required(VERSION 3.3)
+cmake_minimum_required(VERSION 3.2)
 
 # Intialize git submodules if not done already
 file(GLOB SUBMODULE_FILES "common/*")
@@ -76,7 +76,32 @@ target_include_directories(NitroCore INTERFACE
 )
 target_compile_features(NitroCore
     INTERFACE
-        cxx_std_14
+        cxx_auto_type
+        cxx_constexpr
+        cxx_decltype
+        cxx_decltype_auto
+        cxx_defaulted_functions
+        cxx_defaulted_move_initializers
+        cxx_delegating_constructors
+        cxx_deleted_functions
+        cxx_explicit_conversions
+        cxx_generalized_initializers
+        cxx_generic_lambdas
+        cxx_inheriting_constructors
+        cxx_lambdas
+        cxx_lambda_init_captures
+        cxx_noexcept
+        cxx_nullptr
+        cxx_override
+        cxx_range_for
+        cxx_return_type_deduction
+        cxx_rvalue_references
+        cxx_thread_local
+        cxx_trailing_return_types
+        cxx_user_literals
+        cxx_variable_templates
+        cxx_variadic_templates
+        cxx_template_template_parameters
 )
 
 add_library(NitroDl INTERFACE)
