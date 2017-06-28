@@ -99,7 +99,6 @@ target_compile_features(NitroCore
         cxx_thread_local
         cxx_trailing_return_types
         cxx_user_literals
-        cxx_variable_templates
         cxx_variadic_templates
         cxx_template_template_parameters
 )
