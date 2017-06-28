@@ -139,9 +139,9 @@ matrix:
       osx_image: xcode7.3
     - os: osx
       osx_image: xcode8
-- before_script:
+before_script:
   - cmake --version
   - cmake .
-- script:
+script:
   - make
   - ctest -V .
