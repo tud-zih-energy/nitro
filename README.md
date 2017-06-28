@@ -25,9 +25,14 @@ On Linux:
 *   gcc 4.9
 *   gcc 5
 *   gcc 6
+*   gcc 7
 *   clang 3.6
 *   clang 3.7
 *   clang 3.8
+*   clang 3.9
+*   clang 4.0
+*   clang 5.0
+
 
 On MacOS:
 *   XCode 7
