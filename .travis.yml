@@ -139,12 +139,9 @@ matrix:
       osx_image: xcode7.3
     - os: osx
       osx_image: xcode8
-jobs:
-  include:
-    - stage: configure
-      script: cmake --version
-    - script: cmake .
-    - stage: build
-      script: make
-    - stage: test
-      script: ctest -v .
+-before_script:
+  - cmake --version
+  - cmake .
+-script:
+  - make
+  - ctest -V .
