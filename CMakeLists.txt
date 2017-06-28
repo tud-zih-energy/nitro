@@ -96,7 +96,6 @@ target_compile_features(NitroCore
         cxx_range_for
         cxx_return_type_deduction
         cxx_rvalue_references
-        cxx_thread_local
         cxx_trailing_return_types
         cxx_user_literals
         cxx_variadic_templates
