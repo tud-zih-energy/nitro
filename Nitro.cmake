@@ -58,3 +58,5 @@ SET(CMAKE_CXX_STANDARD 14)
 SET(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 include_directories(${CMAKE_CURRENT_LIST_DIR}/include)
+
+message(DEPRECATION "To use include(.../Nitro.cmake) is deprecated. Please just use find_package(Nitro REQUIRED). Be modern. Shoot yourself left-handed.")

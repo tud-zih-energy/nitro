@@ -1,7 +1,7 @@
 language: generic
 
-sudo: required
-dist: precise
+sudo: false
+dist: trusty
 
 matrix:
   include:
@@ -37,6 +37,17 @@ matrix:
           packages:
             - gcc-6
             - g++-6
+            - cmake
+            - cmake-data
+          sources: *sources
+    - os: linux
+      env: CXX="g++-7" CC="gcc-7"
+      compiler: gcc
+      addons:
+        apt:
+          packages:
+            - gcc-7
+            - g++-7
             - cmake
             - cmake-data
           sources: *sources
@@ -93,7 +104,21 @@ matrix:
             - cmake
             - cmake-data
           sources:
-            - llvm-toolchain-precise-3.9
+            - llvm-toolchain-trusty-3.9
+            - ubuntu-toolchain-r-test
+            - george-edison55-precise-backports
+    - os: linux
+      env: CXX="clang++-4.0" CC="clang-4.0"
+      compiler: clang
+      addons:
+        apt:
+          packages:
+            - clang-4.0
+            - g++-5
+            - cmake
+            - cmake-data
+          sources:
+            - llvm-toolchain-trusty-4.0
             - ubuntu-toolchain-r-test
             - george-edison55-precise-backports
     - os: linux
@@ -107,7 +132,7 @@ matrix:
             - cmake
             - cmake-data
           sources:
-            - llvm-toolchain-precise
+            - llvm-toolchain-trusty
             - ubuntu-toolchain-r-test
             - george-edison55-precise-backports
     - os: osx
