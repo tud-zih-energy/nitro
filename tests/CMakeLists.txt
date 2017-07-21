@@ -14,7 +14,7 @@ macro(NitroTest TEST)
     add_test(${TEST_NAME} ${TEST_NAME})
 endmacro()
 
-include_directories(${CMAKE_CURRENT_SOURCE_DIR}/Catch/include)
+include_directories(SYSTEM ${CMAKE_CURRENT_SOURCE_DIR}/Catch/include)
 
 add_library(nitro_test_lib SHARED nitro_test_lib.cpp)
 
