@@ -5,7 +5,11 @@ macro(NitroTest TEST)
 
     add_executable(${TEST_NAME} ${TEST})
     target_link_libraries(${TEST_NAME} Nitro::Core)
-    target_compile_options(${TEST_NAME} PRIVATE -Wall -Wextra -pedantic)
+    if(${CMAKE_C_COMPILER_ID} STREQUAL "MSVC")
+        target_compile_options(${TEST_NAME} PRIVATE /Wall)
+    else()
+        target_compile_options(${TEST_NAME} PRIVATE -Wall -Wextra -pedantic)
+    endif()
 
     add_test(${TEST_NAME} ${TEST_NAME})
 endmacro()
