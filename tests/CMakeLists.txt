@@ -16,14 +16,16 @@ endmacro()
 
 include_directories(SYSTEM ${CMAKE_CURRENT_SOURCE_DIR}/Catch/include)
 
-add_library(nitro_test_lib SHARED nitro_test_lib.cpp)
+if(NOT CMAKE_C_COMPILER_ID MATCHES "MSVC")
+    add_library(nitro_test_lib SHARED nitro_test_lib.cpp)
+    
+    NitroTest(dl_test.cpp)
+    set_tests_properties(Nitro.dl_test PROPERTIES ENVIRONMENT "LD_LIBRARY_PATH=${CMAKE_CURRENT_BINARY_DIR}:$ENV{LD_LIBRARY_PATH}")
+    target_link_libraries(Nitro.dl_test Nitro::Dl)
 
-NitroTest(dl_test.cpp)
-set_tests_properties(Nitro.dl_test PROPERTIES ENVIRONMENT "LD_LIBRARY_PATH=${CMAKE_CURRENT_BINARY_DIR}:$ENV{LD_LIBRARY_PATH}")
-target_link_libraries(Nitro.dl_test Nitro::Dl)
-
-NitroTest(env_get_test.cpp)
-set_tests_properties(Nitro.env_get_test PROPERTIES ENVIRONMENT "TEST_1=THIS_WAS_SET")
+    NitroTest(env_get_test.cpp)
+    set_tests_properties(Nitro.env_get_test PROPERTIES ENVIRONMENT "TEST_1=THIS_WAS_SET")
+endif()
 
 NitroTest(broken_options_test.cpp)
 
