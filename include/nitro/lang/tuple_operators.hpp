@@ -148,7 +148,7 @@ namespace lang
         }
 
         template <class Archive>
-        inline void serialize(Archive& ar, __attribute__((unused)) const unsigned int file_version)
+        inline void serialize(Archive& ar, const unsigned int)
         {
             // Insert some random rant about boost::serialze
             // (ノಠ益ಠ)ノ彡┻━┻
