@@ -1,4 +1,5 @@
 [![Build Status](https://travis-ci.org/tud-zih-energy/nitro.svg?branch=master)](https://travis-ci.org/tud-zih-energy/nitro)
+[![Build status](https://ci.appveyor.com/api/projects/status/i8bo30mu0j95dh3k?svg=true)](https://ci.appveyor.com/project/bmario/nitro)
 
 # nitro
 
