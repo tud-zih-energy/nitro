@@ -10,7 +10,6 @@
 #endif
 #define NITRO_LOG_MIN_SEVERITY info
 
-#include <nitro/log/attribute/hostname.hpp>
 #include <nitro/log/attribute/severity.hpp>
 #include <nitro/log/filter/severity_filter.hpp>
 #include <nitro/log/log.hpp>
@@ -20,7 +19,7 @@ namespace detail
 {
 
 typedef nitro::log::record<nitro::log::tag_attribute, nitro::log::message_attribute,
-                           nitro::log::hostname_attribute, nitro::log::severity_attribute>
+                           nitro::log::severity_attribute>
     record;
 
 template <typename Record>
@@ -35,10 +34,10 @@ public:
 
         if (!r.tag().empty())
         {
-            s << r.tag() << "][";
+            s << r.tag() << "[";
         }
 
-        s << r.hostname() << "][" << r.severity() << "]: " << r.message();
+        s << r.severity() << "]: " << r.message();
 
         return s.str();
     }
