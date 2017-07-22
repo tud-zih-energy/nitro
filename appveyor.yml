@@ -28,5 +28,5 @@ environment:
      - GENERATOR: "Visual Studio 15"
        CONFIG: Release
 
- matrix:
+matrix:
   fast_finish: true
