@@ -17,16 +17,5 @@ build_script:
   - cmake --build . --config Debug
   - ctest .
 
-environment:
-  matrix:
-     - GENERATOR: "Visual Studio 14"
-       CONFIG: Debug
-     - GENERATOR: "Visual Studio 14"
-       CONFIG: Release
-     - GENERATOR: "Visual Studio 15"
-       CONFIG: Debug
-     - GENERATOR: "Visual Studio 15"
-       CONFIG: Release
-
 matrix:
   fast_finish: true
