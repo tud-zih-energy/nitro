@@ -39,15 +39,14 @@ namespace log
 {
     namespace sink
     {
-
-        static std::mutex stdout_mutex;
-
         class stdout_mt
         {
+            static std::mutex mutex_;
+
         public:
             void sink(std::string formatted_record)
             {
-                std::lock_guard<std::mutex> my_lock(stdout_mutex);
+                std::lock_guard<std::mutex> my_lock(mutex_);
 
                 std::cout << formatted_record << std::endl;
             }

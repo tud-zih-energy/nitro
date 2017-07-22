@@ -38,7 +38,7 @@ namespace log
     namespace sink
     {
 
-        class null
+        class Null
         {
         public:
             void sink(std::string)

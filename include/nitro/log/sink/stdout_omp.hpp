@@ -29,25 +29,29 @@
 #ifndef INCLUDE_NITRO_LOG_SINK_STDOUT_OMP_HPP
 #define INCLUDE_NITRO_LOG_SINK_STDOUT_OMP_HPP
 
-#include <string>
 #include <iostream>
+#include <string>
 
-namespace nitro { namespace log { namespace sink {
-
-    class stdout_omp
+namespace nitro
+{
+namespace log
+{
+    namespace sink
     {
-    public:
 
-        void sink(std::string formatted_record)
+        class StdOutOmp
         {
-            #pragma omp critical
+        public:
+            void sink(std::string formatted_record)
             {
-                std::cout << formatted_record << std::endl;
+#pragma omp critical
+                {
+                    std::cout << formatted_record << std::endl;
+                }
             }
-        }
-    };
+        };
+    }
+}
+} // namespace nitro::log::sink
 
-
-}}} //namespace nitro::log::sink
-
-#endif //INCLUDE_NITRO_LOG_SINK_STDOUT_HPP
+#endif // INCLUDE_NITRO_LOG_SINK_STDOUT_HPP

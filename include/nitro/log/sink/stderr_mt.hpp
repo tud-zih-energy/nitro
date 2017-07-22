@@ -39,14 +39,14 @@ namespace log
 {
     namespace sink
     {
-        static std::mutex stderr_mutex;
-
-        class stderr_mt
+        class StdErrThreaded
         {
+            static std::mutex mutex_;
+
         public:
             void sink(std::string formatted_record)
             {
-                std::lock_guard<std::mutex> my_lock(stderr_mutex);
+                std::lock_guard<std::mutex> my_lock(mutex_);
 
                 std::cerr << formatted_record << std::endl;
             }

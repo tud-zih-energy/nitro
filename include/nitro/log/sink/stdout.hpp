@@ -39,7 +39,7 @@ namespace log
     namespace sink
     {
 
-        class stdout
+        class StdOut
         {
         public:
             void sink(std::string formatted_record)
