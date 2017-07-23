@@ -19,8 +19,8 @@ environment:
 build_script:
   - md build
   - cd build
-  - cmake -G "Visual Studio 14 2015 Win64" ..
-  - cmake --build . --config Debug
+  - cmake -G "$GENERATOR" ..
+  - cmake --build . --config $CONFIG
   - ctest .
 
 matrix:
