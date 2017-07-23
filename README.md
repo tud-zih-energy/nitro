@@ -34,7 +34,10 @@ On Linux:
 *   clang 4.0
 *   clang 5.0
 
-
 On MacOS:
 *   XCode 7
 *   XCode 8
+
+On Windows:
+*   Visual Studio 2015
+*   Visual Studio 2017
