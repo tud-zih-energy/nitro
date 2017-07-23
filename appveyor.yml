@@ -1,27 +1,42 @@
 image:
+  - Visual Studio 2013
+  - Visual Studio 2015
   - Visual Studio 2017
-
+  
+configuration:
+  - Release
+  - Debug
+  
 platform:
-  - x86
   - x64
-
+  
 environment:
   matrix:
-     - GENERATOR: "Visual Studio 14 2015"
-       CONFIG: Debug
-     - GENERATOR: "Visual Studio 14 2015"
-       CONFIG: Release
-     - GENERATOR: "Visual Studio 15 2017"
-       CONFIG: Debug
-     - GENERATOR: "Visual Studio 15 2017"
-       CONFIG: Release
-
-build_script:
-  - md build
-  - cd build
-  - cmake ..
-  - cmake --build .
-  - ctest .
-
+  - arch: Win64
+  
 matrix:
   fast_finish: true
+
+# skip unsupported combinations
+init:
+- set arch=
+- if "%arch%"=="Win64" ( set arch= Win64)
+- echo %arch%
+- echo %APPVEYOR_BUILD_WORKER_IMAGE%
+- if "%APPVEYOR_BUILD_WORKER_IMAGE%"=="Visual Studio 2017" ( set generator="Visual Studio 15 2017%arch%" )
+- if "%APPVEYOR_BUILD_WORKER_IMAGE%"=="Visual Studio 2015" ( set generator="Visual Studio 14 2015%arch%" )
+- if "%APPVEYOR_BUILD_WORKER_IMAGE%"=="Visual Studio 2013" ( set generator="Visual Studio 12 2013%arch%" )
+- echo %generator%
+
+before_build:
+- cmd: >-
+    mkdir build
+    
+    cd build
+    
+    cmake --version
+    cmake .. -G %generator%
+    
+build:
+  verbosity: minimal
+  parallel: true 
