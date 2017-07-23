@@ -39,5 +39,7 @@ On MacOS:
 *   XCode 8
 
 On Windows:
-*   Visual Studio 2015
-*   Visual Studio 2017
+*   Visual Studio 2015<sup>1</sup>
+*   Visual Studio 2017<sup>1</sup>
+
+<sup>1</sup> These do not include tests for `dl` and `env`
