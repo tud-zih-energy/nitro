@@ -38,6 +38,7 @@ before_build:
     cmake .. -G %generator%
     
 build:
-  project: c:\projects\nitro\build\template.sln
-  verbosity: minimal
-  parallel: true 
+- cmd: >-
+    cmake --build . --config %configuration%
+
+    ctest .
