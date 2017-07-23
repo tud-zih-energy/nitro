@@ -35,6 +35,7 @@ before_build:
     cd build
     
     cmake --version
+    
     cmake .. -G %generator%
     
 build:
