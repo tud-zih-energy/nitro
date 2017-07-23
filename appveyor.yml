@@ -26,6 +26,7 @@ init:
 - if "%APPVEYOR_BUILD_WORKER_IMAGE%"=="Visual Studio 2015" ( set generator="Visual Studio 14 2015%arch%" )
 - if "%APPVEYOR_BUILD_WORKER_IMAGE%"=="Visual Studio 2013" ( set generator="Visual Studio 12 2013%arch%" )
 - echo %generator%
+- echo %configuration%
 
 before_build:
 - cmd: >-
@@ -37,7 +38,7 @@ before_build:
     
     cmake .. -G %generator%
     
-build:
+build_script:
 - cmd: >-
     cmake --build . --config %configuration%
 
