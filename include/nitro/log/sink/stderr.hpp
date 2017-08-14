@@ -38,7 +38,7 @@ namespace log
 {
     namespace sink
     {
-        class stderr
+        class StdErr
         {
         public:
             void sink(std::string formatted_record)

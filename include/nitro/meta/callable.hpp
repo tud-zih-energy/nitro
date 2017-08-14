@@ -26,33 +26,18 @@
  * WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef INCLUDE_NITRO_LOG_SINK_STDOUT_HPP
-#define INCLUDE_NITRO_LOG_SINK_STDOUT_HPP
+#pragma once
 
-#include <iostream>
-#include <mutex>
-#include <string>
+#include <functional>
+#include <type_traits>
 
 namespace nitro
 {
-namespace log
+namespace meta
 {
-    namespace sink
+    template <typename T, typename Signature>
+    struct is_callable : std::is_convertible<T, std::function<Signature>>
     {
-        class StdErrThreaded
-        {
-            static std::mutex mutex_;
-
-        public:
-            void sink(std::string formatted_record)
-            {
-                std::lock_guard<std::mutex> my_lock(mutex_);
-
-                std::cerr << formatted_record << std::endl;
-            }
-        };
-    }
+    };
 }
-} // namespace nitro::log::sink
-
-#endif // INCLUDE_NITRO_LOG_SINK_STDOUT_HPP
+}

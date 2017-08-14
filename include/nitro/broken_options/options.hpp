@@ -33,7 +33,6 @@
 #include <nitro/broken_options/option.hpp>
 #include <nitro/broken_options/toggle.hpp>
 
-#include <experimental/optional>
 #include <map>
 #include <sstream>
 #include <string>
@@ -94,7 +93,8 @@ namespace broken_options
         {
             if (i < 0)
             {
-                i += positionals_.size();
+                // if you ever manage to have more than 2^31 positionals, I owe you a beer.
+                i += static_cast<int>(positionals_.size());
             }
             return positionals_.at(i);
         }

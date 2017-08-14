@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015-2016, Technische Universität Dresden, Germany
+ * Copyright (c) 2015-2017, Technische Universität Dresden, Germany
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without modification, are permitted
@@ -26,33 +26,67 @@
  * WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef INCLUDE_NITRO_LOG_SINK_STDOUT_HPP
-#define INCLUDE_NITRO_LOG_SINK_STDOUT_HPP
+#pragma once
 
-#include <iostream>
-#include <mutex>
-#include <string>
+#include <functional>
+#include <memory>
 
 namespace nitro
 {
-namespace log
+namespace lang
 {
-    namespace sink
+    class quaint_ptr : private std::unique_ptr<void, std::function<void(void*)>>
     {
-        class StdErrThreaded
+        using base = std::unique_ptr<void, std::function<void(void*)>>;
+
+    public:
+        quaint_ptr() = default;
+
+        quaint_ptr(const quaint_ptr&) = delete;
+        quaint_ptr& operator=(const quaint_ptr&) = delete;
+
+        quaint_ptr(quaint_ptr&&) = default;
+        quaint_ptr& operator=(quaint_ptr&&) = default;
+
+    private:
+        template <typename T, typename D>
+        quaint_ptr(T* ptr, D d) : base(ptr, std::move(d))
         {
-            static std::mutex mutex_;
+        }
 
-        public:
-            void sink(std::string formatted_record)
-            {
-                std::lock_guard<std::mutex> my_lock(mutex_);
+        template <typename T, typename D>
+        quaint_ptr(T* ptr, D& d) : base(ptr, d)
+        {
+        }
 
-                std::cerr << formatted_record << std::endl;
-            }
-        };
+    public:
+        using base::operator bool;
+        using base::get_deleter;
+        using base::get;
+
+        using base::operator=;
+
+    public:
+        template <typename T>
+        T& as() const
+        {
+            return *static_cast<T*>(get());
+        }
+
+        void reset()
+        {
+            base::reset(nullptr);
+        }
+
+        template <typename T, typename... Args>
+        friend quaint_ptr make_quaint(Args&&... args);
+    };
+
+    template <typename T, typename... Args>
+    auto make_quaint(Args&&... args) -> quaint_ptr
+    {
+        return { new T(std::forward<Args>(args)...),
+                 [](void* ptr) { delete static_cast<T*>(ptr); } };
     }
 }
-} // namespace nitro::log::sink
-
-#endif // INCLUDE_NITRO_LOG_SINK_STDOUT_HPP
+}

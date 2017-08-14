@@ -1,4 +1,5 @@
 [![Build Status](https://travis-ci.org/tud-zih-energy/nitro.svg?branch=master)](https://travis-ci.org/tud-zih-energy/nitro)
+[![Build status](https://ci.appveyor.com/api/projects/status/i8bo30mu0j95dh3k?svg=true)](https://ci.appveyor.com/project/bmario/nitro)
 
 # nitro
 
@@ -25,10 +26,20 @@ On Linux:
 *   gcc 4.9
 *   gcc 5
 *   gcc 6
+*   gcc 7
 *   clang 3.6
 *   clang 3.7
 *   clang 3.8
+*   clang 3.9
+*   clang 4.0
+*   clang 5.0
 
 On MacOS:
 *   XCode 7
 *   XCode 8
+
+On Windows:
+*   Visual Studio 2015<sup>1</sup>
+*   Visual Studio 2017<sup>1</sup>
+
+<sup>1</sup> These do not include tests for `dl` and `env`

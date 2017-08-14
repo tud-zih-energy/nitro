@@ -1,3 +1,7 @@
+#ifndef NITRO_LOG_MIN_SEVERITY
+#error "NITRO_LOG_MIN_SEVERITY should be set by the build system, but isn't!"
+#endif
+
 #define CATCH_CONFIG_MAIN
 #include <catch.hpp>
 
@@ -6,7 +10,6 @@
 #endif
 #define NITRO_LOG_MIN_SEVERITY info
 
-#include <nitro/log/attribute/hostname.hpp>
 #include <nitro/log/attribute/severity.hpp>
 #include <nitro/log/filter/severity_filter.hpp>
 #include <nitro/log/log.hpp>
@@ -16,7 +19,7 @@ namespace detail
 {
 
 typedef nitro::log::record<nitro::log::tag_attribute, nitro::log::message_attribute,
-                           nitro::log::hostname_attribute, nitro::log::severity_attribute>
+                           nitro::log::severity_attribute>
     record;
 
 template <typename Record>
@@ -31,10 +34,10 @@ public:
 
         if (!r.tag().empty())
         {
-            s << r.tag() << "][";
+            s << r.tag() << "[";
         }
 
-        s << r.hostname() << "][" << r.severity() << "]: " << r.message();
+        s << r.severity() << "]: " << r.message();
 
         return s.str();
     }
@@ -44,7 +47,7 @@ template <typename Record>
 using log_filter = nitro::log::filter::severity_filter<Record>;
 }
 
-typedef nitro::log::logger<detail::record, detail::log_formater, nitro::log::sink::stdout,
+typedef nitro::log::logger<detail::record, detail::log_formater, nitro::log::sink::StdOut,
                            detail::log_filter>
     logging;
 
@@ -137,5 +140,98 @@ TEST_CASE("With tag works", "[log]")
             auto log = logging::trace("test tag");
             log << "test";
         }
+    }
+}
+
+TEST_CASE("Logging lambdas works", "[log]")
+{
+    SECTION("As one statement")
+    {
+        logging::fatal() << []() { return "test"; };
+        logging::error() << []() { return "test"; };
+        logging::warn() << []() { return "test"; };
+        logging::info() << []() { return "test"; };
+        logging::debug() << []() { return "test"; };
+        logging::trace() << []() { return "test"; };
+    }
+
+    SECTION("As multiple statements")
+    {
+        {
+            auto log = logging::fatal();
+            log << []() { return "test"; };
+        }
+
+        {
+            auto log = logging::error();
+            log << []() { return "test"; };
+        }
+
+        {
+            auto log = logging::warn();
+            log << []() { return "test"; };
+        }
+
+        {
+            auto log = logging::info();
+            log << []() { return "test"; };
+        }
+
+        {
+            auto log = logging::debug();
+            log << []() { return "test"; };
+        }
+
+        {
+            auto log = logging::trace();
+            log << []() { return "test"; };
+        }
+    }
+
+    SECTION("Evaluation of the lambda is lazy")
+    {
+        int i = 0;
+
+        logging::fatal() << [&i]() {
+            ++i;
+            return "test";
+        };
+
+        CHECK(i == 1);
+
+        logging::error() << [&i]() {
+            ++i;
+            return "test";
+        };
+
+        CHECK(i == 2);
+
+        logging::warn() << [&i]() {
+            ++i;
+            return "test";
+        };
+
+        CHECK(i == 3);
+
+        logging::info() << [&i]() {
+            ++i;
+            return "test";
+        };
+
+        CHECK(i == 4);
+
+        logging::debug() << [&i]() {
+            ++i;
+            return "test";
+        };
+
+        CHECK(i == 4);
+
+        logging::trace() << [&i]() {
+            ++i;
+            return "test";
+        };
+
+        CHECK(i == 4);
     }
 }

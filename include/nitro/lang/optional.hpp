@@ -32,6 +32,7 @@
 #include <nitro/except/raise.hpp>
 
 #include <memory>
+#include <utility>
 
 namespace nitro
 {
@@ -56,6 +57,10 @@ namespace lang
         {
         }
 
+        optional(T&& data) : data_(std::make_unique<T>(std::move(data)))
+        {
+        }
+
         optional& operator=(const optional& other)
         {
             if (other)
@@ -69,6 +74,13 @@ namespace lang
         optional& operator=(const T& data)
         {
             data_ = std::make_unique<T>(data);
+
+            return *this;
+        }
+
+        optional& operator=(T&& data)
+        {
+            data_ = std::make_unique<T>(std::move(data));
 
             return *this;
         }
