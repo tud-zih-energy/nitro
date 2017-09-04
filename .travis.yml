@@ -114,13 +114,11 @@ matrix:
         apt:
           packages:
             - clang-4.0
-            - g++-5
             - cmake
             - cmake-data
           sources:
             - llvm-toolchain-trusty-4.0
             - ubuntu-toolchain-r-test
-            - george-edison55-precise-backports
     - os: linux
       env: CXX="clang++-5.0" CC="clang-5.0"
       compiler: clang
@@ -128,27 +126,23 @@ matrix:
         apt:
           packages:
             - clang-5.0
-            - g++-5
             - cmake
             - cmake-data
           sources:
             - llvm-toolchain-trusty-5.0
             - ubuntu-toolchain-r-test
-            - george-edison55-precise-backports
     - os: linux
       env: CXX="clang++" CC="clang"
       compiler: clang
       addons:
         apt:
           packages:
-            - clang-5.0
-            - g++-5
+            - clang
             - cmake
             - cmake-data
           sources:
             - llvm-toolchain-trusty
             - ubuntu-toolchain-r-test
-            - george-edison55-precise-backports
     - os: osx
       osx_image: xcode7.3
     - os: osx
