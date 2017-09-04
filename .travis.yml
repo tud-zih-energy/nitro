@@ -132,6 +132,20 @@ matrix:
             - cmake
             - cmake-data
           sources:
+            - llvm-toolchain-trusty-5.0
+            - ubuntu-toolchain-r-test
+            - george-edison55-precise-backports
+    - os: linux
+      env: CXX="clang++" CC="clang"
+      compiler: clang
+      addons:
+        apt:
+          packages:
+            - clang-5.0
+            - g++-5
+            - cmake
+            - cmake-data
+          sources:
             - llvm-toolchain-trusty
             - ubuntu-toolchain-r-test
             - george-edison55-precise-backports
