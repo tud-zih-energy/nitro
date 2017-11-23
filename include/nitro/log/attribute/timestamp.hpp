@@ -36,25 +36,31 @@ namespace nitro
 namespace log
 {
 
-    class timestamp_attribute
+    template <typename Clock>
+    class timestamp_clock_attribute
     {
-        std::chrono::nanoseconds my_timestamp;
+        typename Clock::time_point my_timestamp;
 
     public:
-        timestamp_attribute() : my_timestamp()
+        typename Clock::time_point timestamp_clock_get_time()
         {
+            return Clock::now();
         }
 
-        std::chrono::nanoseconds timestamp() const
+        timestamp_clock_attribute() = default;
+
+        typename Clock::time_point timestamp() const
         {
             return my_timestamp;
         }
 
-        std::chrono::nanoseconds& timestamp()
+        typename Clock::time_point& timestamp()
         {
             return my_timestamp;
         }
     };
+
+    using timestamp_attribute = timestamp_clock_attribute<std::chrono::high_resolution_clock>;
 }
 } // namespace nitro::log
 

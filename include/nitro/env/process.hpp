@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015-2016, Technische Universität Dresden, Germany
+ * Copyright (c) 2015-2017, Technische Universität Dresden, Germany
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without modification, are permitted
@@ -26,40 +26,33 @@
  * WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef INCLUDE_NITRO_LOG_DETAIL_HAS_ATTRIBUTE_HPP
-#define INCLUDE_NITRO_LOG_DETAIL_HAS_ATTRIBUTE_HPP
+#pragma once
 
-#include <nitro/meta/variadic.hpp>
+extern "C" {
+#include <sys/types.h>
+#include <unistd.h>
+}
 
 namespace nitro
 {
-namespace log
+namespace env
 {
-    namespace detail
+    namespace linux
     {
-
-        template <typename... Attributes>
-        struct has_attribute;
-
-        template <typename Attribute, typename... Attributes, template <typename...> class Record>
-        struct has_attribute<Attribute, Record<Attributes...>>
+        inline pid_t getpid()
         {
-            static const bool value =
-                nitro::meta::is_variadic_member<Attribute, Attributes...>::value;
-        };
+            return getpid();
+        }
 
-        template <template <typename...> class Attribute, typename... Attributes>
-        struct has_attribute_specialization;
-
-        template <template <typename...> class Attribute, typename... Attributes,
-                  template <typename...> class Record>
-        struct has_attribute_specialization<Attribute, Record<Attributes...>>
+        inline pid_t get_parent_pid()
         {
-            static const bool value =
-                nitro::meta::is_variadic_member_specialization<Attribute, Attributes...>::value;
-        };
+            return getppid();
+        }
+
+        inline pid_t gettid()
+        {
+            return getpid();
+        }
     }
 }
-} // namespace nitro::log::detail
-
-#endif // INCLUDE_NITRO_LOG_DETAIL_HAS_ATTRIBUTE_HPP
+}

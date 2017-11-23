@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015-2016, Technische Universität Dresden, Germany
+ * Copyright (c) 2015-2017, Technische Universität Dresden, Germany
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without modification, are permitted
@@ -26,40 +26,37 @@
  * WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef INCLUDE_NITRO_LOG_DETAIL_HAS_ATTRIBUTE_HPP
-#define INCLUDE_NITRO_LOG_DETAIL_HAS_ATTRIBUTE_HPP
+#include <nitro/env/hostname.hpp>
 
-#include <nitro/meta/variadic.hpp>
+#include <nitro/except/raise.hpp>
+
+extern "C" {
+#include <limits.h>
+#include <unistd.h>
+
+// For our beloved MAC
+#ifndef HOST_NAME_MAX
+#ifdef _POSIX_HOST_NAME_MAX
+#define HOST_NAME_MAX _POSIX_HOST_NAME_MAX
+#else
+#define HOST_NAME_MAX 64
+#endif
+#endif
+}
 
 namespace nitro
 {
-namespace log
+namespace env
 {
-    namespace detail
+    std::string hostname()
     {
-
-        template <typename... Attributes>
-        struct has_attribute;
-
-        template <typename Attribute, typename... Attributes, template <typename...> class Record>
-        struct has_attribute<Attribute, Record<Attributes...>>
+        char c_hostname[HOST_NAME_MAX + 1];
+        if (gethostname(c_hostname, HOST_NAME_MAX + 1))
         {
-            static const bool value =
-                nitro::meta::is_variadic_member<Attribute, Attributes...>::value;
-        };
+            raise("Failed to get local hostname");
+        }
 
-        template <template <typename...> class Attribute, typename... Attributes>
-        struct has_attribute_specialization;
-
-        template <template <typename...> class Attribute, typename... Attributes,
-                  template <typename...> class Record>
-        struct has_attribute_specialization<Attribute, Record<Attributes...>>
-        {
-            static const bool value =
-                nitro::meta::is_variadic_member_specialization<Attribute, Attributes...>::value;
-        };
+        return c_hostname;
     }
 }
-} // namespace nitro::log::detail
-
-#endif // INCLUDE_NITRO_LOG_DETAIL_HAS_ATTRIBUTE_HPP
+}

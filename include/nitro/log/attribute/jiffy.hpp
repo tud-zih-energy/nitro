@@ -26,40 +26,36 @@
  * WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef INCLUDE_NITRO_LOG_DETAIL_HAS_ATTRIBUTE_HPP
-#define INCLUDE_NITRO_LOG_DETAIL_HAS_ATTRIBUTE_HPP
+#pragma once
 
-#include <nitro/meta/variadic.hpp>
+#include <nitro/jiffy/jiffy.hpp>
 
 namespace nitro
 {
 namespace log
 {
-    namespace detail
+
+    class jiffy_attribute
     {
+        nitro::jiffy::Jiffy my_timestamp;
 
-        template <typename... Attributes>
-        struct has_attribute;
-
-        template <typename Attribute, typename... Attributes, template <typename...> class Record>
-        struct has_attribute<Attribute, Record<Attributes...>>
+    public:
+        nitro::jiffy::Jiffy jiffy_get_time()
         {
-            static const bool value =
-                nitro::meta::is_variadic_member<Attribute, Attributes...>::value;
-        };
+            return nitro::jiffy::Jiffy();
+        }
 
-        template <template <typename...> class Attribute, typename... Attributes>
-        struct has_attribute_specialization;
+        jiffy_attribute() = default;
 
-        template <template <typename...> class Attribute, typename... Attributes,
-                  template <typename...> class Record>
-        struct has_attribute_specialization<Attribute, Record<Attributes...>>
+        const nitro::jiffy::Jiffy& jiffy() const
         {
-            static const bool value =
-                nitro::meta::is_variadic_member_specialization<Attribute, Attributes...>::value;
-        };
-    }
+            return my_timestamp;
+        }
+
+        nitro::jiffy::Jiffy& jiffy()
+        {
+            return my_timestamp;
+        }
+    };
 }
-} // namespace nitro::log::detail
-
-#endif // INCLUDE_NITRO_LOG_DETAIL_HAS_ATTRIBUTE_HPP
+} // namespace nitro::log

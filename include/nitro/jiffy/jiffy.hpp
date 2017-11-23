@@ -26,17 +26,95 @@
  * WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef INCLUDE_NITRO_ENV_HOSTNAME_HPP
-#define INCLUDE_NITRO_ENV_HOSTNAME_HPP
+#pragma once
 
+#include <chrono>
+#include <ctime>
+#include <iostream>
 #include <string>
 
 namespace nitro
 {
-namespace env
+namespace jiffy
 {
-    std::string hostname();
-}
-}
+    class Jiffy
+    {
+    public:
+        Jiffy();
 
-#endif // INCLUDE_NITRO_ENV_HOSTNAME_HPP
+        Jiffy(std::chrono::system_clock::time_point tp);
+
+        Jiffy(const std::string& date,
+              const std::string& format = std::string("%Y-%m-%dT%H:%M:%S%z"));
+
+    public:
+        std::string format(std::string fmt) const;
+
+        std::string isoformat() const
+        {
+            return format("%Y-%m-%dT%H:%M:%S.%f%z");
+        }
+
+        operator std::string() const
+        {
+            return isoformat();
+        }
+
+    public:
+        int year() const
+        {
+            return tm_data_.tm_year + 1900;
+        }
+
+        int month() const
+        {
+            return tm_data_.tm_mon + 1;
+        }
+
+        int day() const
+        {
+            return tm_data_.tm_mday;
+        }
+
+        int hour() const
+        {
+            return tm_data_.tm_hour;
+        }
+
+        int minute() const
+        {
+            return tm_data_.tm_min;
+        }
+
+        int second() const
+        {
+            return tm_data_.tm_sec;
+        }
+
+        int microsecond() const
+        {
+            return fraction_.count();
+        }
+
+    public:
+        operator std::tm() const
+        {
+            return tm_data_;
+        }
+
+    private:
+        void clear()
+        {
+            std::memset(&tm_data_, 0, sizeof(tm_data_));
+        }
+
+        std::tm tm_data_;
+        std::chrono::microseconds fraction_;
+    };
+
+    inline std::ostream& operator<<(std::ostream& s, const Jiffy& j)
+    {
+        return s << j.isoformat();
+    }
+}
+}

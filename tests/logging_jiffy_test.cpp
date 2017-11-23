@@ -10,21 +10,20 @@
 #endif
 #define NITRO_LOG_MIN_SEVERITY info
 
+#include <nitro/log/attribute/jiffy.hpp>
 #include <nitro/log/attribute/severity.hpp>
 #include <nitro/log/filter/severity_filter.hpp>
 #include <nitro/log/log.hpp>
 #include <nitro/log/sink/sequence.hpp>
-#include <nitro/log/sink/stderr.hpp>
 #include <nitro/log/sink/stdout.hpp>
 
 namespace detail
 {
 
-using Sink = nitro::log::sink::sequence<nitro::log::sink::StdOut, nitro::log::sink::StdErr>;
+using Sink = nitro::log::sink::StdOut;
 
-typedef nitro::log::record<nitro::log::tag_attribute, nitro::log::message_attribute,
-                           nitro::log::severity_attribute>
-    record;
+using record = nitro::log::record<nitro::log::tag_attribute, nitro::log::message_attribute,
+                                  nitro::log::severity_attribute, nitro::log::jiffy_attribute>;
 
 template <typename Record>
 class log_formater
@@ -34,7 +33,7 @@ public:
     {
         std::stringstream s;
 
-        s << "[";
+        s << "[" << r.jiffy().format("%h, %d %Y %I:%M:%S.%f %p") << "][";
 
         if (!r.tag().empty())
         {

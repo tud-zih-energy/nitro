@@ -39,31 +39,39 @@ namespace meta
     /**
      * @brief meta function to check if a variadic type pack contains a given type.
      */
-    template <typename U, typename... Attributes>
+    template <typename...>
     struct is_variadic_member;
 
-    /**
-     * @brief meta function to check if a variadic type pack contains a given type.
-     */
     template <typename U, typename first, typename... Attributes>
     struct is_variadic_member<U, first, Attributes...>
     {
-        /**
-         * @brief value contains true if input type is contained in the pack
-         */
         static const bool value =
             std::is_same<U, first>::value || is_variadic_member<U, Attributes...>::value;
     };
 
-    /**
-     * @brief meta function to check if a variadic type pack contains a given type.
-     */
     template <typename U>
-    struct is_variadic_member<U>
+    struct is_variadic_member<U> : std::false_type
     {
-        /**
-         * @brief value contains true if input type is contained in the pack
-         */
+    };
+
+    template <template <typename...> class U, typename... Members>
+    struct is_variadic_member_specialization;
+
+    template <template <typename...> class U, typename... Members, typename... Args>
+    struct is_variadic_member_specialization<U, U<Args...>, Members...>
+    {
+        static const bool value = true;
+    };
+
+    template <template <typename...> class U, typename First, typename... Members>
+    struct is_variadic_member_specialization<U, First, Members...>
+    {
+        static const bool value = is_variadic_member_specialization<U, Members...>::value;
+    };
+
+    template <template <typename...> class U>
+    struct is_variadic_member_specialization<U>
+    {
         static const bool value = false;
     };
 }

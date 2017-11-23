@@ -29,24 +29,13 @@
 #ifndef INCLUDE_NITRO_ENV_GET_HPP
 #define INCLUDE_NITRO_ENV_GET_HPP
 
-#include <cstdlib>
 #include <string>
 
 namespace nitro
 {
 namespace env
 {
-    inline std::string get(std::string name, std::string default_ = "")
-    {
-        char* tmp = std::getenv(name.c_str());
-
-        if (tmp == nullptr)
-        {
-            return default_;
-        }
-
-        return std::string(tmp);
-    }
+    std::string get(const std::string& name, std::string default_ = "");
 }
 }
 #endif // INCLUDE_NITRO_ENV_GET_HPP
