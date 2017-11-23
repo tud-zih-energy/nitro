@@ -32,7 +32,11 @@
 
 extern "C" {
 #include <limits.h>
+#if defined(_MSC_VER) || defined(_MSC_EXTENSIONS)
+#include <Winsock2.h>
+#else
 #include <unistd.h>
+#endif
 
 // For our beloved MAC
 #ifndef HOST_NAME_MAX
