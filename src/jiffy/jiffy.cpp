@@ -9,8 +9,14 @@
 
 #include <cstring>
 
+#if defined(_MSC_VER) || defined(_MSC_EXTENSIONS)
+#define USE_CXX_STD_SYSTEM_TIME
+#endif
+
 extern "C" {
+#ifndef USE_CXX_STD_SYSTEM_TIME
 #include <sys/time.h>
+#endif
 #include <time.h>
 }
 
@@ -23,6 +29,11 @@ namespace jiffy
 {
 
     Jiffy::Jiffy()
+#ifdef USE_CXX_STD_SYSTEM_TIME
+    : Jiffy(std::chrono::system_clock::now())
+    {
+    }
+#else
     {
         clear();
 
@@ -47,6 +58,7 @@ namespace jiffy
 
         fraction_ = std::chrono::microseconds(tv.tv_usec);
     }
+#endif
 
     Jiffy::Jiffy(std::chrono::system_clock::time_point tp)
     {
@@ -54,6 +66,18 @@ namespace jiffy
 
         auto time = std::chrono::system_clock::to_time_t(tp);
 
+#ifdef USE_CXX_STD_SYSTEM_TIME
+
+        auto res = std::localtime(&time);
+
+        if (res == nullptr)
+        {
+            nitro::except::raise("Couldn't get localtime for time point.");
+        }
+
+        tm_data_ = *res;
+
+#else
         // localtime_r isn't required to behave like tzset was called, so we do it
         tzset();
 
@@ -63,18 +87,30 @@ namespace jiffy
         {
             nitro::except::raise("Couldn't get localtime for time point.");
         }
+#endif
     }
 
     Jiffy::Jiffy(const std::string& date, const std::string& format)
     {
         clear();
+#ifdef USE_CXX_STD_SYSTEM_TIME
+        std::stringstream s;
 
+        s << date;
+        s >> std::get_time(&tm_data_, format.c_str());
+
+        if (s.fail())
+        {
+            nitro::except::raise("Couldn't parse time string '", date, "'");
+        }
+#else
         auto res = strptime(date.c_str(), format.c_str(), &tm_data_);
 
         if (res == nullptr)
         {
             nitro::except::raise("Couldn't parse time string '", date, "'");
         }
+#endif
     }
 
     std::string Jiffy::format(std::string fmt) const
