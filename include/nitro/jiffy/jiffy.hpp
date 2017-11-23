@@ -93,7 +93,8 @@ namespace jiffy
 
         int microsecond() const
         {
-            return fraction_.count();
+            // this is in the range [0, 1e6), so it's fine
+            return static_cast<int>(fraction_.count());
         }
 
     public:
