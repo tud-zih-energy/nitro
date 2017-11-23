@@ -7,6 +7,8 @@
 #include <sstream>
 #include <type_traits>
 
+#include <cstring>
+
 extern "C" {
 #include <sys/time.h>
 #include <time.h>
@@ -105,6 +107,11 @@ namespace jiffy
         buffer.resize(size - 1);
 
         return buffer;
+    }
+
+    void Jiffy::clear()
+    {
+        std::memset(&tm_data_, 0, sizeof(tm_data_));
     }
 }
 }

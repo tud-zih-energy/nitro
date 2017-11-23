@@ -103,10 +103,7 @@ namespace jiffy
         }
 
     private:
-        void clear()
-        {
-            std::memset(&tm_data_, 0, sizeof(tm_data_));
-        }
+        void clear();
 
         std::tm tm_data_;
         std::chrono::microseconds fraction_;
