@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015-2016, Technische Universität Dresden, Germany
+ * Copyright (c) 2015-2017, Technische Universität Dresden, Germany
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without modification, are permitted
@@ -26,40 +26,45 @@
  * WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef INCLUDE_NITRO_LOG_DETAIL_HAS_ATTRIBUTE_HPP
-#define INCLUDE_NITRO_LOG_DETAIL_HAS_ATTRIBUTE_HPP
+#pragma once
 
-#include <nitro/meta/variadic.hpp>
+#include <tuple>
 
 namespace nitro
 {
-namespace log
+namespace lang
 {
-    namespace detail
+    namespace helper
     {
-
-        template <typename... Attributes>
-        struct has_attribute;
-
-        template <typename Attribute, typename... Attributes, template <typename...> class Record>
-        struct has_attribute<Attribute, Record<Attributes...>>
+        template <int... Is>
+        struct seq
         {
-            static const bool value =
-                nitro::meta::is_variadic_member<Attribute, Attributes...>::value;
         };
 
-        template <template <typename...> class Attribute, typename... Attributes>
-        struct has_attribute_specialization;
-
-        template <template <typename...> class Attribute, typename... Attributes,
-                  template <typename...> class Record>
-        struct has_attribute_specialization<Attribute, Record<Attributes...>>
+        template <int N, int... Is>
+        struct gen_seq : gen_seq<N - 1, N - 1, Is...>
         {
-            static const bool value =
-                nitro::meta::is_variadic_member_specialization<Attribute, Attributes...>::value;
         };
+
+        template <int... Is>
+        struct gen_seq<0, Is...> : seq<Is...>
+        {
+        };
+
+        template <typename T, typename F, int... Is>
+        inline void for_each(T&& t, F f, seq<Is...>)
+        {
+            auto l = { (f(std::get<Is>(t)), 0)... };
+
+            // l is only for meta bullshit
+            (void)l;
+        }
+    }
+
+    template <typename... Ts, typename F>
+    inline void tuple_foreach(std::tuple<Ts...>& t, F f)
+    {
+        helper::for_each(t, f, helper::gen_seq<sizeof...(Ts)>());
     }
 }
-} // namespace nitro::log::detail
-
-#endif // INCLUDE_NITRO_LOG_DETAIL_HAS_ATTRIBUTE_HPP
+}

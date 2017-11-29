@@ -30,9 +30,7 @@
 #define INCLUDE_NITRO_TUPLE_OPERATORS_HPP
 
 #include <nitro/lang/hash.hpp>
-
-// included on purpose, though not required in this file for convenience
-#include <tuple>
+#include <nitro/lang/tuple_foreach.hpp>
 
 namespace nitro
 {
@@ -40,36 +38,6 @@ namespace lang
 {
     namespace helper
     {
-        template <int... Is>
-        struct seq
-        {
-        };
-
-        template <int N, int... Is>
-        struct gen_seq : gen_seq<N - 1, N - 1, Is...>
-        {
-        };
-
-        template <int... Is>
-        struct gen_seq<0, Is...> : seq<Is...>
-        {
-        };
-
-        template <typename T, typename F, int... Is>
-        inline void for_each(T&& t, F f, seq<Is...>)
-        {
-            auto l = { (f(std::get<Is>(t)), 0)... };
-
-            // l is only for meta bullshit
-            (void)l;
-        }
-
-        template <typename... Ts, typename F>
-        inline void for_each_in_tuple(std::tuple<Ts...> t, F f)
-        {
-            for_each(t, f, gen_seq<sizeof...(Ts)>());
-        }
-
         template <class Archive>
         struct serialize_functor
         {
@@ -89,7 +57,7 @@ namespace lang
         template <class Archive, typename... Args>
         inline void serialize(Archive& ar, std::tuple<Args&...> t)
         {
-            for_each_in_tuple(t, serialize_functor<Archive>(ar));
+            lang::tuple_foreach(t, serialize_functor<Archive>(ar));
         }
 
         template <class Archive, typename... Args, bool False = false>

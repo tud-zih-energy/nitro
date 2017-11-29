@@ -48,7 +48,12 @@ namespace nitro
 namespace log
 {
     class tag_attribute;
-    class timestamp_attribute;
+    class jiffy_attribute;
+
+    template <typename Clock>
+    class timestamp_clock_attribute;
+
+    using timestamp_attribute = timestamp_clock_attribute<std::chrono::high_resolution_clock>;
 
     template <typename Record, template <typename> class Formatter, typename Sink,
               template <typename> class Filter>
@@ -72,15 +77,35 @@ namespace log
         public:
             void operator()(Record& r)
             {
-                r.timestamp() = std::chrono::high_resolution_clock::now().time_since_epoch();
+                r.timestamp() = r.timestamp_clock_get_time();
+            }
+        };
+
+        template <typename Record, bool has_timestamp>
+        class set_jiffy_attribute
+        {
+        public:
+            void operator()(Record&)
+            {
+            }
+        };
+
+        template <typename Record>
+        class set_jiffy_attribute<Record, true>
+        {
+        public:
+            void operator()(Record& r)
+            {
+                r.jiffy() = r.jiffy_get_time();
             }
         };
 
         template <typename Record>
         void set_timestamp(Record& r)
         {
-            set_timestamp_attribute<Record,
-                                    detail::has_attribute<timestamp_attribute, Record>::value>()(r);
+            set_timestamp_attribute<Record, detail::has_attribute_specialization<
+                                                timestamp_clock_attribute, Record>::value>()(r);
+            set_jiffy_attribute<Record, detail::has_attribute<jiffy_attribute, Record>::value>()(r);
         }
 
         template <typename Record, bool has_tag>

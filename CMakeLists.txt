@@ -116,24 +116,41 @@ target_link_libraries(NitroLog
 )
 target_compile_definitions(NitroLog INTERFACE NITRO_LOG_MIN_SEVERITY=${MIN_LOG_LEVEL})
 
+add_library(NitroEnv src/env/get.cpp src/env/hostname.cpp)
+target_link_libraries(NitroEnv
+    PUBLIC
+        Nitro::Core
+)
+
+add_library(NitroJiffy src/jiffy/jiffy.cpp)
+target_link_libraries(NitroJiffy
+    PUBLIC
+        Nitro::Core
+)
+
 add_library(NitroAll INTERFACE)
 target_link_libraries(NitroAll
     INTERFACE
         Nitro::Core
         Nitro::Log
         Nitro::Dl
+        Nitro::Env
+        Nitro::Jiffy
 )
 
 add_library(Nitro::Nitro ALIAS NitroAll)
 add_library(Nitro::Core ALIAS NitroCore)
 add_library(Nitro::Dl ALIAS NitroDl)
 add_library(Nitro::Log ALIAS NitroLog)
+add_library(Nitro::Env ALIAS NitroEnv)
+add_library(Nitro::Jiffy ALIAS NitroJiffy)
+
 
 install(DIRECTORY
     ${CMAKE_CURRENT_SOURCE_DIR}/include/nitro
     DESTINATION include
 )
-install(TARGETS NitroCore NitroAll NitroDl NitroLog EXPORT NitroTargets
+install(TARGETS NitroCore NitroAll NitroDl NitroLog NitroEnv NitroJiffy EXPORT NitroTargets
     LIBRARY DESTINATION lib
     ARCHIVE DESTINATION lib
     RUNTIME DESTINATION bin
