@@ -46,7 +46,7 @@ namespace log
             {
 #pragma omp critical
                 {
-                    std::cout << formatted_record << std::endl;
+                    std::cout << formatted_record;
                 }
             }
         };

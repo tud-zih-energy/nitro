@@ -48,7 +48,7 @@ namespace log
             {
                 std::lock_guard<std::mutex> my_lock(mutex_);
 
-                std::cout << formatted_record << std::endl;
+                std::cout << formatted_record;
             }
         };
     }
