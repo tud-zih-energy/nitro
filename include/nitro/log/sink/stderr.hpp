@@ -43,7 +43,7 @@ namespace log
         public:
             void sink(std::string formatted_record)
             {
-                std::cerr << formatted_record << std::endl;
+                std::cerr << formatted_record;
             }
         };
     }

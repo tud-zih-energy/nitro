@@ -44,7 +44,7 @@ namespace log
         public:
             void sink(std::string formatted_record)
             {
-                std::cout << formatted_record << std::endl;
+                std::cout << formatted_record;
             }
         };
     }
