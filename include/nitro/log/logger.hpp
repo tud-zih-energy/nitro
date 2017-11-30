@@ -43,9 +43,13 @@ namespace log
               template <typename> class Filter>
     class logger : Sink, Formater<Record>, Filter<Record>
     {
-        typedef logger self;
+        using self = logger;
 
         logger() = default;
+
+        template <severity_level Severity>
+        using actual_stream_t =
+            typename actual_stream<Severity, Record, Formater, Sink, Filter>::type;
 
     public:
         static self& instance()
@@ -65,52 +69,34 @@ namespace log
             instance().Sink::sink(instance().Formater<Record>::format(r));
         }
 
-        static typename actual_stream<severity_level::trace, Record, Formater, Sink, Filter>::type
-        trace(lang::string_ref tag = nullptr)
+        static actual_stream_t<severity_level::trace> trace(lang::string_ref tag = nullptr)
         {
-            return
-                typename actual_stream<severity_level::trace, Record, Formater, Sink, Filter>::type(
-                    tag);
+            return actual_stream_t<severity_level::trace>(tag);
         }
 
-        static typename actual_stream<severity_level::debug, Record, Formater, Sink, Filter>::type
-        debug(lang::string_ref tag = nullptr)
+        static actual_stream_t<severity_level::debug> debug(lang::string_ref tag = nullptr)
         {
-            return
-                typename actual_stream<severity_level::debug, Record, Formater, Sink, Filter>::type(
-                    tag);
+            return actual_stream_t<severity_level::debug>(tag);
         }
 
-        static typename actual_stream<severity_level::info, Record, Formater, Sink, Filter>::type
-        info(lang::string_ref tag = nullptr)
+        static actual_stream_t<severity_level::info> info(lang::string_ref tag = nullptr)
         {
-            return
-                typename actual_stream<severity_level::info, Record, Formater, Sink, Filter>::type(
-                    tag);
+            return actual_stream_t<severity_level::info>(tag);
         }
 
-        static typename actual_stream<severity_level::warn, Record, Formater, Sink, Filter>::type
-        warn(lang::string_ref tag = nullptr)
+        static actual_stream_t<severity_level::warn> warn(lang::string_ref tag = nullptr)
         {
-            return
-                typename actual_stream<severity_level::warn, Record, Formater, Sink, Filter>::type(
-                    tag);
+            return actual_stream_t<severity_level::warn>(tag);
         }
 
-        static typename actual_stream<severity_level::error, Record, Formater, Sink, Filter>::type
-        error(lang::string_ref tag = nullptr)
+        static actual_stream_t<severity_level::error> error(lang::string_ref tag = nullptr)
         {
-            return
-                typename actual_stream<severity_level::error, Record, Formater, Sink, Filter>::type(
-                    tag);
+            return actual_stream_t<severity_level::error>(tag);
         }
 
-        static typename actual_stream<severity_level::fatal, Record, Formater, Sink, Filter>::type
-        fatal(lang::string_ref tag = nullptr)
+        static actual_stream_t<severity_level::fatal> fatal(lang::string_ref tag = nullptr)
         {
-            return
-                typename actual_stream<severity_level::fatal, Record, Formater, Sink, Filter>::type(
-                    tag);
+            return actual_stream_t<severity_level::fatal>(tag);
         }
     };
 }

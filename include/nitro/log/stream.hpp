@@ -151,7 +151,6 @@ namespace log
 
                 if (logger::will_log(*r))
                 {
-                    detail::set_timestamp(*r);
                     s.reset(new std::stringstream());
                 }
                 else
@@ -168,6 +167,7 @@ namespace log
             {
                 if (r)
                 {
+                    detail::set_timestamp(*r);
                     r->message() = s->str();
                     logger::log(*r);
                 }
