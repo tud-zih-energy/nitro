@@ -15,12 +15,12 @@
 #include <nitro/log/log.hpp>
 #include <nitro/log/sink/sequence.hpp>
 #include <nitro/log/sink/stderr.hpp>
-#include <nitro/log/sink/syslog.hpp>
+#include <nitro/log/sink/stdout.hpp>
 
 namespace detail
 {
 
-using Sink = nitro::log::sink::sequence<nitro::log::sink::Syslog, nitro::log::sink::StdErr>;
+using Sink = nitro::log::sink::sequence<nitro::log::sink::StdOut, nitro::log::sink::StdErr>;
 
 typedef nitro::log::record<nitro::log::tag_attribute, nitro::log::message_attribute,
                            nitro::log::severity_attribute>
