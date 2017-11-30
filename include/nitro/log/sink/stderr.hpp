@@ -29,6 +29,8 @@
 #ifndef INCLUDE_NITRO_LOG_SINK_STDERR_HPP
 #define INCLUDE_NITRO_LOG_SINK_STDERR_HPP
 
+#include <nitro/log/severity.hpp>
+
 #include <iostream>
 #include <string>
 
@@ -36,12 +38,13 @@ namespace nitro
 {
 namespace log
 {
+
     namespace sink
     {
         class StdErr
         {
         public:
-            void sink(std::string formatted_record)
+            void sink(severity_level, const std::string& formatted_record)
             {
                 std::cerr << formatted_record;
             }

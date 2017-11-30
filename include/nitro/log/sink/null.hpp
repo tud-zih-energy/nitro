@@ -29,6 +29,8 @@
 #ifndef INCLUDE_NITRO_LOG_SINK_NULL_HPP
 #define INCLUDE_NITRO_LOG_SINK_NULL_HPP
 
+#include <nitro/log/severity.hpp>
+
 #include <string>
 
 namespace nitro
@@ -41,7 +43,7 @@ namespace log
         class Null
         {
         public:
-            void sink(std::string)
+            void sink(severity_level, const std::string&)
             {
             }
         };

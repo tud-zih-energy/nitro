@@ -169,7 +169,7 @@ namespace log
                 {
                     detail::set_timestamp(*r);
                     r->message() = s->str();
-                    logger::log(*r);
+                    logger::log(Severity, *r);
                 }
             }
 

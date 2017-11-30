@@ -64,9 +64,9 @@ namespace log
             return instance().Filter<Record>::filter(r);
         }
 
-        static void log(Record& r)
+        static void log(severity_level sev, Record& r)
         {
-            instance().Sink::sink(instance().Formater<Record>::format(r));
+            instance().Sink::sink(sev, instance().Formater<Record>::format(r));
         }
 
         static actual_stream_t<severity_level::trace> trace(lang::string_ref tag = nullptr)

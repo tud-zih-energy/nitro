@@ -29,6 +29,8 @@
 #ifndef INCLUDE_NITRO_LOG_SINK_STDERR_MT_HPP
 #define INCLUDE_NITRO_LOG_SINK_STDERR_MT_HPP
 
+#include <nitro/log/severity.hpp>
+
 #include <iostream>
 #include <mutex>
 #include <string>
@@ -44,7 +46,7 @@ namespace log
             static std::mutex mutex_;
 
         public:
-            void sink(std::string formatted_record)
+            void sink(severity_level, const std::string& formatted_record)
             {
                 std::lock_guard<std::mutex> my_lock(mutex_);
 

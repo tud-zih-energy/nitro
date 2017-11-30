@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015-2017, Technische Universität Dresden, Germany
+ * Copyright (c) 2015-2016, Technische Universität Dresden, Germany
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without modification, are permitted
@@ -30,7 +30,11 @@
 
 #include <nitro/log/severity.hpp>
 
-#include <nitro/lang/tuple_foreach.hpp>
+#include <string>
+
+extern "C" {
+#include <syslog.h>
+}
 
 namespace nitro
 {
@@ -38,22 +42,46 @@ namespace log
 {
     namespace sink
     {
-        template <typename... Sinks>
-        class sequence
+        class Syslog
         {
-            static std::tuple<Sinks...> sinks;
-
         public:
+            Syslog()
+            {
+                openlog(nullptr, LOG_PID, LOG_USER);
+            }
+
             void sink(severity_level sev, const std::string& formatted_record)
             {
-                lang::tuple_foreach(sinks, [&sev, &formatted_record](auto& sink) {
-                    sink.sink(sev, formatted_record);
-                });
+                syslog(get_syslog_priority(sev), "%s", formatted_record.c_str());
+            }
+
+            ~Syslog()
+            {
+                closelog();
+            }
+
+        private:
+            int get_syslog_priority(severity_level sev)
+            {
+                switch (sev)
+                {
+                case severity_level::fatal:
+                    return LOG_CRIT;
+                case severity_level::error:
+                    return LOG_ERR;
+                case severity_level::warn:
+                    return LOG_WARNING;
+                case severity_level::info:
+                    return LOG_INFO;
+                case severity_level::debug:
+                    return LOG_DEBUG;
+                case severity_level::trace:
+                    return LOG_DEBUG;
+                default:
+                    return LOG_NOTICE;
+                }
             }
         };
-
-        template <typename... Sinks>
-        std::tuple<Sinks...> sequence<Sinks...>::sinks;
     }
 }
 }

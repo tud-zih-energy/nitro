@@ -29,6 +29,8 @@
 #ifndef INCLUDE_NITRO_LOG_SINK_STDOUT_HPP
 #define INCLUDE_NITRO_LOG_SINK_STDOUT_HPP
 
+#include <nitro/log/severity.hpp>
+
 #include <iostream>
 #include <string>
 
@@ -42,7 +44,7 @@ namespace log
         class StdOut
         {
         public:
-            void sink(std::string formatted_record)
+            void sink(severity_level, const std::string& formatted_record)
             {
                 std::cout << formatted_record;
             }
