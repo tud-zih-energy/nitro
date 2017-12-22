@@ -69,12 +69,12 @@ endif()
 
 set(Nitro_VERSION 1.0)
 
-add_library(NitroCore INTERFACE)
-target_include_directories(NitroCore INTERFACE
+add_library(nitro-core INTERFACE)
+target_include_directories(nitro-core INTERFACE
     $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
     $<INSTALL_INTERFACE:include>
 )
-target_compile_features(NitroCore
+target_compile_features(nitro-core
     INTERFACE
         cxx_auto_type
         cxx_constexpr
@@ -102,34 +102,34 @@ target_compile_features(NitroCore
         cxx_template_template_parameters
 )
 
-add_library(NitroDl INTERFACE)
-target_link_libraries(NitroDl
+add_library(nitro-dl INTERFACE)
+target_link_libraries(nitro-dl
     INTERFACE
         Nitro::Core
         ${CMAKE_DL_LIBS}
 )
 
-add_library(NitroLog INTERFACE)
-target_link_libraries(NitroLog
+add_library(nitro-log INTERFACE)
+target_link_libraries(nitro-log
     INTERFACE
         Nitro::Core
 )
-target_compile_definitions(NitroLog INTERFACE NITRO_LOG_MIN_SEVERITY=${MIN_LOG_LEVEL})
+target_compile_definitions(nitro-log INTERFACE NITRO_LOG_MIN_SEVERITY=${MIN_LOG_LEVEL})
 
-add_library(NitroEnv src/env/get.cpp src/env/hostname.cpp)
-target_link_libraries(NitroEnv
+add_library(nitro-env src/env/get.cpp src/env/hostname.cpp)
+target_link_libraries(nitro-env
     PUBLIC
         Nitro::Core
 )
 
-add_library(NitroJiffy src/jiffy/jiffy.cpp)
-target_link_libraries(NitroJiffy
+add_library(nitro-jiffy src/jiffy/jiffy.cpp)
+target_link_libraries(nitro-jiffy
     PUBLIC
         Nitro::Core
 )
 
-add_library(NitroAll INTERFACE)
-target_link_libraries(NitroAll
+add_library(nitro-all INTERFACE)
+target_link_libraries(nitro-all
     INTERFACE
         Nitro::Core
         Nitro::Log
@@ -138,39 +138,41 @@ target_link_libraries(NitroAll
         Nitro::Jiffy
 )
 
-add_library(Nitro::Nitro ALIAS NitroAll)
-add_library(Nitro::Core ALIAS NitroCore)
-add_library(Nitro::Dl ALIAS NitroDl)
-add_library(Nitro::Log ALIAS NitroLog)
-add_library(Nitro::Env ALIAS NitroEnv)
-add_library(Nitro::Jiffy ALIAS NitroJiffy)
+add_library(Nitro::Nitro ALIAS nitro-all)
+add_library(Nitro::Core ALIAS nitro-core)
+add_library(Nitro::Dl ALIAS nitro-dl)
+add_library(Nitro::Log ALIAS nitro-log)
+add_library(Nitro::Env ALIAS nitro-env)
+add_library(Nitro::Jiffy ALIAS nitro-jiffy)
 
+if(CMAKE_CURRENT_SOURCE_DIR STREQUAL CMAKE_SOURCE_DIR)
+    install(DIRECTORY
+        ${CMAKE_CURRENT_SOURCE_DIR}/include/nitro
+        DESTINATION include
+    )
+    install(TARGETS nitro-core nitro-all nitro-dl nitro-log nitro-env nitro-jiffy EXPORT NitroTargets
+        LIBRARY DESTINATION lib
+        ARCHIVE DESTINATION lib
+        RUNTIME DESTINATION bin
+        INCLUDES DESTINATION include
+    )
+    install(EXPORT NitroTargets
+        FILE NitroTargets.cmake
+        NAMESPACE Nitro::
+        DESTINATION lib/cmake/Nitro
+    )
 
-install(DIRECTORY
-    ${CMAKE_CURRENT_SOURCE_DIR}/include/nitro
-    DESTINATION include
-)
-install(TARGETS NitroCore NitroAll NitroDl NitroLog NitroEnv NitroJiffy EXPORT NitroTargets
-    LIBRARY DESTINATION lib
-    ARCHIVE DESTINATION lib
-    RUNTIME DESTINATION bin
-    INCLUDES DESTINATION include
-)
-install(EXPORT NitroTargets
-    FILE NitroTargets.cmake
-    NAMESPACE Nitro::
-    DESTINATION lib/cmake/Nitro
-)
+    include(CMakePackageConfigHelpers)
+    write_basic_package_version_File("NitroConfigVersion.cmake"
+        VERSION ${Nitro_VERSION}
+        COMPATIBILITY SameMajorVersion
+    )
+    install(FILES "NitroConfig.cmake" "${CMAKE_CURRENT_BINARY_DIR}/NitroConfigVersion.cmake"
+        DESTINATION lib/cmake/Nitro
+    )
 
-include(CMakePackageConfigHelpers)
-write_basic_package_version_File("NitroConfigVersion.cmake"
-    VERSION ${Nitro_VERSION}
-    COMPATIBILITY SameMajorVersion
-)
-install(FILES "NitroConfig.cmake" "${CMAKE_CURRENT_BINARY_DIR}/NitroConfigVersion.cmake"
-    DESTINATION lib/cmake/Nitro
-)
-
-include(CTest)
-
-add_subdirectory(tests)
+    include(CTest)
+    add_subdirectory(tests)
+else()
+    set_target_properties(nitro-env nitro-jiffy PROPERTIES EXCLUDE_FROM_ALL TRUE)
+endif()
