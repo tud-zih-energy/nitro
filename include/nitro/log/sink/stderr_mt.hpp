@@ -43,18 +43,22 @@ namespace log
     {
         class StdErrThreaded
         {
-            static std::mutex mutex_;
+            std::mutex& std_err_mutex()
+            {
+                static std::mutex mutex_;
+                return mutex_;
+            }
 
         public:
             void sink(severity_level, const std::string& formatted_record)
             {
-                std::lock_guard<std::mutex> my_lock(mutex_);
+                std::lock_guard<std::mutex> my_lock(std_err_mutex());
 
                 std::cerr << formatted_record;
             }
         };
-    }
-}
-} // namespace nitro::log::sink
+    } // namespace sink
+} // namespace log
+} // namespace nitro
 
 #endif // INCLUDE_NITRO_LOG_SINK_STDERR_MT_HPP
