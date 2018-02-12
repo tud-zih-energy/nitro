@@ -22,11 +22,11 @@ if(NOT CMAKE_C_COMPILER_ID MATCHES "MSVC")
     NitroTest(dl_test.cpp)
     set_tests_properties(Nitro.dl_test PROPERTIES ENVIRONMENT "LD_LIBRARY_PATH=${CMAKE_CURRENT_BINARY_DIR}:$ENV{LD_LIBRARY_PATH}")
     target_link_libraries(Nitro.dl_test Nitro::Dl)
-
-    NitroTest(env_get_test.cpp)
-    target_link_libraries(Nitro.env_get_test Nitro::Env)
-    set_tests_properties(Nitro.env_get_test PROPERTIES ENVIRONMENT "TEST_1=THIS_WAS_SET")
 endif()
+
+NitroTest(env_get_test.cpp)
+target_link_libraries(Nitro.env_get_test Nitro::Env)
+set_tests_properties(Nitro.env_get_test PROPERTIES ENVIRONMENT "TEST_1=THIS_WAS_SET")
 
 NitroTest(broken_options_test.cpp)
 
