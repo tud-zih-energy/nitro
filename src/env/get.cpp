@@ -28,13 +28,7 @@
 
 #include <nitro/env/get.hpp>
 
-#ifndef _GNU_SOURCE
 #include <cstdlib>
-#else
-extern "C" {
-#include <stdlib.h>
-}
-#endif
 
 namespace nitro
 {
@@ -43,11 +37,7 @@ namespace env
     std::string get(const std::string& name, std::string default_)
     {
         char* tmp;
-#ifndef _GNU_SOURCE
         tmp = std::getenv(name.c_str());
-#else
-        tmp = ::secure_getenv(name.c_str());
-#endif
 
         if (tmp == nullptr)
         {
@@ -56,5 +46,5 @@ namespace env
 
         return std::string(tmp);
     }
-}
-}
+} // namespace env
+} // namespace nitro
