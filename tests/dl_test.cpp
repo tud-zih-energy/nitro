@@ -33,11 +33,6 @@ TEST_CASE("library symbols can be loaded and used", "[dl]")
     }
 }
 
-extern "C" double nitro_binary_cos(double)
-{
-    return 1.0;
-}
-
 TEST_CASE("self binary symbols can be loaded and used", "[dl]")
 {
     nitro::dl::dl test_library(nitro::dl::self);

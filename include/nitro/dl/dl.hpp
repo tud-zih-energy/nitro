@@ -44,9 +44,13 @@ namespace nitro
 {
 namespace dl
 {
+    /**
+     * \brief A tag for opening the actual binary itself, instead of an external library
+     */
     static struct self_tag
     {
     } self;
+
     /**
      * \brief Class for dynamically loading libraries
      *
