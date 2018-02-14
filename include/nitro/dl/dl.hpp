@@ -84,6 +84,31 @@ namespace dl
             }
         }
 
+        /**
+         * \brief construct with the application binary
+         *
+         * \throws nitro::dl::exception {
+         * throws if the library could not be opened.
+         * }
+         */
+        dl()
+        : handle(dlopen(NULL, RTLD_NOW), [](void* handle) {
+              if (handle != nullptr)
+              {
+                  dlclose(handle);
+              }
+          })
+        {
+            if (handle == nullptr)
+            {
+                std::stringstream msg;
+                msg << "Couldn't open the main program";
+
+                raise<nitro::dl::exception>(dlerror(), msg.str());
+            }
+        }
+
+
         template <typename T>
         nitro::dl::symbol<T> load(const std::string& name)
         {
