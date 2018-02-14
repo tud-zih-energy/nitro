@@ -44,6 +44,12 @@ namespace nitro
 {
 namespace dl
 {
+    /**
+     * \brief A tag for opening the actual binary itself, instead of an external library
+     */
+    static struct self_tag
+    {
+    } self;
 
     /**
      * \brief Class for dynamically loading libraries
@@ -67,7 +73,7 @@ namespace dl
          * throws if the library could not be opened.
          * }
          */
-        dl(const std::string& filename)
+        explicit dl(const std::string& filename)
         : handle(dlopen(filename.c_str(), RTLD_NOW), [](void* handle) {
               if (handle != nullptr)
               {
@@ -79,6 +85,30 @@ namespace dl
             {
                 std::stringstream msg;
                 msg << "Couldn't open library '" << filename << '\'';
+
+                raise<nitro::dl::exception>(dlerror(), msg.str());
+            }
+        }
+
+        /**
+         * \brief construct with the application binary
+         *
+         * \throws nitro::dl::exception {
+         * throws if the library could not be opened.
+         * }
+         */
+        explicit dl(self_tag)
+        : handle(dlopen(NULL, RTLD_NOW), [](void* handle) {
+              if (handle != nullptr)
+              {
+                  dlclose(handle);
+              }
+          })
+        {
+            if (handle == nullptr)
+            {
+                std::stringstream msg;
+                msg << "Couldn't open the main program";
 
                 raise<nitro::dl::exception>(dlerror(), msg.str());
             }
@@ -98,7 +128,7 @@ namespace dl
     private:
         std::shared_ptr<void> handle;
     };
-}
-} // namespace nitro::dl
+} // namespace dl
+} // namespace nitro
 
 #endif // INCLUDE_NITRO_DL_DL_HPP

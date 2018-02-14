@@ -20,6 +20,7 @@ if(NOT CMAKE_C_COMPILER_ID MATCHES "MSVC")
     add_library(nitro_test_lib SHARED nitro_test_lib.cpp)
 
     NitroTest(dl_test.cpp)
+    target_sources(Nitro.dl_test PRIVATE dl_test_other.cpp)
     set_tests_properties(Nitro.dl_test PROPERTIES ENVIRONMENT "LD_LIBRARY_PATH=${CMAKE_CURRENT_BINARY_DIR}:$ENV{LD_LIBRARY_PATH}")
     target_link_libraries(Nitro.dl_test Nitro::Dl)
 endif()
