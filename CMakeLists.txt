@@ -27,31 +27,12 @@ project(Nitro)
 
 cmake_minimum_required(VERSION 3.2)
 
-# Intialize git submodules if not done already
-file(GLOB SUBMODULE_FILES "common/*")
-list(LENGTH SUBMODULE_FILES COUNT_COMMON)
-file(GLOB SUBMODULE_FILES "tests/Catch/*")
-list(LENGTH SUBMODULE_FILES COUNT_CATCH)
-if(${COUNT_COMMON} EQUAL 0 OR ${COUNT_CATCH} EQUAL 0)
-    message(STATUS "Initializing git submodule")
-    execute_process(COMMAND "git" "submodule" "init" WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}")
-    execute_process(COMMAND "git" "submodule" "update" WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}")
-endif()
+include(GitSubmoduleUpdate.cmake)
+git_submodule_update()
 
 include(common/DefaultBuildType.cmake)
+include(common/UnsetIfUpdated.cmake)
 
-# Intialize git submodules if not done already
-file(GLOB SUBMODULE_FILES "${CMAKE_CURRENT_LIST_DIR}/common/*")
-list(LENGTH SUBMODULE_FILES COUNT_COMMON)
-
-if(${COUNT_COMMON} EQUAL 0)
-    message(STATUS "Initializing git submodule")
-    execute_process(COMMAND "git" "submodule" "init" WORKING_DIRECTORY "${CMAKE_CURRENT_LIST_DIR}")
-endif()
-message(STATUS "Updating git submodule")
-execute_process(COMMAND "git" "submodule" "update" WORKING_DIRECTORY "${CMAKE_CURRENT_LIST_DIR}")
-
-include(${CMAKE_CURRENT_LIST_DIR}/common/UnsetIfUpdated.cmake)
 UnsetIfUpdated(MIN_LOG_LEVEL CMAKE_BUILD_TYPE)
 
 if (NOT MIN_LOG_LEVEL)
