@@ -44,7 +44,9 @@ namespace nitro
 {
 namespace dl
 {
-
+    static struct self_tag
+    {
+    } self;
     /**
      * \brief Class for dynamically loading libraries
      *
@@ -67,7 +69,7 @@ namespace dl
          * throws if the library could not be opened.
          * }
          */
-        dl(const std::string& filename)
+        explicit dl(const std::string& filename)
         : handle(dlopen(filename.c_str(), RTLD_NOW), [](void* handle) {
               if (handle != nullptr)
               {
@@ -91,7 +93,7 @@ namespace dl
          * throws if the library could not be opened.
          * }
          */
-        dl()
+        explicit dl(self_tag)
         : handle(dlopen(NULL, RTLD_NOW), [](void* handle) {
               if (handle != nullptr)
               {
@@ -108,7 +110,6 @@ namespace dl
             }
         }
 
-
         template <typename T>
         nitro::dl::symbol<T> load(const std::string& name)
         {
@@ -123,7 +124,7 @@ namespace dl
     private:
         std::shared_ptr<void> handle;
     };
-}
-} // namespace nitro::dl
+} // namespace dl
+} // namespace nitro
 
 #endif // INCLUDE_NITRO_DL_DL_HPP
