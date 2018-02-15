@@ -23,6 +23,10 @@
 # IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF
 # THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
+if(TARGET Nitro::Nitro)
+    message(AUTHOR_WARNING "Nitro targets were already defined. Skipping.")
+else()
+
 project(Nitro)
 
 cmake_minimum_required(VERSION 3.2)
@@ -33,22 +37,27 @@ git_submodule_update()
 include(common/DefaultBuildType.cmake)
 include(common/UnsetIfUpdated.cmake)
 
-UnsetIfUpdated(MIN_LOG_LEVEL CMAKE_BUILD_TYPE)
+UnsetIfUpdated(NITRO_LOG_LEVEL CMAKE_BUILD_TYPE)
 
-if (NOT MIN_LOG_LEVEL)
+if (NOT NITRO_LOG_LEVEL)
     if (CMAKE_BUILD_TYPE STREQUAL "Debug")
-        set(MIN_LOG_LEVEL "trace" CACHE STRING
-                "The minimum required severity level of log messages to be compiled into the binary.")
+        set(NITRO_LOG_LEVEL "trace" CACHE STRING
+                "The minimum required severity level of log messages available during runtime.")
     else()
-        set(MIN_LOG_LEVEL "debug" CACHE STRING
-                "The minimum required severity level of log messages to be compiled into the binary.")
+        set(NITRO_LOG_LEVEL "debug" CACHE STRING
+                "The minimum required severity level of log messages available during runtime.")
     endif()
 
-    set_property(CACHE MIN_LOG_LEVEL PROPERTY "STRINGS" "fatal" "error" "warn" "info" "debug"
+    set_property(CACHE NITRO_LOG_LEVEL PROPERTY "STRINGS" "fatal" "error" "warn" "info" "debug"
             "trace")
 endif()
 
 set(Nitro_VERSION 1.0)
+
+if(NOT NITRO_POSITION_INDEPENDENT_CODE)
+    set(NITRO_POSITION_INDEPENDENT_CODE OFF)
+endif()
+option(NITRO_POSITION_INDEPENDENT_CODE "Whether to build Nitro libraries with position independent code" ${NITRO_POSITION_INDEPENDENT_CODE})
 
 add_library(nitro-core INTERFACE)
 target_include_directories(nitro-core INTERFACE
@@ -95,19 +104,21 @@ target_link_libraries(nitro-log
     INTERFACE
         Nitro::Core
 )
-target_compile_definitions(nitro-log INTERFACE NITRO_LOG_MIN_SEVERITY=${MIN_LOG_LEVEL})
+target_compile_definitions(nitro-log INTERFACE NITRO_LOG_MIN_SEVERITY=${NITRO_LOG_LEVEL})
 
 add_library(nitro-env src/env/get.cpp src/env/hostname.cpp)
 target_link_libraries(nitro-env
     PUBLIC
         Nitro::Core
 )
+set_target_properties(nitro-env PROPERTIES POSITION_INDEPENDENT_CODE ${NITRO_POSITION_INDEPENDENT_CODE})
 
 add_library(nitro-jiffy src/jiffy/jiffy.cpp)
 target_link_libraries(nitro-jiffy
     PUBLIC
         Nitro::Core
 )
+set_target_properties(nitro-jiffy PROPERTIES POSITION_INDEPENDENT_CODE ${NITRO_POSITION_INDEPENDENT_CODE})
 
 add_library(nitro-all INTERFACE)
 target_link_libraries(nitro-all
@@ -127,20 +138,23 @@ add_library(Nitro::Env ALIAS nitro-env)
 add_library(Nitro::Jiffy ALIAS nitro-jiffy)
 
 if(CMAKE_CURRENT_SOURCE_DIR STREQUAL CMAKE_SOURCE_DIR)
+    # build Debug with all warnings
+    target_compile_options(nitro-all INTERFACE $<$<CONFIG:Debug>:-Wall -pedantic -Wextra>)
+
     install(DIRECTORY
         ${CMAKE_CURRENT_SOURCE_DIR}/include/nitro
         DESTINATION include
     )
-    install(TARGETS nitro-core nitro-all nitro-dl nitro-log nitro-env nitro-jiffy EXPORT NitroTargets
+    install(TARGETS nitro-core nitro-all nitro-dl nitro-log nitro-env nitro-jiffy
+        EXPORT NitroTargets
         LIBRARY DESTINATION lib
         ARCHIVE DESTINATION lib
         RUNTIME DESTINATION bin
         INCLUDES DESTINATION include
     )
     install(EXPORT NitroTargets
-        FILE NitroTargets.cmake
-        NAMESPACE Nitro::
         DESTINATION lib/cmake/Nitro
+        NAMESPACE Nitro::
     )
 
     include(CMakePackageConfigHelpers)
@@ -156,4 +170,6 @@ if(CMAKE_CURRENT_SOURCE_DIR STREQUAL CMAKE_SOURCE_DIR)
     add_subdirectory(tests)
 else()
     set_target_properties(nitro-env nitro-jiffy PROPERTIES EXCLUDE_FROM_ALL TRUE)
+endif()
+
 endif()
