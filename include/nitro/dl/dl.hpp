@@ -99,6 +99,7 @@ namespace dl
          */
         explicit dl(self_tag)
         : handle(dlopen(NULL, RTLD_NOW), [](void* handle) {
+              (void)nitro::dl::self;
               if (handle != nullptr)
               {
                   dlclose(handle);
