@@ -4,7 +4,7 @@ macro(NitroTest TEST)
     set(TEST_NAME "Nitro.${TEST_NAME}")
 
     add_executable(${TEST_NAME} ${TEST})
-    target_link_libraries(${TEST_NAME} Nitro::Core)
+    target_link_libraries(${TEST_NAME} Nitro::nitro-core)
     if(CMAKE_C_COMPILER_ID MATCHES "MSVC")
         target_compile_options(${TEST_NAME} PRIVATE /W4)
     else()
@@ -22,11 +22,11 @@ if(NOT CMAKE_C_COMPILER_ID MATCHES "MSVC")
     NitroTest(dl_test.cpp)
     target_sources(Nitro.dl_test PRIVATE dl_test_other.cpp)
     set_tests_properties(Nitro.dl_test PROPERTIES ENVIRONMENT "LD_LIBRARY_PATH=${CMAKE_CURRENT_BINARY_DIR}:$ENV{LD_LIBRARY_PATH}")
-    target_link_libraries(Nitro.dl_test Nitro::Dl)
+    target_link_libraries(Nitro.dl_test Nitro::nitro-dl)
 endif()
 
 NitroTest(env_get_test.cpp)
-target_link_libraries(Nitro.env_get_test Nitro::Env)
+target_link_libraries(Nitro.env_get_test Nitro::nitro-env)
 set_tests_properties(Nitro.env_get_test PROPERTIES ENVIRONMENT "TEST_1=THIS_WAS_SET")
 
 NitroTest(broken_options_test.cpp)
@@ -38,10 +38,10 @@ NitroTest(reverse_test.cpp)
 NitroTest(enumerate_test.cpp)
 
 NitroTest(logging_test.cpp)
-target_link_libraries(Nitro.logging_test Nitro::Log)
+target_link_libraries(Nitro.logging_test Nitro::nitro-log)
 
 NitroTest(logging_jiffy_test.cpp)
-target_link_libraries(Nitro.logging_jiffy_test Nitro::Log Nitro::Jiffy)
+target_link_libraries(Nitro.logging_jiffy_test Nitro::nitro-log Nitro::nitro-jiffy)
 
 NitroTest(string_ref_test.cpp)
 
@@ -50,4 +50,4 @@ NitroTest(catch_test.cpp)
 NitroTest(quaint_ptr_test.cpp)
 
 NitroTest(jiffy_test.cpp)
-target_link_libraries(Nitro.jiffy_test Nitro::Jiffy)
+target_link_libraries(Nitro.jiffy_test Nitro::nitro-jiffy)

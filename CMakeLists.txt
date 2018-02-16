@@ -95,57 +95,84 @@ target_compile_features(nitro-core
 add_library(nitro-dl INTERFACE)
 target_link_libraries(nitro-dl
     INTERFACE
-        Nitro::Core
+        Nitro::nitro-core
         ${CMAKE_DL_LIBS}
 )
 
 add_library(nitro-log INTERFACE)
 target_link_libraries(nitro-log
     INTERFACE
-        Nitro::Core
+        Nitro::nitro-core
 )
 target_compile_definitions(nitro-log INTERFACE NITRO_LOG_MIN_SEVERITY=${NITRO_LOG_LEVEL})
 
-add_library(nitro-env src/env/get.cpp src/env/hostname.cpp)
+add_library(nitro-env SHARED src/env/get.cpp src/env/hostname.cpp)
 target_link_libraries(nitro-env
     PUBLIC
-        Nitro::Core
+        Nitro::nitro-core
 )
-set_target_properties(nitro-env PROPERTIES POSITION_INDEPENDENT_CODE ${NITRO_POSITION_INDEPENDENT_CODE})
+
+add_library(nitro-env-static STATIC src/env/get.cpp src/env/hostname.cpp)
+target_link_libraries(nitro-env-static
+    PUBLIC
+        Nitro::nitro-core
+)
+set_target_properties(nitro-env-static PROPERTIES
+    POSITION_INDEPENDENT_CODE ${NITRO_POSITION_INDEPENDENT_CODE}
+    OUTPUT_NAME nitro-env
+)
 
 add_library(nitro-jiffy src/jiffy/jiffy.cpp)
 target_link_libraries(nitro-jiffy
     PUBLIC
-        Nitro::Core
+        Nitro::nitro-core
 )
-set_target_properties(nitro-jiffy PROPERTIES POSITION_INDEPENDENT_CODE ${NITRO_POSITION_INDEPENDENT_CODE})
 
-add_library(nitro-all INTERFACE)
-target_link_libraries(nitro-all
+add_library(nitro-jiffy-static STATIC src/jiffy/jiffy.cpp)
+target_link_libraries(nitro-jiffy-static
+    PUBLIC
+        Nitro::nitro-core
+)
+set_target_properties(nitro-jiffy-static PROPERTIES
+    POSITION_INDEPENDENT_CODE ${NITRO_POSITION_INDEPENDENT_CODE}
+    OUTPUT_NAME nitro-jiffy
+)
+
+add_library(nitro INTERFACE)
+target_link_libraries(nitro
     INTERFACE
-        Nitro::Core
-        Nitro::Log
-        Nitro::Dl
-        Nitro::Env
-        Nitro::Jiffy
+        Nitro::nitro-core
+        Nitro::nitro-log
+        Nitro::nitro-dl
+        Nitro::nitro-env
+        Nitro::nitro-jiffy
 )
 
-add_library(Nitro::Nitro ALIAS nitro-all)
-add_library(Nitro::Core ALIAS nitro-core)
-add_library(Nitro::Dl ALIAS nitro-dl)
-add_library(Nitro::Log ALIAS nitro-log)
-add_library(Nitro::Env ALIAS nitro-env)
-add_library(Nitro::Jiffy ALIAS nitro-jiffy)
+add_library(Nitro::nitro ALIAS nitro)
+add_library(Nitro::nitro-core ALIAS nitro-core)
+add_library(Nitro::nitro-dl ALIAS nitro-dl)
+add_library(Nitro::nitro-log ALIAS nitro-log)
+add_library(Nitro::nitro-env ALIAS nitro-env-static)
+add_library(Nitro::nitro-jiffy ALIAS nitro-jiffy-static)
 
 if(CMAKE_CURRENT_SOURCE_DIR STREQUAL CMAKE_SOURCE_DIR)
     # build Debug with all warnings
-    target_compile_options(nitro-all INTERFACE $<$<CONFIG:Debug>:-Wall -pedantic -Wextra>)
+    target_compile_options(nitro INTERFACE $<$<CONFIG:Debug>:-Wall -pedantic -Wextra>)
 
     install(DIRECTORY
         ${CMAKE_CURRENT_SOURCE_DIR}/include/nitro
         DESTINATION include
     )
-    install(TARGETS nitro-core nitro-all nitro-dl nitro-log nitro-env nitro-jiffy
+
+    install(TARGETS
+            nitro
+            nitro-core
+            nitro-dl
+            nitro-log
+            nitro-env
+            nitro-env-static
+            nitro-jiffy
+            nitro-jiffy-static
         EXPORT NitroTargets
         LIBRARY DESTINATION lib
         ARCHIVE DESTINATION lib
@@ -169,7 +196,7 @@ if(CMAKE_CURRENT_SOURCE_DIR STREQUAL CMAKE_SOURCE_DIR)
     include(CTest)
     add_subdirectory(tests)
 else()
-    set_target_properties(nitro-env nitro-jiffy PROPERTIES EXCLUDE_FROM_ALL TRUE)
+    set_target_properties(nitro-env nitro-jiffy nitro-env-static nitro-jiffy-static PROPERTIES EXCLUDE_FROM_ALL TRUE)
 endif()
 
 endif()
