@@ -115,7 +115,7 @@ namespace broken_options
         std::map<std::string, toggle> toggles_;
         std::vector<std::string> positionals_;
     };
-}
-} // namespace nitr::broken_options
+} // namespace broken_options
+} // namespace nitro
 
 #endif // INCLUDE_NITRO_BROKEN_OPTIONS_OPTIONS_HPP

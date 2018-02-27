@@ -29,6 +29,7 @@
 #ifndef INCLUDE_NITRO_BROKEN_OPTIONS_OPTION_HPP
 #define INCLUDE_NITRO_BROKEN_OPTIONS_OPTION_HPP
 
+#include <nitro/broken_options/exception.hpp>
 #include <nitro/broken_options/fwd.hpp>
 
 #include <nitro/lang/optional.hpp>
@@ -36,6 +37,7 @@
 #include <memory>
 #include <sstream>
 #include <string>
+#include <type_traits>
 
 namespace nitro
 {
@@ -66,7 +68,7 @@ namespace broken_options
         {
             if (short_ && *short_ != short_name)
             {
-                raise("Trying to redefine short name");
+                raise<parser_error>("Trying to redefine short name");
             }
 
             short_ = short_name;
@@ -88,7 +90,7 @@ namespace broken_options
         }
 
         template <typename T>
-        T as() const
+        std::enable_if_t<!std::is_constructible<T, std::string>::value> as() const
         {
             std::stringstream str;
             str << *value_;
@@ -102,12 +104,18 @@ namespace broken_options
             return result;
         }
 
+        template <typename T>
+        std::enable_if_t<std::is_constructible<T, std::string>::value> as() const
+        {
+            return T(*value_);
+        }
+
     private:
         void update_value(const std::string& data)
         {
             if (value_)
             {
-                raise("option was already given: ", name_);
+                raise<parser_error>("option was already given: ", name_);
             }
 
             if (data_)
@@ -130,7 +138,7 @@ namespace broken_options
         {
             if (!value_)
             {
-                raise("missing value for required option");
+                raise<parser_error>("missing value for required option: ", name_);
             }
         }
 
@@ -153,7 +161,7 @@ namespace broken_options
         nitro::lang::optional<std::string> value_;
         std::string* data_;
     };
-}
-} // namespace nitr::broken_options
+} // namespace broken_options
+} // namespace nitro
 
 #endif // INCLUDE_NITRO_BROKEN_OPTIONS_OPTION_HPP

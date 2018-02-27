@@ -29,6 +29,7 @@
 #ifndef INCLUDE_NITRO_BROKEN_OPTIONS_ARGUMENT_HPP
 #define INCLUDE_NITRO_BROKEN_OPTIONS_ARGUMENT_HPP
 
+#include <nitro/broken_options/exception.hpp>
 #include <nitro/broken_options/fwd.hpp>
 
 #include <nitro/except/raise.hpp>
@@ -109,7 +110,7 @@ namespace broken_options
         {
             if (!is_short_option() || has_value())
             {
-                raise("Trying to interprete option as short options list, but ain't");
+                raise<parser_error>("Trying to interprete option as short options list, but ain't");
             }
 
             std::vector<std::string> result;
@@ -127,7 +128,7 @@ namespace broken_options
         std::string name_;
         lang::optional<std::string> value_;
     };
-}
-} // namespace nitr::broken_options
+} // namespace broken_options
+} // namespace nitro
 
 #endif // INCLUDE_NITRO_BROKEN_OPTIONS_ARGUMENT_HPP

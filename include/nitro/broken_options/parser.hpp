@@ -30,6 +30,7 @@
 #define INCLUDE_NITRO_BROKEN_OPTIONS_PARSER_HPP
 
 #include <nitro/broken_options/argument.hpp>
+#include <nitro/broken_options/exception.hpp>
 #include <nitro/broken_options/multi_option.hpp>
 #include <nitro/broken_options/option.hpp>
 #include <nitro/broken_options/options.hpp>
@@ -61,12 +62,12 @@ namespace broken_options
         {
             if (multi_options_.count(name) > 0)
             {
-                raise("Trying to redefine multi_option as option. Name: ", name);
+                raise<parser_error>("Trying to redefine multi_option as option. Name: ", name);
             }
 
             if (toggles_.count(name) > 0)
             {
-                raise("Trying to redefine toggle as multi_option. Name: ", name);
+                raise<parser_error>("Trying to redefine toggle as multi_option. Name: ", name);
             }
 
             if (options_.count(name) == 0)
@@ -82,12 +83,12 @@ namespace broken_options
         {
             if (options_.count(name) > 0)
             {
-                raise("Trying to redefine option as multi_option. Name: ", name);
+                raise<parser_error>("Trying to redefine option as multi_option. Name: ", name);
             }
 
             if (toggles_.count(name) > 0)
             {
-                raise("Trying to redefine toggle as multi_option. Name: ", name);
+                raise<parser_error>("Trying to redefine toggle as multi_option. Name: ", name);
             }
 
             if (multi_options_.count(name) == 0)
@@ -103,12 +104,12 @@ namespace broken_options
         {
             if (options_.count(name) > 0)
             {
-                raise("Trying to redefine option as multi_option. Name: ", name);
+                raise<parser_error>("Trying to redefine option as multi_option. Name: ", name);
             }
 
             if (multi_options_.count(name) > 0)
             {
-                raise("Trying to redefine multi_option as option. Name: ", name);
+                raise<parser_error>("Trying to redefine multi_option as option. Name: ", name);
             }
 
             if (toggles_.count(name) == 0)
@@ -255,7 +256,7 @@ namespace broken_options
 
                 if (!match_found)
                 {
-                    raise("Argument '", current_arg.data(), "' could not be parsed.");
+                    raise<parser_error>("Argument '", current_arg.data(), "' could not be parsed.");
                 }
             }
 
@@ -329,7 +330,7 @@ namespace broken_options
 
         bool force_positional_ = false;
     };
-}
-} // namespace nitr::broken_options
+} // namespace broken_options
+} // namespace nitro
 
 #endif // INCLUDE_NITRO_BROKEN_OPTIONS_PARSER_HPP

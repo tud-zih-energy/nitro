@@ -29,6 +29,7 @@
 #ifndef INCLUDE_NITRO_BROKEN_OPTIONS_MULTI_OPTION_HPP
 #define INCLUDE_NITRO_BROKEN_OPTIONS_MULTI_OPTION_HPP
 
+#include <nitro/broken_options/exception.hpp>
 #include <nitro/broken_options/fwd.hpp>
 
 #include <nitro/except/raise.hpp>
@@ -63,7 +64,7 @@ namespace broken_options
         {
             if (short_ && *short_ != short_name)
             {
-                raise("Trying to redefine short name");
+                raise<parser_error>("Trying to redefine short name");
             }
 
             short_ = short_name;
@@ -130,7 +131,7 @@ namespace broken_options
         {
             if (value_.empty())
             {
-                raise("missing value for required option");
+                raise<parser_error>("missing value for required option");
             }
         }
 
@@ -153,7 +154,7 @@ namespace broken_options
         std::vector<std::string> value_;
         std::vector<std::string>* ref_;
     };
-}
-} // namespace nitr::broken_options
+} // namespace broken_options
+} // namespace nitro
 
 #endif // INCLUDE_NITRO_BROKEN_OPTIONS_MULTI_OPTION_HPP
