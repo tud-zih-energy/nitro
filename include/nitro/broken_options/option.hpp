@@ -90,7 +90,7 @@ namespace broken_options
         }
 
         template <typename T>
-        std::enable_if_t<!std::is_constructible<T, std::string>::value> as() const
+        std::enable_if_t<!std::is_constructible<T, std::string>::value, T> as() const
         {
             std::stringstream str;
             str << *value_;
@@ -105,7 +105,7 @@ namespace broken_options
         }
 
         template <typename T>
-        std::enable_if_t<std::is_constructible<T, std::string>::value> as() const
+        std::enable_if_t<std::is_constructible<T, std::string>::value, T> as() const
         {
             return T(*value_);
         }
