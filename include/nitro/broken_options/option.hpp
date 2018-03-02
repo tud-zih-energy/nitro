@@ -128,17 +128,20 @@ namespace broken_options
 
         void update()
         {
-            if (default_)
-            {
-                update_value(*default_);
-            }
         }
 
         void check()
         {
             if (!value_)
             {
-                raise<parser_error>("missing value for required option: ", name_);
+                if (default_)
+                {
+                    update_value(*default_);
+                }
+                else
+                {
+                    raise<parser_error>("missing value for required option: ", name_);
+                }
             }
         }
 
