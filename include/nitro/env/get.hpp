@@ -35,7 +35,18 @@ namespace nitro
 {
 namespace env
 {
+    namespace detail
+    {
+        struct no_default_t
+        {
+        };
+    } // namespace detail
+
+    extern detail::no_default_t no_default;
+
     std::string get(const std::string& name, std::string default_ = "");
-}
-}
+    std::string get(const std::string& name, detail::no_default_t);
+
+} // namespace env
+} // namespace nitro
 #endif // INCLUDE_NITRO_ENV_GET_HPP

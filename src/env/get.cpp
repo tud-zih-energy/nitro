@@ -28,12 +28,16 @@
 
 #include <nitro/env/get.hpp>
 
+#include <nitro/except/raise.hpp>
+
 #include <cstdlib>
 
 namespace nitro
 {
 namespace env
 {
+    detail::no_default_t no_default;
+
     std::string get(const std::string& name, std::string default_)
     {
         char* tmp;
@@ -46,5 +50,19 @@ namespace env
 
         return std::string(tmp);
     }
+
+    std::string get(const std::string& name, detail::no_default_t)
+    {
+        char* tmp;
+        tmp = std::getenv(name.c_str());
+
+        if (tmp == nullptr)
+        {
+            raise("Couldn't read the enviroment variable ", name);
+        }
+
+        return std::string(tmp);
+    }
+
 } // namespace env
 } // namespace nitro
