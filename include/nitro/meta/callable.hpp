@@ -36,8 +36,14 @@ namespace nitro
 namespace meta
 {
     template <typename T, typename Signature>
-    struct is_callable : std::is_convertible<T, std::function<Signature>>
+    struct is_callable;
+
+    template <typename T, typename Result, typename... Args>
+    struct is_callable<T, Result(Args...)>
     {
+        static constexpr bool value =
+            std::is_function<T>::value &&
+            std::is_same<decltype(std::declval<T>(std::declval<Args>...)), Result>::value;
     };
-}
-}
+} // namespace meta
+} // namespace nitro
