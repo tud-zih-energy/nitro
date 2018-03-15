@@ -75,7 +75,6 @@ target_compile_features(nitro-core
         cxx_delegating_constructors
         cxx_deleted_functions
         cxx_explicit_conversions
-        #cxx_generalized_initializers //currently broken: https://gitlab.kitware.com/cmake/cmake/issues/17829
         cxx_generic_lambdas
         cxx_inheriting_constructors
         cxx_lambdas
@@ -91,6 +90,15 @@ target_compile_features(nitro-core
         cxx_variadic_templates
         cxx_template_template_parameters
 )
+
+if(NOT ${CMAKE_CXX_COMPILER_ID} STREQUAL "Intel")
+    # This compile feature test is broken on Intel. So we only check on other compilers.
+    # See https://gitlab.kitware.com/cmake/cmake/issues/17829
+    target_compile_features(nitro-core
+        INTERFACE
+            cxx_generalized_initializers
+    )
+endif()
 
 add_library(nitro-dl INTERFACE)
 target_link_libraries(nitro-dl
