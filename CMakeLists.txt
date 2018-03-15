@@ -75,7 +75,7 @@ target_compile_features(nitro-core
         cxx_delegating_constructors
         cxx_deleted_functions
         cxx_explicit_conversions
-        cxx_generalized_initializers
+        #cxx_generalized_initializers //currently broken: https://gitlab.kitware.com/cmake/cmake/issues/17829
         cxx_generic_lambdas
         cxx_inheriting_constructors
         cxx_lambdas
