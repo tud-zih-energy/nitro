@@ -43,7 +43,11 @@ TEST_CASE("Usage descriptions work")
 
         parser.usage(s);
 
-        REQUIRE(s.str() == R"EXPECTED(usage: app_name [-tu] --opt [--opt_with_d] --mopt
+        std::cout << s.str();
+
+        REQUIRE(
+            s.str() ==
+            R"EXPECTED(usage: app_name [-tu] --opt --opt_long [--opt_nos] --opt_nosd [--opt_with_d] --mopt
 
 about
 

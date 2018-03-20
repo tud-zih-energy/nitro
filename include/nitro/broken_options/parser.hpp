@@ -293,22 +293,23 @@ namespace broken_options
 
             for (auto& opt : options_)
             {
-                if (opt.second.has_short_name())
+                if (opt.second.has_default())
                 {
-                    if (opt.second.has_default())
-                    {
-                        option_list += " [--" + opt.second.name() + "]";
-                    }
-                    else
-                    {
-                        option_list += " --" + opt.second.name();
-                    }
+                    option_list += " [--" + opt.second.name() + "]";
+                }
+                else
+                {
+                    option_list += " --" + opt.second.name();
                 }
             }
 
             for (auto& mopt : multi_options_)
             {
-                if (mopt.second.has_short_name())
+                if (mopt.second.has_default())
+                {
+                    option_list += " [--" + mopt.second.name() + "]";
+                }
+                else
                 {
                     option_list += " --" + mopt.second.name();
                 }
