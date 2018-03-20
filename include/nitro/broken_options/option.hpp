@@ -64,6 +64,11 @@ namespace broken_options
             return static_cast<bool>(default_);
         }
 
+        const std::string& default_value() const
+        {
+            return *default_;
+        }
+
         option& short_name(const std::string& short_name)
         {
             if (short_ && *short_ != short_name)
@@ -76,11 +81,62 @@ namespace broken_options
             return *this;
         }
 
+        bool has_short_name() const
+        {
+            return static_cast<bool>(short_);
+        }
+
+        const std::string& short_name() const
+        {
+            return *short_;
+        }
+
+        const std::string& name() const
+        {
+            return name_;
+        }
+
         option& ref(std::string& target)
         {
             data_ = &target;
 
             return *this;
+        }
+
+        std::ostream& format(std::ostream& s) const
+        {
+            s << "  " << std::left << std::setw(38);
+
+            std::stringstream str;
+
+            if (has_short_name())
+            {
+                str << "-" << short_name() << " [ --" << name() << " ]";
+            }
+            else
+            {
+                str << "--" << name();
+            }
+
+            if (has_default())
+            {
+                str << " [=" << default_value() << "]";
+            }
+            else
+            {
+                str << " arg";
+            }
+
+            s << str.str();
+
+            s << description_.substr(0, 40) << std::endl;
+
+            for (auto i = 40u; i < description_.size(); i += 40)
+            {
+                s << std::setw(40) << " " << description_.substr(i, 40) << std::endl;
+            }
+
+            return s;
         }
 
     public:

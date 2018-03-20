@@ -16,18 +16,53 @@ TEST_CASE("Using argc, argv from main does compile")
 
 TEST_CASE("Usage descriptions work")
 {
-    SECTION("Description for optinos work")
+    SECTION("Description for options work")
     {
         nitro::broken_options::parser parser("app_name", "about");
 
         std::stringstream s;
 
         parser.toggle("tog", "some toggle").short_name("t");
+        parser.toggle("togg", "some other toggle").short_name("u");
+
+        parser.option("opt", "some opt").short_name("o");
+        parser.option("opt_with_d", "some opt with a default")
+            .short_name("d")
+            .default_value("default value");
+
+        parser.option("opt_nos", "some opt without a short, but a default")
+            .default_value("default value");
+        parser.option("opt_nosd", "some opt without short and default");
+
+        parser.option("opt_long",
+                      "an option with an very very very very very very very very very "
+                      "very very very very very very very very very very very very very "
+                      "very very very very very very very very long description");
+
+        parser.multi_option("mopt", "some multi opt").short_name("m");
 
         parser.usage(s);
 
-        // TODO Implement usage
-        // REQUIRE(s.str() == "");
+        REQUIRE(s.str() == R"EXPECTED(usage: app_name [-tu] --opt [--opt_with_d] --mopt
+
+about
+
+optional arguments:
+  -t [ --tog ]                          some toggle
+  -u [ --togg ]                         some other toggle
+  --opt_nos [=default value]            some opt without a short, but a default
+  -d [ --opt_with_d ] [=default value]  some opt with a default
+
+required arguments:
+  -o [ --opt ] arg                      some opt
+  --opt_long arg                        an option with an very very very very ve
+                                        ry very very very very very very very ve
+                                        ry very very very very very very very ve
+                                        ry very very very very very very very ve
+                                        ry very long description
+  --opt_nosd arg                        some opt without short and default
+  -m [ --mopt ] arg                     some multi opt
+)EXPECTED");
     }
 }
 
@@ -461,5 +496,23 @@ TEST_CASE("Toggles should work", "[broken_options]")
         auto options = parser.parse(argc, argv);
 
         REQUIRE(!options.given("opt2"));
+    }
+
+    SECTION("for multiple toggles in one arg")
+    {
+        int argc = 2;
+        const char* argv[] = { "", "-ab" };
+
+        nitro::broken_options::parser parser;
+
+        parser.toggle("opt_a").short_name("a");
+        parser.toggle("opt_b").short_name("b");
+        parser.toggle("opt_c").short_name("c");
+
+        auto options = parser.parse(argc, argv);
+
+        REQUIRE(options.given("opt_a"));
+        REQUIRE(options.given("opt_b"));
+        REQUIRE(!options.given("opt_c"));
     }
 }

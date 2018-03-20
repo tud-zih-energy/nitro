@@ -225,19 +225,10 @@ namespace broken_options
 
                 for (auto& option : toggles_)
                 {
-                    if (match_found)
-                    {
-                        // could already be set in previous loop
-                        break;
-                    }
-
                     if (option.second.matches(current_arg.name()))
                     {
                         match_found = true;
-
                         option.second.update_value(current_arg.name());
-
-                        break;
                     }
                 }
 
@@ -284,7 +275,7 @@ namespace broken_options
             std::string short_list;
             std::string option_list;
 
-            for (auto toggle : toggles_)
+            for (auto& toggle : toggles_)
             {
                 if (toggle.second.has_short_name())
                 {
@@ -296,12 +287,36 @@ namespace broken_options
 
             if (!short_list.empty())
             {
+                std::sort(short_list.begin(), short_list.end());
                 s << " [-" << short_list << "]";
+            }
+
+            for (auto& opt : options_)
+            {
+                if (opt.second.has_short_name())
+                {
+                    if (opt.second.has_default())
+                    {
+                        option_list += " [--" + opt.second.name() + "]";
+                    }
+                    else
+                    {
+                        option_list += " --" + opt.second.name();
+                    }
+                }
+            }
+
+            for (auto& mopt : multi_options_)
+            {
+                if (mopt.second.has_short_name())
+                {
+                    option_list += " --" + mopt.second.name();
+                }
             }
 
             if (!option_list.empty())
             {
-                s << " " << option_list;
+                s << option_list;
             }
 
             s << std::endl << std::endl;
@@ -312,9 +327,33 @@ namespace broken_options
             }
 
             s << "optional arguments:" << std::endl;
-            for (auto toggle : toggles_)
+            for (auto& toggle : toggles_)
             {
-                s << "  " << toggle.second.name() << " \t- " << toggle.second.description();
+                toggle.second.format(s);
+            }
+            for (auto& opt : options_)
+            {
+                if (opt.second.has_default())
+                {
+                    opt.second.format(s);
+                }
+            }
+
+            s << std::endl << "required arguments:" << std::endl;
+            for (auto& opt : options_)
+            {
+                if (!opt.second.has_default())
+                {
+                    opt.second.format(s);
+                }
+            }
+
+            for (auto& opt : multi_options_)
+            {
+                if (!opt.second.has_default())
+                {
+                    opt.second.format(s);
+                }
             }
 
             return s;

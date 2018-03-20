@@ -34,6 +34,7 @@
 
 #include <nitro/lang/optional.hpp>
 
+#include <ios>
 #include <memory>
 #include <sstream>
 #include <string>
@@ -96,6 +97,34 @@ namespace broken_options
             return description_;
         }
 
+    public:
+        std::ostream& format(std::ostream& s) const
+        {
+            s << "  " << std::left << std::setw(38);
+
+            std::stringstream str;
+
+            if (has_short_name())
+            {
+                str << "-" << short_name() << " [ --" << name() << " ]";
+            }
+            else
+            {
+                str << "--" << name();
+            }
+
+            s << str.str();
+
+            s << description_.substr(0, 40) << std::endl;
+
+            for (auto i = 40u; i < description_.size(); i += 40)
+            {
+                s << std::setw(40) << " " << description_.substr(i, 40) << std::endl;
+            }
+
+            return s;
+        }
+
     private:
         void update_value(const std::string&)
         {
@@ -117,9 +146,15 @@ namespace broken_options
 
         bool matches(const std::string& arg)
         {
-            if (short_)
+            // several short toggles in one argument possible, e.g., -abc
+
+            if (short_ && arg[0] == '-' && arg[1] != '-')
             {
-                return (arg == std::string("-") + *short_) || arg == std::string("--") + name_;
+                auto begin = arg.begin() + 1;
+                if (std::find(begin, arg.end(), (*short_)[0]) != arg.end())
+                {
+                    return true;
+                }
             }
             return arg == std::string("--") + name_;
         }
