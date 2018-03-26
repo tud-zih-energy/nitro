@@ -488,6 +488,20 @@ TEST_CASE("Toggles should work", "[broken_options]")
         REQUIRE(options.given("opt2"));
     }
 
+    SECTION("given multiple times")
+    {
+        int argc = 4;
+        const char* argv[] = { "", "-o", "-o", "-o" };
+
+        nitro::broken_options::parser parser;
+
+        parser.toggle("opt2").short_name("o");
+
+        auto options = parser.parse(argc, argv);
+
+        REQUIRE(options.given("opt2") == 3);
+    }
+
     SECTION("when not given")
     {
         int argc = 1;

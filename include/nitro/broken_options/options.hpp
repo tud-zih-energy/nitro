@@ -67,7 +67,7 @@ namespace broken_options
         }
 
     public:
-        bool given(const std::string& name) const
+        int given(const std::string& name) const
         {
             return toggles_.at(name).given();
         }

@@ -47,7 +47,7 @@ namespace broken_options
     {
     public:
         toggle(const std::string& name, const std::string& description)
-        : name_(name), description_(description), ref_(nullptr), given_(false)
+        : name_(name), description_(description), ref_(nullptr), given_(0)
         {
         }
 
@@ -64,7 +64,7 @@ namespace broken_options
             return *this;
         }
 
-        toggle& ref(bool& target)
+        toggle& ref(int& target)
         {
             ref_ = &target;
 
@@ -82,7 +82,7 @@ namespace broken_options
             return static_cast<bool>(short_);
         }
 
-        bool given() const
+        int given() const
         {
             return given_;
         }
@@ -133,7 +133,7 @@ namespace broken_options
                 *ref_ = true;
             }
 
-            given_ = true;
+            ++given_;
         }
 
         void update()
@@ -165,8 +165,8 @@ namespace broken_options
         std::string name_;
         std::string description_;
         nitro::lang::optional<std::string> short_;
-        bool* ref_;
-        bool given_;
+        int* ref_;
+        int given_;
     };
 } // namespace broken_options
 } // namespace nitro
