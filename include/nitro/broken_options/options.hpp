@@ -29,9 +29,9 @@
 #ifndef INCLUDE_NITRO_BROKEN_OPTIONS_OPTIONS_HPP
 #define INCLUDE_NITRO_BROKEN_OPTIONS_OPTIONS_HPP
 
-#include <nitro/broken_options/multi_option.hpp>
-#include <nitro/broken_options/option.hpp>
-#include <nitro/broken_options/toggle.hpp>
+#include <nitro/broken_options/option/multi_option.hpp>
+#include <nitro/broken_options/option/option.hpp>
+#include <nitro/broken_options/option/toggle.hpp>
 
 #include <map>
 #include <sstream>

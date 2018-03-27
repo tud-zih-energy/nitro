@@ -33,12 +33,16 @@ namespace nitro
 {
 namespace broken_options
 {
-
     class parser;
+    class options;
+
+    struct parser_error;
 
     class option;
-    class options;
-}
-} // namespace nitr::broken_options
+    class multi_option;
+    class toggle;
+
+} // namespace broken_options
+} // namespace nitro
 
 #endif // INCLUDE_NITRO_BROKEN_OPTIONS_OPTION_HPP

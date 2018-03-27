@@ -28,22 +28,47 @@
 
 #pragma once
 
-#include <nitro/except/exception.hpp>
+#include <nitro/broken_options/option/base.hpp>
+
+#include <functional>
+#include <iostream>
+#include <map>
 
 namespace nitro
 {
 namespace broken_options
 {
-    struct parser_error : nitro::except::exception
+    class group
     {
-        using base = nitro::except::exception;
-        using base::base;
-    };
+    public:
+        group(const std::string& name, const std::string& description = std::string(""))
+        : name_(name), description_(description)
+        {
+        }
 
-    struct parsing_error : nitro::except::exception
-    {
-        using base = nitro::except::exception;
-        using base::base;
+        void add(base& option)
+        {
+            options_.emplace(option.name(), std::ref(option));
+        }
+
+        void usage(std::ostream& s)
+        {
+            s << name_ << ":" << std::endl;
+            if (description_.size())
+            {
+                s << std::endl << description_ << std::endl << std::endl;
+            }
+
+            for (auto& iter : options_)
+            {
+                iter.second.get().format(s);
+            }
+        }
+
+    private:
+        std::string name_;
+        std::string description_;
+        std::map<std::string, std::reference_wrapper<base>> options_;
     };
 } // namespace broken_options
 } // namespace nitro

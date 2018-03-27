@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015-2016, Technische Universität Dresden, Germany
+ * Copyright (c) 2015-2018, Technische Universität Dresden, Germany
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without modification, are permitted
@@ -26,11 +26,11 @@
  * WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef INCLUDE_NITRO_BROKEN_OPTIONS_OPTION_HPP
-#define INCLUDE_NITRO_BROKEN_OPTIONS_OPTION_HPP
+#pragma once
 
 #include <nitro/broken_options/exception.hpp>
 #include <nitro/broken_options/fwd.hpp>
+#include <nitro/broken_options/option/base.hpp>
 
 #include <nitro/lang/optional.hpp>
 
@@ -43,11 +43,11 @@ namespace nitro
 {
 namespace broken_options
 {
-    class option
+    class option : public crtp_base<option>
     {
     public:
         option(const std::string& name, const std::string& description)
-        : name_(name), description_(description), data_(nullptr)
+        : crtp_base(name, description), data_(nullptr)
         {
         }
 
@@ -69,33 +69,6 @@ namespace broken_options
             return *default_;
         }
 
-        option& short_name(const std::string& short_name)
-        {
-            if (short_ && *short_ != short_name)
-            {
-                raise<parser_error>("Trying to redefine short name");
-            }
-
-            short_ = short_name;
-
-            return *this;
-        }
-
-        bool has_short_name() const
-        {
-            return static_cast<bool>(short_);
-        }
-
-        const std::string& short_name() const
-        {
-            return *short_;
-        }
-
-        const std::string& name() const
-        {
-            return name_;
-        }
-
         option& ref(std::string& target)
         {
             data_ = &target;
@@ -103,40 +76,16 @@ namespace broken_options
             return *this;
         }
 
-        std::ostream& format(std::ostream& s) const
+        virtual void format_value(std::ostream& s) const override
         {
-            s << "  " << std::left << std::setw(38);
-
-            std::stringstream str;
-
-            if (has_short_name())
-            {
-                str << "-" << short_name() << " [ --" << name() << " ]";
-            }
-            else
-            {
-                str << "--" << name();
-            }
-
             if (has_default())
             {
-                str << " [=" << default_value() << "]";
+                s << " [=" << default_value() << "]";
             }
             else
             {
-                str << " arg";
+                s << " arg";
             }
-
-            s << str.str();
-
-            s << description_.substr(0, 40) << std::endl;
-
-            for (auto i = 40u; i < description_.size(); i += 40)
-            {
-                s << std::setw(40) << " " << description_.substr(i, 40) << std::endl;
-            }
-
-            return s;
         }
 
     public:
@@ -167,7 +116,7 @@ namespace broken_options
         }
 
     private:
-        void update_value(const std::string& data)
+        void update_value(const argument& arg) override
         {
             if (value_)
             {
@@ -176,17 +125,17 @@ namespace broken_options
 
             if (data_)
             {
-                *data_ = data;
+                *data_ = arg.value();
             }
 
-            value_ = data;
+            value_ = arg.value();
         }
 
-        void update()
+        void update() override
         {
         }
 
-        void check()
+        void check() override
         {
             if (!value_)
             {
@@ -201,15 +150,6 @@ namespace broken_options
             }
         }
 
-        bool matches(const std::string& arg)
-        {
-            if (short_)
-            {
-                return (arg == std::string("-") + *short_) || arg == std::string("--") + name_;
-            }
-            return arg == std::string("--") + name_;
-        }
-
         friend class parser;
 
     private:
@@ -222,5 +162,3 @@ namespace broken_options
     };
 } // namespace broken_options
 } // namespace nitro
-
-#endif // INCLUDE_NITRO_BROKEN_OPTIONS_OPTION_HPP

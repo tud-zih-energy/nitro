@@ -31,8 +31,10 @@
 
 #include <nitro/broken_options/argument.hpp>
 #include <nitro/broken_options/exception.hpp>
-#include <nitro/broken_options/multi_option.hpp>
-#include <nitro/broken_options/option.hpp>
+#include <nitro/broken_options/option/group.hpp>
+#include <nitro/broken_options/option/multi_option.hpp>
+#include <nitro/broken_options/option/option.hpp>
+#include <nitro/broken_options/option/toggle.hpp>
 #include <nitro/broken_options/options.hpp>
 
 #include <nitro/except/raise.hpp>
@@ -52,7 +54,7 @@ namespace broken_options
     public:
         parser(const std::string& app_name = std::string("main"),
                const std::string& about = std::string(""))
-        : app_name_(app_name), about_(about)
+        : app_name_(app_name), about_(about), arguments_("arguments")
         {
         }
 
@@ -72,8 +74,9 @@ namespace broken_options
 
             if (options_.count(name) == 0)
             {
-                options_.emplace(std::piecewise_construct, std::forward_as_tuple(name),
-                                 std::forward_as_tuple(name, description));
+                auto res = options_.emplace(std::piecewise_construct, std::forward_as_tuple(name),
+                                            std::forward_as_tuple(name, description));
+                arguments_.add(res.first->second);
             }
             return options_.at(name);
         }
@@ -93,8 +96,10 @@ namespace broken_options
 
             if (multi_options_.count(name) == 0)
             {
-                multi_options_.emplace(std::piecewise_construct, std::forward_as_tuple(name),
-                                       std::forward_as_tuple(name, description));
+                auto res =
+                    multi_options_.emplace(std::piecewise_construct, std::forward_as_tuple(name),
+                                           std::forward_as_tuple(name, description));
+                arguments_.add(res.first->second);
             }
             return multi_options_.at(name);
         }
@@ -114,8 +119,9 @@ namespace broken_options
 
             if (toggles_.count(name) == 0)
             {
-                toggles_.emplace(std::piecewise_construct, std::forward_as_tuple(name),
-                                 std::forward_as_tuple(name, description));
+                auto res = toggles_.emplace(std::piecewise_construct, std::forward_as_tuple(name),
+                                            std::forward_as_tuple(name, description));
+                arguments_.add(res.first->second);
             }
             return toggles_.at(name);
         }
@@ -173,7 +179,7 @@ namespace broken_options
                         {
                             match_found = true;
 
-                            option.second.update_value(current_arg.value());
+                            option.second.update_value(current_arg);
 
                             break;
                         }
@@ -205,7 +211,7 @@ namespace broken_options
                         {
                             match_found = true;
 
-                            option.second.update_value(current_arg.value());
+                            option.second.update_value(current_arg);
 
                             break;
                         }
@@ -228,7 +234,7 @@ namespace broken_options
                     if (option.second.matches(current_arg.name()))
                     {
                         match_found = true;
-                        option.second.update_value(current_arg.name());
+                        option.second.update_value(current_arg);
                     }
                 }
 
@@ -247,7 +253,8 @@ namespace broken_options
 
                 if (!match_found)
                 {
-                    raise<parser_error>("Argument '", current_arg.data(), "' could not be parsed.");
+                    raise<parsing_error>("Argument '", current_arg.data(),
+                                         "' could not be parsed.");
                 }
             }
 
@@ -270,7 +277,7 @@ namespace broken_options
         }
 
     public:
-        std::ostream& usage(std::ostream& s = std::cout)
+        std::ostream& usage(std::ostream& s = std::cout, bool print_default_group = true)
         {
             std::string short_list;
             std::string option_list;
@@ -327,34 +334,9 @@ namespace broken_options
                 s << about_ << std::endl << std::endl;
             }
 
-            s << "optional arguments:" << std::endl;
-            for (auto& toggle : toggles_)
+            if (print_default_group)
             {
-                toggle.second.format(s);
-            }
-            for (auto& opt : options_)
-            {
-                if (opt.second.has_default())
-                {
-                    opt.second.format(s);
-                }
-            }
-
-            s << std::endl << "required arguments:" << std::endl;
-            for (auto& opt : options_)
-            {
-                if (!opt.second.has_default())
-                {
-                    opt.second.format(s);
-                }
-            }
-
-            for (auto& opt : multi_options_)
-            {
-                if (!opt.second.has_default())
-                {
-                    opt.second.format(s);
-                }
+                arguments_.usage(s);
             }
 
             return s;
@@ -367,6 +349,8 @@ namespace broken_options
         std::map<std::string, broken_options::option> options_;
         std::map<std::string, broken_options::multi_option> multi_options_;
         std::map<std::string, broken_options::toggle> toggles_;
+
+        group arguments_;
 
         bool force_positional_ = false;
     };

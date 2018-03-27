@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015-2016, Technische Universität Dresden, Germany
+ * Copyright (c) 2015-2018, Technische Universität Dresden, Germany
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without modification, are permitted
@@ -26,55 +26,29 @@
  * WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef INCLUDE_NITRO_BROKEN_OPTIONS_TOGGLE_HPP
-#define INCLUDE_NITRO_BROKEN_OPTIONS_TOGGLE_HPP
+#pragma once
 
 #include <nitro/broken_options/exception.hpp>
 #include <nitro/broken_options/fwd.hpp>
 
 #include <nitro/lang/optional.hpp>
 
-#include <ios>
 #include <memory>
 #include <sstream>
 #include <string>
+#include <type_traits>
 
 namespace nitro
 {
 namespace broken_options
 {
-    class toggle
+
+    class base
     {
     public:
-        toggle(const std::string& name, const std::string& description)
-        : name_(name), description_(description), ref_(nullptr), given_(0)
+        base(const std::string& name, const std::string& description)
+        : name_(name), description_(description)
         {
-        }
-
-    public:
-        toggle& short_name(const std::string& short_name)
-        {
-            if (short_ && *short_ != short_name)
-            {
-                raise<parser_error>("Trying to redefine short name");
-            }
-
-            short_ = short_name;
-
-            return *this;
-        }
-
-        toggle& ref(int& target)
-        {
-            ref_ = &target;
-
-            return *this;
-        }
-
-    public:
-        const std::string& short_name() const
-        {
-            return *short_;
         }
 
         bool has_short_name() const
@@ -82,9 +56,9 @@ namespace broken_options
             return static_cast<bool>(short_);
         }
 
-        int given() const
+        const std::string& short_name() const
         {
-            return given_;
+            return *short_;
         }
 
         const std::string& name() const
@@ -92,12 +66,8 @@ namespace broken_options
             return name_;
         }
 
-        const std::string& description() const
-        {
-            return description_;
-        }
+        virtual void format_value(std::ostream& s) const = 0;
 
-    public:
         std::ostream& format(std::ostream& s) const
         {
             s << "  " << std::left << std::setw(38);
@@ -113,50 +83,74 @@ namespace broken_options
                 str << "--" << name();
             }
 
-            s << str.str();
+            format_value(str);
 
-            s << description_.substr(0, 40) << std::endl;
+            auto fmt = str.str();
 
-            for (auto i = 40u; i < description_.size(); i += 40)
+            s << fmt;
+
+            if (fmt.size() > 38)
             {
-                s << std::setw(40) << " " << description_.substr(i, 40) << std::endl;
+                s << std::endl << std::setw(40) << ' ' << " ";
+            }
+            else
+            {
+                s << " ";
             }
 
-            return s;
+            auto space = 38;
+
+            std::stringstream dstr;
+            dstr << description_;
+            std::string word;
+
+            while (std::getline(dstr, word, ' '))
+            {
+                if (word.size() + 1 > 38 || static_cast<int>(word.size() + 1) <= space)
+                {
+                    s << ' ' << word;
+                }
+                else
+                {
+                    s << std::endl << std::setw(40) << ' ' << "  " << word;
+                    space = 38;
+                }
+
+                space -= word.size() + 1;
+            }
+
+            return s << std::endl;
         }
 
     private:
-        void update_value(const std::string&)
+        virtual void update_value(const argument& data) = 0;
+        virtual void update() = 0;
+        virtual void check() = 0;
+
+        virtual bool matches(const argument& arg)
         {
-            if (ref_ != nullptr)
+            if (!arg.is_argument())
             {
-                *ref_ = true;
+                return false;
             }
 
-            ++given_;
-        }
-
-        void update()
-        {
-        }
-
-        void check()
-        {
-        }
-
-        bool matches(const std::string& arg)
-        {
-            // several short toggles in one argument possible, e.g., -abc
-
-            if (short_ && arg[0] == '-' && arg[1] != '-')
+            if (has_short_name() && arg.is_short())
             {
-                auto begin = arg.begin() + 1;
-                if (std::find(begin, arg.end(), (*short_)[0]) != arg.end())
+                auto list = arg.as_short_list();
+
+                if (list.size() > 1 && arg.has_value())
                 {
-                    return true;
+                    return false;
                 }
+
+                return list.count(short_name());
             }
-            return arg == std::string("--") + name_;
+            else if (arg.is_named())
+            {
+                return arg.as_named() == name();
+            }
+
+            return false;
         }
 
         friend class parser;
@@ -164,11 +158,29 @@ namespace broken_options
     private:
         std::string name_;
         std::string description_;
+
+    protected:
         nitro::lang::optional<std::string> short_;
-        int* ref_;
-        int given_;
+    };
+
+    template <typename Option>
+    class crtp_base : public base
+    {
+    public:
+        using base::base;
+        using base::short_name;
+
+        Option& short_name(const std::string& short_name)
+        {
+            if (short_ && *short_ != short_name)
+            {
+                raise<parser_error>("Trying to redefine short name");
+            }
+
+            short_ = short_name;
+
+            return *static_cast<Option*>(this);
+        }
     };
 } // namespace broken_options
 } // namespace nitro
-
-#endif // INCLUDE_NITRO_BROKEN_OPTIONS_TOGGLE_HPP

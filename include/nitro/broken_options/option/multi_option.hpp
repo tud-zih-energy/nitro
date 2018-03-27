@@ -31,6 +31,7 @@
 
 #include <nitro/broken_options/exception.hpp>
 #include <nitro/broken_options/fwd.hpp>
+#include <nitro/broken_options/option/base.hpp>
 
 #include <nitro/except/raise.hpp>
 #include <nitro/lang/optional.hpp>
@@ -44,11 +45,11 @@ namespace nitro
 {
 namespace broken_options
 {
-    class multi_option
+    class multi_option : public crtp_base<multi_option>
     {
     public:
         multi_option(const std::string& name, const std::string& description)
-        : name_(name), description_(description), ref_(nullptr)
+        : crtp_base(name, description), ref_(nullptr)
         {
         }
 
@@ -70,28 +71,6 @@ namespace broken_options
             return default_;
         }
 
-        multi_option& short_name(const std::string& short_name)
-        {
-            if (short_ && *short_ != short_name)
-            {
-                raise<parser_error>("Trying to redefine short name");
-            }
-
-            short_ = short_name;
-
-            return *this;
-        }
-
-        bool has_short_name() const
-        {
-            return static_cast<bool>(short_);
-        }
-
-        const std::string& short_name() const
-        {
-            return *short_;
-        }
-
         multi_option& ref(std::vector<std::string>& target)
         {
             ref_ = &target;
@@ -99,29 +78,12 @@ namespace broken_options
             return *this;
         }
 
-        const std::string& name() const
+    public:
+        virtual void format_value(std::ostream& s) const override
         {
-            return name_;
-        }
-
-        std::ostream& format(std::ostream& s) const
-        {
-            s << "  " << std::left << std::setw(38);
-
-            std::stringstream str;
-
-            if (has_short_name())
-            {
-                str << "-" << short_name() << " [ --" << name() << " ]";
-            }
-            else
-            {
-                str << "--" << name();
-            }
-
             if (has_default())
             {
-                str << " [=";
+                s << " [=";
 
                 bool first = true;
 
@@ -129,32 +91,20 @@ namespace broken_options
                 {
                     if (!first)
                     {
-                        str << ", ";
+                        s << ", ";
                     }
-                    str << value;
+                    s << value;
                     first = false;
                 }
 
-                str << "]";
+                s << "]";
             }
             else
             {
-                str << " arg";
+                s << " arg";
             }
-
-            s << str.str();
-
-            s << description_.substr(0, 40) << std::endl;
-
-            for (auto i = 40u; i < description_.size(); i += 40)
-            {
-                s << std::setw(40) << " " << description_.substr(i, 40) << std::endl;
-            }
-
-            return s;
         }
 
-    public:
         const std::string& get(std::size_t i) const
         {
             return value_[i];
@@ -181,17 +131,17 @@ namespace broken_options
         }
 
     private:
-        void update_value(const std::string& data)
+        void update_value(const argument& arg) override
         {
             if (ref_)
             {
-                ref_->push_back(data);
+                ref_->push_back(arg.value());
             }
 
-            value_.push_back(data);
+            value_.push_back(arg.value());
         }
 
-        void update()
+        void update() override
         {
             if (default_.size())
             {
@@ -202,30 +152,18 @@ namespace broken_options
             }
         }
 
-        void check()
+        void check() override
         {
             if (value_.empty())
             {
-                raise<parser_error>("missing value for required option");
+                raise<parsing_error>("missing value for required option");
             }
-        }
-
-        bool matches(const std::string& arg)
-        {
-            if (short_)
-            {
-                return (arg == std::string("-") + *short_) || arg == std::string("--") + name_;
-            }
-            return arg == std::string("--") + name_;
         }
 
         friend class parser;
 
     private:
-        std::string name_;
-        std::string description_;
         std::vector<std::string> default_;
-        nitro::lang::optional<std::string> short_;
         std::vector<std::string> value_;
         std::vector<std::string>* ref_;
     };

@@ -39,33 +39,46 @@ TEST_CASE("Usage descriptions work")
                       "very very very very very very very very very very very very very "
                       "very very very very very very very very long description");
 
+        parser
+            .option("some_long_named_option",
+                    "an option with an very very very very very very very very very "
+                    "very very very very very very very very very very very very very "
+                    "very very very very very very very very long description")
+            .short_name("x")
+            .default_value("some very long default parameter for this fucking thing");
+
         parser.multi_option("mopt", "some multi opt").short_name("m");
 
         parser.usage(s);
 
-        std::cout << s.str();
-
         REQUIRE(
             s.str() ==
-            R"EXPECTED(usage: app_name [-tu] --opt --opt_long [--opt_nos] --opt_nosd [--opt_with_d] --mopt
+            R"EXPECTED(usage: app_name [-tu] --opt --opt_long [--opt_nos] --opt_nosd [--opt_with_d] [--some_long_named_option] --mopt
 
 about
 
-optional arguments:
-  -t [ --tog ]                          some toggle
-  -u [ --togg ]                         some other toggle
-  --opt_nos [=default value]            some opt without a short, but a default
-  -d [ --opt_with_d ] [=default value]  some opt with a default
-
-required arguments:
-  -o [ --opt ] arg                      some opt
-  --opt_long arg                        an option with an very very very very ve
-                                        ry very very very very very very very ve
-                                        ry very very very very very very very ve
-                                        ry very very very very very very very ve
-                                        ry very long description
-  --opt_nosd arg                        some opt without short and default
-  -m [ --mopt ] arg                     some multi opt
+arguments:
+  -m [ --mopt ] arg                       some multi opt
+  -o [ --opt ] arg                        some opt
+  --opt_long arg                          an option with an very very very very
+                                          very very very very very very very
+                                          very very very very very very very
+                                          very very very very very very very
+                                          very very very very very long
+                                          description
+  --opt_nos [=default value]              some opt without a short, but a
+                                          default
+  --opt_nosd arg                          some opt without short and default
+  -d [ --opt_with_d ] [=default value]    some opt with a default
+  -x [ --some_long_named_option ] [=some very long default parameter for this fucking thing]
+                                          an option with an very very very very
+                                          very very very very very very very
+                                          very very very very very very very
+                                          very very very very very very very
+                                          very very very very very long
+                                          description
+  -t [ --tog ]                            some toggle
+  -u [ --togg ]                           some other toggle
 )EXPECTED");
     }
 }

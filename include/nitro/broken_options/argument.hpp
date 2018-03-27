@@ -35,8 +35,8 @@
 #include <nitro/except/raise.hpp>
 #include <nitro/lang/optional.hpp>
 
+#include <set>
 #include <string>
-#include <vector>
 
 namespace nitro
 {
@@ -67,22 +67,22 @@ namespace broken_options
 
         bool is_double_dash() const
         {
-            return arg_.size() == 2 && arg_[0] == '-' && arg_[1] == '-';
+            return arg_ == "--";
         }
 
-        bool is_short_option() const
+        bool is_short() const
         {
             return name_.size() > 1 && name_[0] == '-' && name_[1] != '-';
         }
 
-        bool is_named_option() const
+        bool is_named() const
         {
             return name_.size() > 2 && name_[0] == '-' && name_[1] == '-' && name_[2] != '-';
         }
 
-        bool is_option() const
+        bool is_argument() const
         {
-            return is_short_option() || is_named_option();
+            return is_short() || is_named();
         }
 
     public:
@@ -98,29 +98,45 @@ namespace broken_options
 
         bool has_value() const
         {
-            return static_cast<bool>(value_);
+            return is_value() || static_cast<bool>(value_);
         }
 
         const std::string& value() const
         {
+            if (is_value())
+            {
+                return arg_;
+            }
+
             return *value_;
         }
 
-        std::vector<std::string> short_options() const
+        std::multiset<std::string> as_short_list() const
         {
-            if (!is_short_option() || has_value())
+            if (!is_short())
             {
-                raise<parser_error>("Trying to interprete option as short options list, but ain't");
+                raise<parsing_error>(
+                    "Trying to interpret argument as short options list, but it ain't.");
             }
 
-            std::vector<std::string> result;
+            std::multiset<std::string> result;
 
-            for (std::size_t i = 1; i < arg_.size(); i++)
+            for (std::size_t i = 1; i < name_.size(); i++)
             {
-                result.emplace_back(1, arg_[i]);
+                result.emplace(1, arg_[i]);
             }
 
             return result;
+        }
+
+        std::string as_named() const
+        {
+            if (!is_named())
+            {
+                raise<parsing_error>("Trying to interpret argument as named option, but it ain't.");
+            }
+
+            return { name_.begin() + 2, name_.end() };
         }
 
     private:
