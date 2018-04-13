@@ -10,8 +10,8 @@ Collection of various, modern C++ libraries and helpers.
 Currently the following modules are available:
 
 *   `nitro::broken_options` - Yet another library for argument parsing
-*   `nitro::dl` - A typesafe wrapper for `dlopen()`
-*   `nitro::env` - A platform-dependent libray for getting information about the environment, e.g., hostname
+*   `nitro::dl` - A type-safe wrapper for `dlopen()`
+*   `nitro::env` - A platform-dependent library for getting information about the environment, e.g., hostname
 *   `nitro::jiffy` - A wrapper for date and time handling compatible to `std::chrono`
 *   `nitro::lang` - A collection of various classes used to supplement the standard library
 *   `nitro::log` - A lightweight logging library with support for compile-time filtering
@@ -36,11 +36,12 @@ On Linux:
 *   clang 5.0
 
 On MacOS:
-*   XCode 7
-*   XCode 8
+*   XCode 7.3
+*   XCode 8.3
+*   XCode 9.3
 
 On Windows:
 *   Visual Studio 2015<sup>1</sup>
 *   Visual Studio 2017<sup>1</sup>
 
-<sup>1</sup> These do not include tests for `dl` and `env`
+<sup>1</sup> These do not include tests for `dl`
