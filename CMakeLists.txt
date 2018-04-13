@@ -118,12 +118,14 @@ add_library(nitro-env SHARED src/env/get.cpp src/env/hostname.cpp)
 target_link_libraries(nitro-env
     PUBLIC
         Nitro::nitro-core
+        $<$<CXX_COMPILER_ID:MSVC>:ws2_32>
 )
 
 add_library(nitro-env-static STATIC src/env/get.cpp src/env/hostname.cpp)
 target_link_libraries(nitro-env-static
     PUBLIC
         Nitro::nitro-core
+        $<$<CXX_COMPILER_ID:MSVC>:ws2_32>
 )
 set_target_properties(nitro-env-static PROPERTIES
     POSITION_INDEPENDENT_CODE ${NITRO_POSITION_INDEPENDENT_CODE}
