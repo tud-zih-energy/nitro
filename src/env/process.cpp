@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015-2016, Technische Universität Dresden, Germany
+ * Copyright (c) 2015-2018, Technische Universität Dresden, Germany
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without modification, are permitted
@@ -26,31 +26,31 @@
  * WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef INCLUDE_NITRO_LOG_PID_ATTRIBUTE_HPP
-#define INCLUDE_NITRO_LOG_PID_ATTRIBUTE_HPP
-
 #include <nitro/env/process.hpp>
+
+extern "C"
+{
+#include <unistd.h>
+}
 
 namespace nitro
 {
-namespace log
+namespace env
 {
-
-    class pid_attribute
+    pid_t getpid()
     {
-        int my_pid;
+        return getpid();
+    }
 
-    public:
-        pid_attribute() : my_pid(nitro::env::getpid())
-        {
-        }
+    pid_t get_parent_pid()
+    {
+        return getppid();
+    }
 
-        int pid() const
-        {
-            return my_pid;
-        }
-    };
-} // namespace log
+    pid_t gettid()
+    {
+        return getpid();
+    }
+
+} // namespace env
 } // namespace nitro
-
-#endif // INCLUDE_NITRO_LOG_PID_ATTRIBUTE_HPP

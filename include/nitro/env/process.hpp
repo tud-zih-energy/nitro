@@ -28,31 +28,17 @@
 
 #pragma once
 
-extern "C" {
+extern "C"
+{
 #include <sys/types.h>
-#include <unistd.h>
 }
 
 namespace nitro
 {
 namespace env
 {
-    namespace linux
-    {
-        inline pid_t getpid()
-        {
-            return getpid();
-        }
-
-        inline pid_t get_parent_pid()
-        {
-            return getppid();
-        }
-
-        inline pid_t gettid()
-        {
-            return getpid();
-        }
-    }
-}
-}
+    pid_t getpid();
+    pid_t get_parent_pid();
+    pid_t gettid();
+} // namespace env
+} // namespace nitro

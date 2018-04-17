@@ -114,14 +114,20 @@ target_link_libraries(nitro-log
 )
 target_compile_definitions(nitro-log INTERFACE NITRO_LOG_MIN_SEVERITY=${NITRO_LOG_LEVEL})
 
-add_library(nitro-env SHARED src/env/get.cpp src/env/hostname.cpp)
+set(NITRO_ENV_SRCS
+    src/env/get.cpp
+    src/env/hostname.cpp
+    src/env/process.cpp
+)
+
+add_library(nitro-env SHARED ${NITRO_ENV_SRCS})
 target_link_libraries(nitro-env
     PUBLIC
         Nitro::nitro-core
         $<$<CXX_COMPILER_ID:MSVC>:ws2_32>
 )
 
-add_library(nitro-env-static STATIC src/env/get.cpp src/env/hostname.cpp)
+add_library(nitro-env-static STATIC ${NITRO_ENV_SRCS})
 target_link_libraries(nitro-env-static
     PUBLIC
         Nitro::nitro-core
