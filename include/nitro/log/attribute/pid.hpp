@@ -41,7 +41,7 @@ namespace log
         int my_pid;
 
     public:
-        pid_attribute() : my_pid(nitro::env::getpid())
+        pid_attribute() : my_pid(nitro::env::get_pid())
         {
         }
 

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015-2017, Technische Universität Dresden, Germany
+ * Copyright (c) 2015-2018, Technische Universität Dresden, Germany
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without modification, are permitted
@@ -28,17 +28,12 @@
 
 #pragma once
 
-extern "C"
-{
-#include <sys/types.h>
-}
-
 namespace nitro
 {
 namespace env
 {
-    pid_t getpid();
-    pid_t get_parent_pid();
-    pid_t gettid();
+    int get_pid();
+    int get_parent_pid();
+    int get_tid();
 } // namespace env
 } // namespace nitro
