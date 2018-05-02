@@ -31,7 +31,7 @@ project(Nitro)
 
 cmake_minimum_required(VERSION 3.2)
 
-include(GitSubmoduleUpdate.cmake)
+include(cmake/GitSubmoduleUpdate.cmake)
 git_submodule_update()
 
 include(common/DefaultBuildType.cmake)
