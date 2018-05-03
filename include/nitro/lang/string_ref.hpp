@@ -97,6 +97,11 @@ namespace lang
             return { ptr_ };
         }
 
+        pointer_type get() const
+        {
+            return ptr_;
+        }
+
     public:
         operator std::string() const
         {
@@ -134,7 +139,7 @@ namespace lang
     {
         return s << str.ptr_;
     }
-}
-}
+} // namespace lang
+} // namespace nitro
 
 #endif // INCLUDE_NITRO_LANG_STRING_REF_HPP
