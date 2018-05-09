@@ -38,7 +38,6 @@ if(${COUNT_COMMON} EQUAL 0 OR ${COUNT_CATCH} EQUAL 0)
     execute_process(COMMAND "git" "submodule" "update" WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}")
 endif()
 
-include(common/DefaultBuildType.cmake)
 
 # Intialize git submodules if not done already
 file(GLOB SUBMODULE_FILES "${CMAKE_CURRENT_LIST_DIR}/common/*")
@@ -50,6 +49,8 @@ if(${COUNT_COMMON} EQUAL 0)
 endif()
 message(STATUS "Updating git submodule")
 execute_process(COMMAND "git" "submodule" "update" WORKING_DIRECTORY "${CMAKE_CURRENT_LIST_DIR}")
+
+include(common/DefaultBuildType.cmake)
 
 include(${CMAKE_CURRENT_LIST_DIR}/common/UnsetIfUpdated.cmake)
 UnsetIfUpdated(MIN_LOG_LEVEL CMAKE_BUILD_TYPE)
