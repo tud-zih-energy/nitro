@@ -2,7 +2,7 @@
 #error "NITRO_LOG_MIN_SEVERITY should be set by the build system, but isn't!"
 #endif
 
-#define CATCH_CONFIG_MAIN
+#define CATCH_CONFIG_RUNNER
 #include <catch.hpp>
 
 #ifdef NITRO_LOG_MIN_SEVERITY
@@ -16,11 +16,14 @@
 #include <nitro/log/sink/sequence.hpp>
 #include <nitro/log/sink/stderr.hpp>
 #include <nitro/log/sink/stdout.hpp>
+#include <nitro/log/sink/logfile.hpp>
 
 namespace detail
 {
 
-using Sink = nitro::log::sink::sequence<nitro::log::sink::StdOut, nitro::log::sink::StdErr>;
+using Sink = nitro::log::sink::sequence<nitro::log::sink::StdOut,
+                                        nitro::log::sink::StdErr,
+                                        nitro::log::sink::Logfile>;
 
 typedef nitro::log::record<nitro::log::tag_attribute, nitro::log::message_attribute,
                            nitro::log::severity_attribute>
@@ -237,4 +240,11 @@ TEST_CASE("Logging lambdas works", "[log]")
 
         CHECK(i == 4);
     }
+}
+
+int main(int argc, char** argv)
+{
+    nitro::log::sink::Logfile::log_file() = "test_log.txt";
+    int result = Catch::Session().run(argc, argv);
+    return result;
 }
