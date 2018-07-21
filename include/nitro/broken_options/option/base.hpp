@@ -33,6 +33,7 @@
 
 #include <nitro/lang/optional.hpp>
 
+#include <iomanip>
 #include <memory>
 #include <sstream>
 #include <string>
