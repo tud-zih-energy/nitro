@@ -242,10 +242,13 @@ namespace broken_options
                 {
                     positionals.push_back(current_arg.name());
 
-                    argument next_argument(argv[++i]);
-                    if (next_argument.is_value())
+                    if (i < argc - 1)
                     {
-                        positionals.emplace_back(next_argument.data());
+                        argument next_argument(argv[++i]);
+                        if (next_argument.is_value())
+                        {
+                            positionals.emplace_back(next_argument.data());
+                        }
                     }
 
                     continue;
