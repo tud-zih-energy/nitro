@@ -9,6 +9,62 @@
 
 using nitro::lang::enumerate;
 
+template <typename T>
+struct NonDefaultIterator
+{
+    NonDefaultIterator() = delete;
+    NonDefaultIterator(T* it) : it(it)
+    {
+    }
+
+    NonDefaultIterator& operator++()
+    {
+        it++;
+        return *this;
+    }
+
+    NonDefaultIterator operator++(int)
+    {
+        NonDefaultIterator tmp(*this);
+        ++(*this);
+        return tmp;
+    }
+
+    T& operator*()
+    {
+        return *it;
+    }
+
+    bool operator!=(const NonDefaultIterator& other)
+    {
+        return it != other.it;
+    }
+
+    T* it;
+};
+
+template <typename Container>
+struct Wrapper
+{
+    using value_type = typename std::remove_reference<decltype(std::declval<Container>()[0])>::type;
+
+    Wrapper(Container& c) : c(c)
+    {
+    }
+
+    NonDefaultIterator<value_type> begin()
+    {
+        return { &c[0] };
+    }
+
+    NonDefaultIterator<value_type> end()
+    {
+        return { &c[std::distance(std::begin(c), std::end(c))] };
+    }
+
+    Container& c;
+};
+
 TEST_CASE("referenced containers can be enumerated", "[lang]")
 {
     std::vector<int> reference = { { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9 } };
@@ -148,6 +204,28 @@ TEST_CASE("r-value containers can be enumerated", "[lang]")
         std::size_t index = 0;
 
         for (auto i : enumerate({ 0, 1, 2, 3, 4, 5, 6, 7, 8, 9 }))
+        {
+            CHECK(i.index() == index);
+            CHECK(i.value() == reference[index]);
+
+            index++;
+        }
+    }
+}
+
+TEST_CASE("iterators without a default constructoir can be used", "[lang]")
+{
+    std::vector<int> reference = { { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9 } };
+
+    SECTION("iteration works")
+    {
+        std::size_t index = 0;
+
+        auto vec = std::vector<int>{ { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9 } };
+
+        Wrapper<std::vector<int>> c(vec);
+
+        for (auto i : enumerate(c))
         {
             CHECK(i.index() == index);
             CHECK(i.value() == reference[index]);
