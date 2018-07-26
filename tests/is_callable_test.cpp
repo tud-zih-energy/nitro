@@ -38,7 +38,7 @@ TEST_CASE("is_callable trait works", "[meta]")
     SECTION("with conversions")
     {
         int x;
-        auto fool = [&x](double) { return "hello"; };
+        auto fool = [&x](double) { (void)x; return "hello"; };
         using foo = decltype(fool);
 
         CHECK((nitro::meta::is_callable<foo, const char*(double)>::value == true));
