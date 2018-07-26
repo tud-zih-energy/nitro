@@ -81,7 +81,7 @@ namespace lang
 
             struct iterator
             {
-                using value_type = decltype(*Iterator());
+                using value_type = decltype(*std::declval<Iterator>());
 
                 iterator(Iterator it, std::size_t index) : it_(it), index_(index)
                 {
