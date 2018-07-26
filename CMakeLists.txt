@@ -138,7 +138,7 @@ set_target_properties(nitro-env-static PROPERTIES
     OUTPUT_NAME nitro-env
 )
 
-add_library(nitro-jiffy src/jiffy/jiffy.cpp)
+add_library(nitro-jiffy SHARED src/jiffy/jiffy.cpp)
 target_link_libraries(nitro-jiffy
     PUBLIC
         Nitro::nitro-core
