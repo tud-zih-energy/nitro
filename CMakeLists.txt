@@ -27,9 +27,9 @@ if(TARGET Nitro::nitro)
     message(AUTHOR_WARNING "Nitro targets were already defined. Skipping.")
 else()
 
-project(Nitro)
-
 cmake_minimum_required(VERSION 3.2)
+
+project(Nitro)
 
 include(cmake/GitSubmoduleUpdate.cmake)
 git_submodule_update()
@@ -103,14 +103,14 @@ endif()
 add_library(nitro-dl INTERFACE)
 target_link_libraries(nitro-dl
     INTERFACE
-        Nitro::nitro-core
+        Nitro::core
         ${CMAKE_DL_LIBS}
 )
 
 add_library(nitro-log INTERFACE)
 target_link_libraries(nitro-log
     INTERFACE
-        Nitro::nitro-core
+        Nitro::core
 )
 target_compile_definitions(nitro-log INTERFACE NITRO_LOG_MIN_SEVERITY=${NITRO_LOG_LEVEL})
 
@@ -123,14 +123,14 @@ set(NITRO_ENV_SRCS
 add_library(nitro-env SHARED ${NITRO_ENV_SRCS})
 target_link_libraries(nitro-env
     PUBLIC
-        Nitro::nitro-core
+        Nitro::core
         $<$<CXX_COMPILER_ID:MSVC>:ws2_32>
 )
 
 add_library(nitro-env-static STATIC ${NITRO_ENV_SRCS})
 target_link_libraries(nitro-env-static
     PUBLIC
-        Nitro::nitro-core
+        Nitro::core
         $<$<CXX_COMPILER_ID:MSVC>:ws2_32>
 )
 set_target_properties(nitro-env-static PROPERTIES
@@ -141,13 +141,13 @@ set_target_properties(nitro-env-static PROPERTIES
 add_library(nitro-jiffy SHARED src/jiffy/jiffy.cpp)
 target_link_libraries(nitro-jiffy
     PUBLIC
-        Nitro::nitro-core
+        Nitro::core
 )
 
 add_library(nitro-jiffy-static STATIC src/jiffy/jiffy.cpp)
 target_link_libraries(nitro-jiffy-static
     PUBLIC
-        Nitro::nitro-core
+        Nitro::core
 )
 set_target_properties(nitro-jiffy-static PROPERTIES
     POSITION_INDEPENDENT_CODE ${NITRO_POSITION_INDEPENDENT_CODE}
@@ -157,19 +157,25 @@ set_target_properties(nitro-jiffy-static PROPERTIES
 add_library(nitro INTERFACE)
 target_link_libraries(nitro
     INTERFACE
-        Nitro::nitro-core
-        Nitro::nitro-log
-        Nitro::nitro-dl
-        Nitro::nitro-env
-        Nitro::nitro-jiffy
+        Nitro::core
+        Nitro::log
+        Nitro::dl
+        Nitro::env
+        Nitro::jiffy
 )
 
+set_target_properties(nitro-core PROPERTIES EXPORT_NAME core)
+set_target_properties(nitro-dl PROPERTIES EXPORT_NAME dl)
+set_target_properties(nitro-log PROPERTIES EXPORT_NAME log)
+set_target_properties(nitro-env PROPERTIES EXPORT_NAME env)
+set_target_properties(nitro-jiffy PROPERTIES EXPORT_NAME jiffy)
+
 add_library(Nitro::nitro ALIAS nitro)
-add_library(Nitro::nitro-core ALIAS nitro-core)
-add_library(Nitro::nitro-dl ALIAS nitro-dl)
-add_library(Nitro::nitro-log ALIAS nitro-log)
-add_library(Nitro::nitro-env ALIAS nitro-env-static)
-add_library(Nitro::nitro-jiffy ALIAS nitro-jiffy-static)
+add_library(Nitro::core ALIAS nitro-core)
+add_library(Nitro::dl ALIAS nitro-dl)
+add_library(Nitro::log ALIAS nitro-log)
+add_library(Nitro::env ALIAS nitro-env-static)
+add_library(Nitro::jiffy ALIAS nitro-jiffy-static)
 
 if(CMAKE_CURRENT_SOURCE_DIR STREQUAL CMAKE_SOURCE_DIR)
     # build Debug with all warnings
