@@ -59,7 +59,7 @@ struct Wrapper
 
     NonDefaultIterator<value_type> end()
     {
-        return { &c[std::distance(std::begin(c), std::end(c))] };
+        return { (&c[std::distance(std::begin(c), std::end(c)) - 1]) + 1 };
     }
 
     Container& c;
