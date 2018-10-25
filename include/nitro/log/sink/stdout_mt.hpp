@@ -54,7 +54,7 @@ namespace log
             {
                 std::lock_guard<std::mutex> my_lock(std_out_mutex());
 
-                std::cout << formatted_record;
+                std::cout << formatted_record << std::flush;
             }
         };
     } // namespace sink

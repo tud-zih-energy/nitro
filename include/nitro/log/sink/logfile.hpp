@@ -30,8 +30,8 @@
 
 #include <nitro/log/severity.hpp>
 
-#include <string>
 #include <fstream>
+#include <string>
 
 namespace nitro
 {
@@ -57,7 +57,7 @@ namespace log
 
             void sink(severity_level, const std::string& formatted_record)
             {
-                log_stream() << formatted_record;
+                log_stream() << formatted_record << std::flush;
             }
         };
 
