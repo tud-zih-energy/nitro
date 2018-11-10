@@ -267,6 +267,25 @@ TEST_CASE("Multiple arguments should work", "[broken_options]")
         REQUIRE(options.get("opt3", 1) == "12");
     }
 
+    SECTION("Mutli options get_all should work as well")
+    {
+        int argc = 5;
+        const char* argv[] = { "", "--opt3", "12", "--opt3", "12" };
+
+        nitro::broken_options::parser parser;
+
+        parser.multi_option("opt3");
+
+        auto options = parser.parse(argc, argv);
+
+        auto values = options.get_all("opt3");
+
+        REQUIRE(values.size() == 2);
+
+        REQUIRE(values[0] == "12");
+        REQUIRE(values[1] == "12");
+    }
+
     SECTION("Defining an option also as a multi_option should not work")
     {
         nitro::broken_options::parser parser;

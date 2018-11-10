@@ -82,6 +82,11 @@ namespace broken_options
             return multi_options_.at(name).get(i);
         }
 
+        const std::vector<std::string>& get_all(const std::string& name) const
+        {
+            return multi_options_.at(name).get_all();
+        }
+
         template <typename T>
         T as(const std::string& name, std::size_t i) const
         {

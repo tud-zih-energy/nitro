@@ -110,6 +110,11 @@ namespace broken_options
             return value_[i];
         }
 
+        const std::vector<std::string>& get_all() const
+        {
+            return value_;
+        }
+
         template <typename T>
         T as(std::size_t i) const
         {
