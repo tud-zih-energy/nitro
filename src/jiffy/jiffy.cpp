@@ -44,12 +44,24 @@ namespace jiffy
     {
         clear();
 
+#ifdef USE_CXX_STD_SYSTEM_TIME
+        std::stringstream s;
+
+        s << date;
+        s >> std::get_time(&tm_data_, format.c_str());
+
+        if (s.fail())
+        {
+            nitro::except::raise("Couldn't parse time string '", date, "'");
+        }
+#else
         auto res = strptime(date.c_str(), format.c_str(), &tm_data_);
 
         if (res == nullptr)
         {
             nitro::except::raise("Couldn't parse time string '", date, "'");
         }
+#endif
     }
 
     std::string Jiffy::format(std::string fmt) const
