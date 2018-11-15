@@ -3,6 +3,7 @@
 #include <nitro/except/raise.hpp>
 
 #include <iomanip>
+#include <ratio>
 #include <regex>
 #include <sstream>
 #include <type_traits>
@@ -13,7 +14,8 @@
 #define USE_CXX_STD_SYSTEM_TIME
 #endif
 
-extern "C" {
+extern "C"
+{
 #ifndef USE_CXX_STD_SYSTEM_TIME
 #include <sys/time.h>
 #endif
@@ -27,73 +29,20 @@ namespace nitro
 {
 namespace jiffy
 {
-
-    Jiffy::Jiffy()
-#ifdef USE_CXX_STD_SYSTEM_TIME
-    : Jiffy(std::chrono::system_clock::now())
+    Jiffy::Jiffy() : Jiffy(std::chrono::system_clock::now())
     {
     }
-#else
+
+    Jiffy::Jiffy(std::chrono::system_clock::time_point tp) : tp_(tp)
+    {
+        fraction_ = std::chrono::duration_cast<std::chrono::microseconds>(tp.time_since_epoch()) %
+                    std::micro::den;
+    }
+
+    Jiffy::Jiffy(const std::string& date, const std::string& format) : update_needed_(false)
     {
         clear();
 
-        timeval tv;
-
-        int result = gettimeofday(&tv, nullptr);
-
-        if (result != 0)
-        {
-            nitro::except::raise("Couldn't get time of day.");
-        }
-
-        // localtime_r isn't required to behave like tzset was called, so we do it
-        tzset();
-
-        auto res = localtime_r(&tv.tv_sec, &tm_data_);
-
-        if (res == nullptr)
-        {
-            nitro::except::raise("Couldn't get localtime for time point.");
-        }
-
-        fraction_ = std::chrono::microseconds(tv.tv_usec);
-    }
-#endif
-
-    Jiffy::Jiffy(std::chrono::system_clock::time_point tp)
-    {
-        clear();
-
-        auto time = std::chrono::system_clock::to_time_t(tp);
-
-#ifdef USE_CXX_STD_SYSTEM_TIME
-
-        auto res = std::localtime(&time);
-
-        if (res == nullptr)
-        {
-            nitro::except::raise("Couldn't get localtime for time point.");
-        }
-
-        tm_data_ = *res;
-
-#else
-        // localtime_r isn't required to behave like tzset was called, so we do it
-        tzset();
-
-        auto res = localtime_r(&time, &tm_data_);
-
-        if (res == nullptr)
-        {
-            nitro::except::raise("Couldn't get localtime for time point.");
-        }
-#endif
-    }
-
-    Jiffy::Jiffy(const std::string& date, const std::string& format)
-    {
-        clear();
-#ifdef USE_CXX_STD_SYSTEM_TIME
         std::stringstream s;
 
         s << date;
@@ -103,18 +52,12 @@ namespace jiffy
         {
             nitro::except::raise("Couldn't parse time string '", date, "'");
         }
-#else
-        auto res = strptime(date.c_str(), format.c_str(), &tm_data_);
-
-        if (res == nullptr)
-        {
-            nitro::except::raise("Couldn't parse time string '", date, "'");
-        }
-#endif
     }
 
     std::string Jiffy::format(std::string fmt) const
     {
+        update_cached_tm();
+
         if (fmt.find("%f") != std::string::npos)
         {
             std::stringstream s;
@@ -145,9 +88,77 @@ namespace jiffy
         return buffer;
     }
 
-    void Jiffy::clear()
+    void Jiffy::update_cached_tm() const
+    {
+        if (update_needed_)
+        {
+            update_needed_ = false;
+
+            clear();
+
+            auto time = std::chrono::system_clock::to_time_t(tp_);
+            auto res = std::localtime(&time);
+
+            if (res == nullptr)
+            {
+                nitro::except::raise("Couldn't get localtime for time point.");
+            }
+
+            tm_data_ = *res;
+        }
+    }
+
+    int Jiffy::year() const
+    {
+        update_cached_tm();
+        return tm_data_.tm_year + 1900;
+    }
+
+    int Jiffy::month() const
+    {
+        update_cached_tm();
+        return tm_data_.tm_mon + 1;
+    }
+
+    int Jiffy::day() const
+    {
+        update_cached_tm();
+        return tm_data_.tm_mday;
+    }
+
+    int Jiffy::hour() const
+    {
+        update_cached_tm();
+        return tm_data_.tm_hour;
+    }
+
+    int Jiffy::minute() const
+    {
+        update_cached_tm();
+        return tm_data_.tm_min;
+    }
+
+    int Jiffy::second() const
+    {
+        update_cached_tm();
+        return tm_data_.tm_sec;
+    }
+
+    int Jiffy::microsecond() const
+    {
+        // this is in the range [0, 1e6), so it's fine
+        return static_cast<int>(fraction_.count());
+    }
+
+    Jiffy::operator std::tm() const
+    {
+        update_cached_tm();
+        return tm_data_;
+    }
+
+    void Jiffy::clear() const
     {
         std::memset(&tm_data_, 0, sizeof(tm_data_));
     }
-}
-}
+} // namespace jiffy
+} // namespace nitro

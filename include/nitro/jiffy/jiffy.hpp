@@ -61,52 +61,30 @@ namespace jiffy
         }
 
     public:
-        int year() const
-        {
-            return tm_data_.tm_year + 1900;
-        }
+        int year() const;
 
-        int month() const
-        {
-            return tm_data_.tm_mon + 1;
-        }
+        int month() const;
 
-        int day() const
-        {
-            return tm_data_.tm_mday;
-        }
+        int day() const;
 
-        int hour() const
-        {
-            return tm_data_.tm_hour;
-        }
+        int hour() const;
 
-        int minute() const
-        {
-            return tm_data_.tm_min;
-        }
+        int minute() const;
 
-        int second() const
-        {
-            return tm_data_.tm_sec;
-        }
+        int second() const;
 
-        int microsecond() const
-        {
-            // this is in the range [0, 1e6), so it's fine
-            return static_cast<int>(fraction_.count());
-        }
+        int microsecond() const;
 
     public:
-        operator std::tm() const
-        {
-            return tm_data_;
-        }
+        operator std::tm() const;
 
     private:
-        void clear();
+        void clear() const;
+        void update_cached_tm() const;
 
-        std::tm tm_data_;
+        mutable bool update_needed_ = true;
+        mutable std::tm tm_data_;
+        std::chrono::system_clock::time_point tp_;
         std::chrono::microseconds fraction_;
     };
 
@@ -114,5 +92,5 @@ namespace jiffy
     {
         return s << j.isoformat();
     }
-}
-}
+} // namespace jiffy
+} // namespace nitro
