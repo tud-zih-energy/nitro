@@ -39,16 +39,14 @@ namespace jiffy
                     std::micro::den;
     }
 
-    Jiffy::Jiffy(const std::string& date, const std::string& format) : update_needed_(false)
+    Jiffy::Jiffy(const std::string& date, const std::string& format)
+    : update_needed_(false), fraction_(0)
     {
         clear();
 
-        std::stringstream s;
+        auto res = strptime(date.c_str(), format.c_str(), &tm_data_);
 
-        s << date;
-        s >> std::get_time(&tm_data_, format.c_str());
-
-        if (s.fail())
+        if (res == nullptr)
         {
             nitro::except::raise("Couldn't parse time string '", date, "'");
         }

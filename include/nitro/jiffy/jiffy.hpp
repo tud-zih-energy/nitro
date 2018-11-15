@@ -28,6 +28,8 @@
 
 #pragma once
 
+#include <nitro/lang/tuple_operators.hpp>
+
 #include <chrono>
 #include <ctime>
 #include <iostream>
@@ -37,7 +39,7 @@ namespace nitro
 {
 namespace jiffy
 {
-    class Jiffy
+    class Jiffy : public nitro::lang::tuple_operators<Jiffy>
     {
     public:
         Jiffy();
@@ -74,6 +76,13 @@ namespace jiffy
         int second() const;
 
         int microsecond() const;
+
+    public:
+        auto as_tuple()
+        {
+            return std::tie(tm_data_.tm_year, tm_data_.tm_mon, tm_data_.tm_mday, tm_data_.tm_hour,
+                            tm_data_.tm_min, tm_data_.tm_sec, fraction_);
+        }
 
     public:
         operator std::tm() const;
