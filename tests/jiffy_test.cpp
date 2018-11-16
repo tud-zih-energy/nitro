@@ -5,6 +5,11 @@
 
 #include <chrono>
 
+extern "C"
+{
+#include <stdlib.h>
+}
+
 TEST_CASE("Print 100 jiffies in iso format", "[jiffy]")
 {
     for (int i = 0; i < 100; i++)
@@ -52,7 +57,10 @@ TEST_CASE("Jiffy can be parsed without a fraction", "[jiffy]")
 
     nitro::jiffy::Jiffy tp(ctp);
 
-    REQUIRE(tp.isoformat() == "2018-11-15T16:57:17.000000+0100");
+    // force UTC as timezone
+    setenv("TZ", "", true);
+
+    REQUIRE(tp.isoformat() == "2018-11-15T15:57:17.000000+0000");
 
     REQUIRE(nitro::jiffy::Jiffy("2018-11-15T16:57:17+0100") == tp);
 }
