@@ -53,3 +53,5 @@ NitroTest(jiffy_test.cpp)
 target_link_libraries(Nitro.jiffy_test Nitro::jiffy)
 
 NitroTest(is_callable_test.cpp)
+
+NitroTest(format_test.cpp)
