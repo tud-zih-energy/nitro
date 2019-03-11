@@ -325,12 +325,7 @@ namespace broken_options
                 }
             }
 
-            if (!option_list.empty())
-            {
-                s << option_list;
-            }
-
-            s << std::endl << std::endl;
+            s << option_list << std::endl << std::endl;
 
             if (!about_.empty())
             {
