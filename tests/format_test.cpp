@@ -1,6 +1,7 @@
 #define CATCH_CONFIG_MAIN
 #include <catch.hpp>
 
+#include <nitro/except/raise.hpp>
 #include <nitro/format/format.hpp>
 
 TEST_CASE("Simple format strings", "[format]")
@@ -66,6 +67,15 @@ TEST_CASE("Simple format strings", "[format]")
 
         REQUIRE(out == ref_str);
     }
+
+    SECTION("can format using a user-literal")
+    {
+        const char* ref_str = "Hello world";
+
+        std::string out = "Hello {}"_nf % "world";
+
+        REQUIRE(out == std::string(ref_str));
+    }
 }
 
 TEST_CASE("Holding it wrong gives exceptions", "[format]")
@@ -82,5 +92,21 @@ TEST_CASE("Holding it wrong gives exceptions", "[format]")
         auto fmt = nitro::format("Hello {} {}\n") % 8;
 
         REQUIRE_THROWS(fmt.str());
+    }
+}
+
+TEST_CASE("Format can be used in exptions and raise")
+{
+    SECTION("Passing a format works")
+    {
+        REQUIRE_THROWS_WITH(nitro::raise("This is an exception formatted with nitro::format"_nf),
+                            "This is an exception formatted with nitro::format");
+    }
+
+    SECTION("Formatting the exception message works")
+    {
+        REQUIRE_THROWS_WITH(
+            nitro::raise("This is an exception formatted with {}"_nf, "nitro::format"),
+            "This is an exception formatted with nitro::format");
     }
 }

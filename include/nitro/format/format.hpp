@@ -29,8 +29,6 @@
 #ifndef INCLUDE_NITRO_FORMAT_FORMAT_HPP
 #define INCLUDE_NITRO_FORMAT_FORMAT_HPP
 
-#include <nitro/except/raise.hpp>
-
 #include <cstdio>
 #include <regex>
 #include <sstream>
@@ -38,6 +36,7 @@
 
 namespace nitro
 {
+
 namespace detail
 {
     template <class Char, class Traits = std::char_traits<Char>>
@@ -64,6 +63,18 @@ namespace detail
             return *this;
         }
 
+        template <typename Arg, typename... Args>
+        self& args(Arg&& arg, Args&&... args)
+        {
+            (*this) % std::forward<Arg>(arg);
+            this->args(std::forward<Args>(args)...);
+        }
+
+        self& args()
+        {
+            return *this;
+        }
+
         string_type str() const
         {
             string_type result;
@@ -79,7 +90,8 @@ namespace detail
             {
                 if (placeholder == placeholders_end)
                 {
-                    raise("Provided more arguments than placeholders available in format string");
+                    throw std::runtime_error(
+                        "Provided more arguments than placeholders available in format string");
                 }
 
                 result.append(input, format_.begin() + placeholder->position());
@@ -91,7 +103,8 @@ namespace detail
 
             if (placeholder != placeholders_end)
             {
-                raise("Provided less arguments than placeholders needed in format string");
+                throw std::runtime_error(
+                    "Provided less arguments than placeholders needed in format string");
             }
 
             return result;
@@ -114,25 +127,7 @@ namespace detail
     }
 } // namespace detail
 
-inline detail::formatter<char> operator""_nf(const char* format_str, std::size_t)
-{
-    return detail::formatter<char>(format_str);
-}
-
-inline detail::formatter<char16_t> operator""_nf(const char16_t* format_str, std::size_t)
-{
-    return detail::formatter<char16_t>(format_str);
-}
-
-inline detail::formatter<char32_t> operator""_nf(const char32_t* format_str, std::size_t)
-{
-    return detail::formatter<char32_t>(format_str);
-}
-
-inline detail::formatter<wchar_t> operator""_nf(const wchar_t* format_str, std::size_t)
-{
-    return detail::formatter<wchar_t>(format_str);
-}
+using format_string = detail::formatter<std::string::value_type>;
 
 template <class Char, class Traits>
 inline auto format(const std::basic_string<Char, Traits>& format_str)
@@ -148,5 +143,25 @@ inline auto format(const Char* format_str) -> detail::formatter<Char>
 }
 
 } // namespace nitro
+
+inline nitro::detail::formatter<char> operator""_nf(const char* format_str, std::size_t)
+{
+    return nitro::detail::formatter<char>(format_str);
+}
+
+inline nitro::detail::formatter<char16_t> operator""_nf(const char16_t* format_str, std::size_t)
+{
+    return nitro::detail::formatter<char16_t>(format_str);
+}
+
+inline nitro::detail::formatter<char32_t> operator""_nf(const char32_t* format_str, std::size_t)
+{
+    return nitro::detail::formatter<char32_t>(format_str);
+}
+
+inline nitro::detail::formatter<wchar_t> operator""_nf(const wchar_t* format_str, std::size_t)
+{
+    return nitro::detail::formatter<wchar_t>(format_str);
+}
 
 #endif // INCLUDE_NITRO_FORMAT_FORMAT_HPP

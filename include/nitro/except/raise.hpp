@@ -45,8 +45,8 @@ namespace except
 
         throw Exception(args...);
     }
-}
+} // namespace except
 
 using except::raise;
-}
+} // namespace nitro
 #endif // INCLUDE_NITRO_EXCEPT_RAISE_HPP

@@ -29,6 +29,8 @@
 #ifndef INCLUDE_NITRO_EXCEPT_EXCEPTION_HPP
 #define INCLUDE_NITRO_EXCEPT_EXCEPTION_HPP
 
+#include <nitro/format/format.hpp>
+
 #include <sstream>
 #include <stdexcept>
 #include <string>
@@ -70,7 +72,7 @@ namespace except
             detail::make_exception<Args...>()(msg, args...);
             return msg.str();
         }
-    }
+    } // namespace detail
 
     class exception : public std::runtime_error
     {
@@ -79,8 +81,15 @@ namespace except
         explicit exception(Args... args) : std::runtime_error(detail::make_string(args...))
         {
         }
+
+        template <typename... Args>
+        explicit exception(nitro::format_string&& fmt, Args... args)
+
+        : std::runtime_error(fmt.args(std::forward<Args>(args)...).str())
+        {
+        }
     };
-}
-}
+} // namespace except
+} // namespace nitro
 
 #endif // INCLUDE_NITRO_EXCEPT_EXCEPTION_HPP
