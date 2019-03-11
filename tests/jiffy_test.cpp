@@ -33,15 +33,33 @@ TEST_CASE("Jiffy can be taken", "[jiffy]")
     }
 }
 
-TEST_CASE("Jiffy can be printed with a fraction", "[jiffy]")
+TEST_CASE("Jiffy can handle fractions", "[jiffy]")
 {
     std::chrono::system_clock::time_point ctp(std::chrono::microseconds(1542297437305463));
 
-    nitro::jiffy::Jiffy tp(ctp);
+    SECTION("can print fractions")
+    {
+        nitro::jiffy::Jiffy tp(ctp);
 
-    REQUIRE(tp.isoformat() == "2018-11-15T16:57:17.305463+0100");
+        REQUIRE(tp.format("%f") == "305463");
+    }
 
-    REQUIRE_THROWS(nitro::jiffy::Jiffy("2018-11-15T16:57:17.305463+0100"));
+    SECTION("can print iso format with fractions")
+    {
+        nitro::jiffy::Jiffy tp(ctp);
+
+        REQUIRE(tp.isoformat().substr(20, 6) == "305463");
+    }
+
+    // TODO Implement parsing %f
+    // SECTION("can parse fractions")
+    // {
+    //     nitro::jiffy::Jiffy tp;
+    //
+    //     REQUIRE_NOTHROW(tp = nitro::jiffy::Jiffy("2018-11-15T16:57:17.305463+0100"));
+    //
+    //     REQUIRE(nitro::jiffy::Jiffy(ctp) == tp);
+    // }
 }
 
 TEST_CASE("Jiffy are comparable", "[jiffy]")
