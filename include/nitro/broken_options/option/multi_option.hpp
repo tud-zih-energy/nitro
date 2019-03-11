@@ -161,7 +161,7 @@ namespace broken_options
         {
             if (value_.empty())
             {
-                raise<parsing_error>("missing value for required option");
+                raise<parsing_error>("missing value for required option: ", name());
             }
         }
 

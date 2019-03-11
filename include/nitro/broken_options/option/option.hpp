@@ -120,7 +120,7 @@ namespace broken_options
         {
             if (value_)
             {
-                raise<parser_error>("option was already given: ", name_);
+                raise<parser_error>("option was already given: ", name());
             }
 
             if (data_)
@@ -145,7 +145,7 @@ namespace broken_options
                 }
                 else
                 {
-                    raise<parser_error>("missing value for required option: ", name_);
+                    raise<parser_error>("missing value for required option: ", name());
                 }
             }
         }
@@ -153,8 +153,6 @@ namespace broken_options
         friend class parser;
 
     private:
-        std::string name_;
-        std::string description_;
         nitro::lang::optional<std::string> default_;
         nitro::lang::optional<std::string> short_;
         nitro::lang::optional<std::string> value_;
