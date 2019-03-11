@@ -83,6 +83,15 @@ arguments:
     }
 }
 
+// TEST_CASE("Check if short option names are unique")
+// {
+//     nitro::broken_options::parser parser;
+//
+//     parser.option("opt1").short_name("o");
+//     auto& opt2 = parser.option("opt2");
+//     REQUIRE_THROWS_AS(opt2.short_name("o"), nitro::broken_options::parser_error);
+// }
+
 TEST_CASE("Simple named arguments can get parsed from command line", "[broken_options]")
 {
     SECTION("Trying to parse unknown arguments will throw")
@@ -92,7 +101,7 @@ TEST_CASE("Simple named arguments can get parsed from command line", "[broken_op
 
         nitro::broken_options::parser parser;
 
-        REQUIRE_THROWS(parser.parse(argc, argv));
+        REQUIRE_THROWS_AS(parser.parse(argc, argv), nitro::broken_options::parsing_error);
     }
 
     SECTION("Simple string values work")
@@ -146,7 +155,7 @@ TEST_CASE("Simple named arguments can get parsed from command line", "[broken_op
 
         parser.option("opt3");
 
-        REQUIRE_THROWS(parser.parse(argc, argv));
+        REQUIRE_THROWS_AS(parser.parse(argc, argv), nitro::broken_options::parsing_error);
     }
 }
 
@@ -206,7 +215,7 @@ TEST_CASE("Multiple arguments should work", "[broken_options]")
 
         parser.option("opt3");
 
-        REQUIRE_THROWS(parser.parse(argc, argv));
+        REQUIRE_THROWS_AS(parser.parse(argc, argv), nitro::broken_options::parsing_error);
     }
 
     SECTION("Giving an option mixed with short unexcepted twice should throw")
@@ -218,7 +227,7 @@ TEST_CASE("Multiple arguments should work", "[broken_options]")
 
         parser.option("opt3").short_name("o");
 
-        REQUIRE_THROWS(parser.parse(argc, argv));
+        REQUIRE_THROWS_AS(parser.parse(argc, argv), nitro::broken_options::parsing_error);
     }
 
     SECTION("Giving an identical option twice should throw")
@@ -230,7 +239,7 @@ TEST_CASE("Multiple arguments should work", "[broken_options]")
 
         parser.option("opt3");
 
-        REQUIRE_THROWS(parser.parse(argc, argv));
+        REQUIRE_THROWS_AS(parser.parse(argc, argv), nitro::broken_options::parsing_error);
     }
 
     SECTION("Giving two different values for the same option should work")
@@ -292,7 +301,7 @@ TEST_CASE("Multiple arguments should work", "[broken_options]")
 
         parser.option("opt3");
 
-        REQUIRE_THROWS(parser.multi_option("opt3"));
+        REQUIRE_THROWS_AS(parser.multi_option("opt3"), nitro::broken_options::parser_error);
     }
 }
 
@@ -441,7 +450,8 @@ TEST_CASE("Trying to redefine short_name")
 
         parser.option("opt1").short_name("o");
 
-        REQUIRE_THROWS(parser.option("opt1").short_name("p"));
+        REQUIRE_THROWS_AS(parser.option("opt1").short_name("p"),
+                          nitro::broken_options::parser_error);
     }
 
     SECTION("for multi_options should throw")
@@ -450,7 +460,8 @@ TEST_CASE("Trying to redefine short_name")
 
         parser.multi_option("opt1").short_name("o");
 
-        REQUIRE_THROWS(parser.multi_option("opt1").short_name("p"));
+        REQUIRE_THROWS_AS(parser.multi_option("opt1").short_name("p"),
+                          nitro::broken_options::parser_error);
     }
 
     SECTION("for toggle should throw")
@@ -459,7 +470,8 @@ TEST_CASE("Trying to redefine short_name")
 
         parser.toggle("opt1").short_name("o");
 
-        REQUIRE_THROWS(parser.toggle("opt1").short_name("p"));
+        REQUIRE_THROWS_AS(parser.toggle("opt1").short_name("p"),
+                          nitro::broken_options::parser_error);
     }
 
     SECTION("for options with same short name should NOT throw")

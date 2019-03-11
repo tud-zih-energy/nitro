@@ -34,12 +34,19 @@ namespace nitro
 {
 namespace broken_options
 {
+    /**
+     * This exception will be thrown, if the parser is build wrongly.
+     * This exceptions might as well be assertions only triggering during development.
+     */
     struct parser_error : nitro::except::exception
     {
         using base = nitro::except::exception;
         using base::base;
     };
 
+    /**
+     * This exception is thrown, if the user input is not valid according to the built parser
+     */
     struct parsing_error : nitro::except::exception
     {
         using base = nitro::except::exception;

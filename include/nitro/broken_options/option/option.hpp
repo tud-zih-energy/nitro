@@ -120,7 +120,7 @@ namespace broken_options
         {
             if (value_)
             {
-                raise<parser_error>("option was already given: ", name());
+                raise<parsing_error>("option was already given: ", name());
             }
 
             if (data_)
@@ -145,7 +145,7 @@ namespace broken_options
                 }
                 else
                 {
-                    raise<parser_error>("missing value for required option: ", name());
+                    raise<parsing_error>("missing value for required option: ", name());
                 }
             }
         }
