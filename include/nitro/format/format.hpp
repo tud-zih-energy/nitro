@@ -64,17 +64,6 @@ namespace detail
             return *this;
         }
 
-        template <typename T>
-        self& operator,(T&& arg)
-        {
-            stream_type str;
-            str << std::forward<T>(arg);
-
-            args_.emplace_back(str.str());
-
-            return *this;
-        }
-
         string_type str() const
         {
             string_type result;
