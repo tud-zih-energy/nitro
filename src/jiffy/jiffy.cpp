@@ -22,6 +22,8 @@ extern "C"
 #include <time.h>
 }
 
+extern long timezone;
+
 static_assert(std::is_same<std::tm, struct tm>::value,
               "std::tm must be the same type as struct tm. It ain't though :(");
 
@@ -57,11 +59,23 @@ namespace jiffy
 #else
         auto res = strptime(date.c_str(), format.c_str(), &tm_data_);
 
-        if (res == nullptr)
+        if (res == nullptr || res != date.c_str() + date.size())
         {
             nitro::except::raise("Couldn't parse time string '", date, "'");
         }
 #endif
+        auto a = timelocal(&tm_data_);
+        auto b = timegm(&tm_data_);
+        auto c = mktime(&tm_data_);
+
+        auto offset = timezone - tm_data_.tm_gmtoff;
+        std::time_t tp = timegm(&tm_data_) + offset;
+        if (tp == -1)
+        {
+            nitro::except::raise("Couldn't convert given time point into timestamp");
+        }
+
+        tp_ = std::chrono::system_clock::from_time_t(tp);
     }
 
     std::string Jiffy::format(std::string fmt) const
@@ -164,6 +178,11 @@ namespace jiffy
     {
         update_cached_tm();
         return tm_data_;
+    }
+
+    Jiffy::operator std::chrono::system_clock::time_point() const
+    {
+        return tp_;
     }
 
     void Jiffy::clear() const

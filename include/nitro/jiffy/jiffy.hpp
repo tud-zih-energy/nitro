@@ -44,7 +44,7 @@ namespace jiffy
     public:
         Jiffy();
 
-        Jiffy(std::chrono::system_clock::time_point tp);
+        explicit Jiffy(std::chrono::system_clock::time_point tp);
 
         Jiffy(const std::string& date,
               const std::string& format = std::string("%Y-%m-%dT%H:%M:%S%z"));
@@ -80,12 +80,17 @@ namespace jiffy
     public:
         auto as_tuple()
         {
-            return std::tie(tm_data_.tm_year, tm_data_.tm_mon, tm_data_.tm_mday, tm_data_.tm_hour,
-                            tm_data_.tm_min, tm_data_.tm_sec, fraction_);
+            return std::tie(tp_, fraction_);
         }
 
     public:
-        operator std::tm() const;
+        explicit operator std::tm() const;
+        explicit operator std::chrono::system_clock::time_point() const;
+
+        std::chrono::system_clock::time_point time_point() const
+        {
+            return std::chrono::system_clock::time_point{ *this };
+        }
 
     private:
         void clear() const;

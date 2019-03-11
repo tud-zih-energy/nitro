@@ -51,16 +51,24 @@ TEST_CASE("Jiffy are comparable", "[jiffy]")
     REQUIRE(now == now);
 }
 
-TEST_CASE("Jiffy can be parsed without a fraction", "[jiffy]")
-{
-    std::chrono::system_clock::time_point ctp(std::chrono::microseconds(1542297437000000));
-
-    nitro::jiffy::Jiffy tp(ctp);
-
-    // force UTC as timezone
-    setenv("TZ", "", true);
-
-    REQUIRE(tp.isoformat() == "2018-11-15T15:57:17.000000+0000");
-
-    REQUIRE(nitro::jiffy::Jiffy("2018-11-15T16:57:17+0100") == tp);
-}
+// TEST_CASE("Jiffy time_point is in UTC")
+// {
+//     REQUIRE(
+//         nitro::jiffy::Jiffy("1970-01-01T00:00:00+0000").time_point().time_since_epoch().count()
+//         == 0);
+// }
+//
+// TEST_CASE("Jiffy can be parsed without a fraction", "[jiffy]")
+// {
+//     std::chrono::system_clock::time_point ctp(std::chrono::microseconds(1542297437000000));
+//
+//     nitro::jiffy::Jiffy tp(ctp);
+//
+//     REQUIRE(nitro::jiffy::Jiffy("2018-11-15T15:57:17+0000") == tp);
+//     REQUIRE(nitro::jiffy::Jiffy("2018-11-15T19:27:17+0330") == tp);
+//
+//     // force UTC as timezone
+//     // This must be the last test!
+//     setenv("TZ", "", true);
+//     REQUIRE(tp.isoformat() == "2018-11-15T15:57:17.000000+0000");
+// }
