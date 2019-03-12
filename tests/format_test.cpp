@@ -4,11 +4,16 @@
 #include <nitro/except/raise.hpp>
 #include <nitro/format/format.hpp>
 
+#include <sstream>
+
 TEST_CASE("Simple format strings", "[format]")
 {
-    SECTION("can be printed to stdout")
+    SECTION("can be printed to an ostream")
     {
-        std::cout << nitro::format("Hello World") << std::endl;
+        std::stringstream s;
+        s << nitro::format("Hello {}") % "World";
+
+        REQUIRE(s.str() == "Hello World");
     }
 
     SECTION("can implicitly convert to std::string")
@@ -78,6 +83,37 @@ TEST_CASE("Simple format strings", "[format]")
     }
 }
 
+TEST_CASE("Args works")
+{
+    SECTION("Can be called with zero arguments")
+    {
+        auto fmt = "Test"_nf;
+        fmt.args();
+        std::string out = fmt;
+
+        REQUIRE(out == "Test");
+    }
+
+    SECTION("Can be called with multiple arguments")
+    {
+        auto fmt = "Test {} {} {}"_nf;
+        fmt.args(1, "foo", 5.25004005);
+        std::string out = fmt;
+
+        REQUIRE(out == "Test 1 foo 5.25004");
+    }
+
+    SECTION("Can be called mixed with arguments")
+    {
+        auto fmt = "Test {} {}"_nf;
+        fmt % 1;
+        fmt.args("foo");
+        std::string out = fmt;
+
+        REQUIRE(out == "Test 1 foo");
+    }
+}
+
 TEST_CASE("Holding it wrong gives exceptions", "[format]")
 {
     SECTION("Formatting with more arguments than placeholders throws")
@@ -106,7 +142,7 @@ TEST_CASE("Format can be used in exptions and raise")
     SECTION("Formatting the exception message works")
     {
         REQUIRE_THROWS_WITH(
-            nitro::raise("This is an exception formatted with {}"_nf, "nitro::format"),
+            nitro::raise("This is an exception formatted with {}"_nf % "nitro::format"),
             "This is an exception formatted with nitro::format");
     }
 }

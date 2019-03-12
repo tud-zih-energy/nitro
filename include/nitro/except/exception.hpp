@@ -29,8 +29,6 @@
 #ifndef INCLUDE_NITRO_EXCEPT_EXCEPTION_HPP
 #define INCLUDE_NITRO_EXCEPT_EXCEPTION_HPP
 
-#include <nitro/format/format.hpp>
-
 #include <sstream>
 #include <stdexcept>
 #include <string>
@@ -47,10 +45,10 @@ namespace except
         class make_exception
         {
         public:
-            void operator()(std::stringstream& msg, Arg arg, Args... args)
+            void operator()(std::stringstream& msg, Arg&& arg, Args&&... args)
             {
-                msg << arg;
-                make_exception<Args...>()(msg, args...);
+                msg << std::forward<Arg>(arg);
+                make_exception<Args...>()(msg, std::forward<Args>(args)...);
             }
         };
 
@@ -58,18 +56,18 @@ namespace except
         class make_exception<Arg>
         {
         public:
-            void operator()(std::stringstream& msg, Arg arg)
+            void operator()(std::stringstream& msg, Arg&& arg)
             {
-                msg << arg;
+                msg << std::forward<Arg>(arg);
             }
         };
 
         template <typename... Args>
-        inline std::string make_string(Args... args)
+        inline std::string make_string(Args&&... args)
         {
             std::stringstream msg;
 
-            detail::make_exception<Args...>()(msg, args...);
+            detail::make_exception<Args...>()(msg, std::forward<Args>(args)...);
             return msg.str();
         }
     } // namespace detail
@@ -78,14 +76,8 @@ namespace except
     {
     public:
         template <typename... Args>
-        explicit exception(Args... args) : std::runtime_error(detail::make_string(args...))
-        {
-        }
-
-        template <typename... Args>
-        explicit exception(nitro::format_string&& fmt, Args... args)
-
-        : std::runtime_error(fmt.args(std::forward<Args>(args)...).str())
+        explicit exception(Args&&... args)
+        : std::runtime_error(detail::make_string(std::forward<Args>(args)...))
         {
         }
     };

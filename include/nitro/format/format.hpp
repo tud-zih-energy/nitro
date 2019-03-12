@@ -29,6 +29,8 @@
 #ifndef INCLUDE_NITRO_FORMAT_FORMAT_HPP
 #define INCLUDE_NITRO_FORMAT_FORMAT_HPP
 
+#include <nitro/except/raise.hpp>
+
 #include <cstdio>
 #include <regex>
 #include <sstream>
@@ -68,6 +70,7 @@ namespace detail
         {
             (*this) % std::forward<Arg>(arg);
             this->args(std::forward<Args>(args)...);
+            return *this;
         }
 
         self& args()
@@ -90,8 +93,7 @@ namespace detail
             {
                 if (placeholder == placeholders_end)
                 {
-                    throw std::runtime_error(
-                        "Provided more arguments than placeholders available in format string");
+                    raise("Provided more arguments than placeholders available in format string");
                 }
 
                 result.append(input, format_.begin() + placeholder->position());
@@ -103,8 +105,7 @@ namespace detail
 
             if (placeholder != placeholders_end)
             {
-                throw std::runtime_error(
-                    "Provided less arguments than placeholders needed in format string");
+                raise("Provided less arguments than placeholders needed in format string");
             }
 
             return result;
