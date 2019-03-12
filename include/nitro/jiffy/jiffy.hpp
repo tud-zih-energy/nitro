@@ -88,10 +88,7 @@ namespace jiffy
         explicit operator std::tm() const;
         explicit operator std::chrono::system_clock::time_point() const;
 
-        std::chrono::system_clock::time_point time_point() const
-        {
-            return std::chrono::system_clock::time_point{ *this };
-        }
+        std::chrono::system_clock::time_point time_point() const;
 
     private:
         void clear() const;

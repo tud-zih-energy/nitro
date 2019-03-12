@@ -135,6 +135,11 @@ namespace jiffy
         return tp_;
     }
 
+    std::chrono::system_clock::time_point time_point() const
+    {
+        return tp_;
+    }
+
     void Jiffy::clear() const
     {
         std::memset(&tm_data_, 0, sizeof(tm_data_));
