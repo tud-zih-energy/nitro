@@ -48,7 +48,7 @@ namespace jiffy
 
         std::stringstream s;
 
-        s << data;
+        s << date;
         s >> std::get_time(&tm_data_, format.c_str());
 
         if (s.fail())
@@ -89,7 +89,7 @@ namespace jiffy
 
         std::stringstream s;
 
-        s << data;
+        s << date;
         s >> std::get_time(&tm_data_, format.c_str());
 
         if (s.fail())

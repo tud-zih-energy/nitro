@@ -164,7 +164,7 @@ set_target_properties(nitro-jiffy-static PROPERTIES
 target_sources(nitro-jiffy-static PRIVATE
     $<$<STREQUAL:$<PLATFORM_ID>,Darwin>:src/jiffy/jiffy-mac.cpp>
     $<$<STREQUAL:$<PLATFORM_ID>,Linux>:src/jiffy/jiffy-linux.cpp>
-    $<$<STREQUAL:$<PLATFORM_ID>,Linux>:src/jiffy/jiffy-win.cpp>
+    $<$<STREQUAL:$<PLATFORM_ID>,Windows>:src/jiffy/jiffy-win.cpp>
 )
 
 add_library(nitro INTERFACE)
