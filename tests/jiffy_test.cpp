@@ -10,6 +10,8 @@ extern "C"
 #include <stdlib.h>
 }
 
+extern long timezone;
+
 TEST_CASE("Print 100 jiffies in iso format", "[jiffy]")
 {
     for (int i = 0; i < 100; i++)

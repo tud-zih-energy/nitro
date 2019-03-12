@@ -120,12 +120,14 @@ set(NITRO_ENV_SRCS
     src/env/process.cpp
 )
 
-add_library(nitro-env SHARED ${NITRO_ENV_SRCS})
-target_link_libraries(nitro-env
-    PUBLIC
-        Nitro::core
-        $<$<CXX_COMPILER_ID:MSVC>:ws2_32>
-)
+if(NOT WIN32)
+    add_library(nitro-env SHARED ${NITRO_ENV_SRCS})
+    target_link_libraries(nitro-env
+        PUBLIC
+            Nitro::core
+            $<$<CXX_COMPILER_ID:MSVC>:ws2_32>
+    )
+endif()
 
 add_library(nitro-env-static STATIC ${NITRO_ENV_SRCS})
 target_link_libraries(nitro-env-static
@@ -138,6 +140,7 @@ set_target_properties(nitro-env-static PROPERTIES
     OUTPUT_NAME nitro-env
 )
 
+if(NOT WIN32)
 add_library(nitro-jiffy SHARED src/jiffy/jiffy.cpp)
 target_link_libraries(nitro-jiffy
     PUBLIC
@@ -147,6 +150,7 @@ target_sources(nitro-jiffy PRIVATE
     $<$<STREQUAL:$<PLATFORM_ID>,Darwin>:src/jiffy/jiffy-mac.cpp>
     $<$<STREQUAL:$<PLATFORM_ID>,Linux>:src/jiffy/jiffy-linux.cpp>
 )
+endif()
 
 add_library(nitro-jiffy-static STATIC src/jiffy/jiffy.cpp)
 target_link_libraries(nitro-jiffy-static
@@ -160,6 +164,7 @@ set_target_properties(nitro-jiffy-static PROPERTIES
 target_sources(nitro-jiffy-static PRIVATE
     $<$<STREQUAL:$<PLATFORM_ID>,Darwin>:src/jiffy/jiffy-mac.cpp>
     $<$<STREQUAL:$<PLATFORM_ID>,Linux>:src/jiffy/jiffy-linux.cpp>
+    $<$<STREQUAL:$<PLATFORM_ID>,Linux>:src/jiffy/jiffy-win.cpp>
 )
 
 add_library(nitro INTERFACE)
@@ -175,8 +180,13 @@ target_link_libraries(nitro
 set_target_properties(nitro-core PROPERTIES EXPORT_NAME core)
 set_target_properties(nitro-dl PROPERTIES EXPORT_NAME dl)
 set_target_properties(nitro-log PROPERTIES EXPORT_NAME log)
-set_target_properties(nitro-env PROPERTIES EXPORT_NAME env)
-set_target_properties(nitro-jiffy PROPERTIES EXPORT_NAME jiffy)
+if(WIN32)
+    set_target_properties(nitro-env-static PROPERTIES EXPORT_NAME env)
+    set_target_properties(nitro-jiffy-static PROPERTIES EXPORT_NAME jiffy)
+else()
+    set_target_properties(nitro-env PROPERTIES EXPORT_NAME env)
+    set_target_properties(nitro-jiffy PROPERTIES EXPORT_NAME jiffy)
+endif()
 
 add_library(Nitro::nitro ALIAS nitro)
 add_library(Nitro::core ALIAS nitro-core)
@@ -194,21 +204,37 @@ if(CMAKE_CURRENT_SOURCE_DIR STREQUAL CMAKE_SOURCE_DIR)
         DESTINATION include
     )
 
-    install(TARGETS
-            nitro
-            nitro-core
-            nitro-dl
-            nitro-log
-            nitro-env
-            nitro-env-static
-            nitro-jiffy
-            nitro-jiffy-static
-        EXPORT NitroTargets
-        LIBRARY DESTINATION lib
-        ARCHIVE DESTINATION lib
-        RUNTIME DESTINATION bin
-        INCLUDES DESTINATION include
-    )
+    if(WIN32)
+        install(TARGETS
+                nitro
+                nitro-core
+                nitro-dl
+                nitro-log
+                nitro-env-static
+                nitro-jiffy-static
+            EXPORT NitroTargets
+            LIBRARY DESTINATION lib
+            ARCHIVE DESTINATION lib
+            RUNTIME DESTINATION bin
+            INCLUDES DESTINATION include
+        )
+    else()
+        install(TARGETS
+                nitro
+                nitro-core
+                nitro-dl
+                nitro-log
+                nitro-env
+                nitro-env-static
+                nitro-jiffy
+                nitro-jiffy-static
+            EXPORT NitroTargets
+            LIBRARY DESTINATION lib
+            ARCHIVE DESTINATION lib
+            RUNTIME DESTINATION bin
+            INCLUDES DESTINATION include
+        )
+    endif()
     install(EXPORT NitroTargets
         DESTINATION lib/cmake/Nitro
         NAMESPACE Nitro::
