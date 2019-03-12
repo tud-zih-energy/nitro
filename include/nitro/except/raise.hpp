@@ -40,10 +40,9 @@ namespace except
 {
 
     template <typename Exception = nitro::except::exception, typename... Args>
-    [[noreturn]] inline void raise(Args... args)
+    [[noreturn]] inline void raise(Args&&... args)
     {
-
-        throw Exception(args...);
+        throw Exception(std::forward<Args>(args)...);
     }
 } // namespace except
 
