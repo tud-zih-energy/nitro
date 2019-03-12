@@ -135,7 +135,7 @@ namespace jiffy
         return tp_;
     }
 
-    std::chrono::system_clock::time_point time_point() const
+    std::chrono::system_clock::time_point Jiffy::time_point() const
     {
         return tp_;
     }
