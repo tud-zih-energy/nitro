@@ -46,8 +46,9 @@ namespace jiffy
 
         explicit Jiffy(std::chrono::system_clock::time_point tp);
 
-        Jiffy(const std::string& date,
-              const std::string& format = std::string("%Y-%m-%dT%H:%M:%S%z"));
+        explicit Jiffy(const std::string& isoformat);
+
+        Jiffy(const std::string& date, const std::string& format);
 
     public:
         std::string format(std::string fmt) const;
@@ -80,7 +81,7 @@ namespace jiffy
     public:
         auto as_tuple()
         {
-            return std::tie(tp_, fraction_);
+            return std::tie(tp_);
         }
 
     public:
@@ -99,7 +100,6 @@ namespace jiffy
         mutable bool update_needed_ = true;
         mutable std::tm tm_data_;
         std::chrono::system_clock::time_point tp_;
-        std::chrono::microseconds fraction_;
     };
 
     inline std::ostream& operator<<(std::ostream& s, const Jiffy& j)

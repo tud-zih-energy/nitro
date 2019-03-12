@@ -143,6 +143,10 @@ target_link_libraries(nitro-jiffy
     PUBLIC
         Nitro::core
 )
+target_sources(nitro-jiffy PRIVATE
+    $<$<STREQUAL:$<PLATFORM_ID>,Darwin>:src/jiffy/jiffy-mac.cpp>
+    $<$<STREQUAL:$<PLATFORM_ID>,Linux>:src/jiffy/jiffy-linux.cpp>
+)
 
 add_library(nitro-jiffy-static STATIC src/jiffy/jiffy.cpp)
 target_link_libraries(nitro-jiffy-static
@@ -152,6 +156,10 @@ target_link_libraries(nitro-jiffy-static
 set_target_properties(nitro-jiffy-static PROPERTIES
     POSITION_INDEPENDENT_CODE ${NITRO_POSITION_INDEPENDENT_CODE}
     OUTPUT_NAME nitro-jiffy
+)
+target_sources(nitro-jiffy-static PRIVATE
+    $<$<STREQUAL:$<PLATFORM_ID>,Darwin>:src/jiffy/jiffy-mac.cpp>
+    $<$<STREQUAL:$<PLATFORM_ID>,Linux>:src/jiffy/jiffy-linux.cpp>
 )
 
 add_library(nitro INTERFACE)

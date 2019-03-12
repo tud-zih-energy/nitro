@@ -10,19 +10,10 @@
 
 #include <cstring>
 
-#if defined(_MSC_VER) || defined(_MSC_EXTENSIONS)
-#define USE_CXX_STD_SYSTEM_TIME
-#endif
-
 extern "C"
 {
-#ifndef USE_CXX_STD_SYSTEM_TIME
-#include <sys/time.h>
-#endif
 #include <time.h>
 }
-
-extern long timezone;
 
 static_assert(std::is_same<std::tm, struct tm>::value,
               "std::tm must be the same type as struct tm. It ain't though :(");
@@ -35,49 +26,6 @@ namespace jiffy
     {
     }
 
-    Jiffy::Jiffy(std::chrono::system_clock::time_point tp) : tp_(tp)
-    {
-        fraction_ = std::chrono::duration_cast<std::chrono::microseconds>(tp.time_since_epoch()) %
-                    std::micro::den;
-    }
-
-    Jiffy::Jiffy(const std::string& date, const std::string& format)
-    : update_needed_(false), fraction_(0)
-    {
-        clear();
-
-#ifdef USE_CXX_STD_SYSTEM_TIME
-        std::stringstream s;
-
-        s << date;
-        s >> std::get_time(&tm_data_, format.c_str());
-
-        if (s.fail())
-        {
-            nitro::except::raise("Couldn't parse time string '", date, "'");
-        }
-#else
-        auto res = strptime(date.c_str(), format.c_str(), &tm_data_);
-
-        if (res == nullptr || res != date.c_str() + date.size())
-        {
-            nitro::except::raise("Couldn't parse time string '", date, "'");
-        }
-#endif
-        auto a = timelocal(&tm_data_);
-        auto b = timegm(&tm_data_);
-        auto c = mktime(&tm_data_);
-
-        auto offset = timezone - tm_data_.tm_gmtoff;
-        std::time_t tp = timegm(&tm_data_) + offset;
-        if (tp == -1)
-        {
-            nitro::except::raise("Couldn't convert given time point into timestamp");
-        }
-
-        tp_ = std::chrono::system_clock::from_time_t(tp);
-    }
-
     std::string Jiffy::format(std::string fmt) const
     {
         update_cached_tm();
@@ -86,7 +34,7 @@ namespace jiffy
         {
             std::stringstream s;
 
-            s << std::setfill('0') << std::setw(6) << fraction_.count();
+            s << std::setfill('0') << std::setw(6) << microsecond();
 
             fmt = std::regex_replace(fmt, std::regex("%f"), s.str());
         }
@@ -171,7 +119,9 @@ namespace jiffy
     int Jiffy::microsecond() const
     {
         // this is in the range [0, 1e6), so it's fine
-        return static_cast<int>(fraction_.count());
+        return static_cast<int>(
+            std::chrono::duration_cast<std::chrono::microseconds>(tp_.time_since_epoch()).count() %
+            std::micro::den);
     }
 
     Jiffy::operator std::tm() const

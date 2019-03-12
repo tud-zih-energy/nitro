@@ -23,6 +23,12 @@ if(NOT CMAKE_C_COMPILER_ID MATCHES "MSVC")
     target_sources(Nitro.dl_test PRIVATE dl_test_other.cpp)
     set_tests_properties(Nitro.dl_test PROPERTIES ENVIRONMENT "LD_LIBRARY_PATH=${CMAKE_CURRENT_BINARY_DIR}:$ENV{LD_LIBRARY_PATH}")
     target_link_libraries(Nitro.dl_test Nitro::dl)
+
+    NitroTest(jiffy_test.cpp)
+    target_link_libraries(Nitro.jiffy_test Nitro::jiffy)
+
+    NitroTest(logging_jiffy_test.cpp)
+    target_link_libraries(Nitro.logging_jiffy_test Nitro::log Nitro::jiffy)
 endif()
 
 NitroTest(env_get_test.cpp)
@@ -40,17 +46,11 @@ NitroTest(enumerate_test.cpp)
 NitroTest(logging_test.cpp)
 target_link_libraries(Nitro.logging_test Nitro::log)
 
-NitroTest(logging_jiffy_test.cpp)
-target_link_libraries(Nitro.logging_jiffy_test Nitro::log Nitro::jiffy)
-
 NitroTest(string_ref_test.cpp)
 
 NitroTest(catch_test.cpp)
 
 NitroTest(quaint_ptr_test.cpp)
-
-NitroTest(jiffy_test.cpp)
-target_link_libraries(Nitro.jiffy_test Nitro::jiffy)
 
 NitroTest(is_callable_test.cpp)
 
