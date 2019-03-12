@@ -75,15 +75,8 @@ namespace except
     class exception : public std::runtime_error
     {
     public:
-        exception(const exception&) = default;
-        exception& operator=(const exception&) = default;
-
-        exception(exception&&) = default;
-        exception& operator=(exception&&) = default;
-
         template <typename... Args>
-        explicit exception(Args&&... args)
-        : std::runtime_error(detail::make_string(std::forward<Args>(args)...))
+        explicit exception(Args... args) : std::runtime_error(detail::make_string(args...))
         {
         }
     };
