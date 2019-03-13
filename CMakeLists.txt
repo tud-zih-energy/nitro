@@ -54,7 +54,6 @@ endif()
 
 set(Nitro_VERSION 1.0)
 
-cmake_policy(SET CMP0077 NEW)
 option(NITRO_POSITION_INDEPENDENT_CODE "Whether to build Nitro libraries with position independent code" OFF)
 
 add_library(nitro-core INTERFACE)
