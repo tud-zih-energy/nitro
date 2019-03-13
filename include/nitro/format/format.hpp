@@ -128,8 +128,6 @@ namespace detail
     }
 } // namespace detail
 
-using format_string = detail::formatter<std::string::value_type>;
-
 template <class Char, class Traits>
 inline auto format(const std::basic_string<Char, Traits>& format_str)
     -> detail::formatter<Char, Traits>
