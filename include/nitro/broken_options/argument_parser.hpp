@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015-2016, Technische Universität Dresden, Germany
+ * Copyright (c) 2015-2019, Technische Universität Dresden, Germany
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without modification, are permitted
@@ -26,80 +26,43 @@
  * WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef INCLUDE_NITRO_BROKEN_OPTIONS_TOGGLE_HPP
-#define INCLUDE_NITRO_BROKEN_OPTIONS_TOGGLE_HPP
+#pragma once
 
-#include <nitro/broken_options/exception.hpp>
-#include <nitro/broken_options/fwd.hpp>
-#include <nitro/broken_options/option/base.hpp>
-
-#include <nitro/lang/optional.hpp>
-
-#include <ios>
-#include <memory>
-#include <sstream>
-#include <string>
+#include <nitro/broken_options/argument.hpp>
 
 namespace nitro
 {
 namespace broken_options
 {
-    class toggle : public crtp_base<toggle>
+    class argument_parser
     {
     public:
-        toggle(const std::string& name, const std::string& description)
-        : crtp_base(name, description), ref_(nullptr), given_(0)
+        argument_parser(int argc, const char* const argv[])
         {
-        }
-
-    public:
-        toggle& ref(int& target)
-        {
-            ref_ = &target;
-
-            return *this;
-        }
-
-    public:
-        int given() const
-        {
-            return given_;
-        }
-
-    public:
-        virtual void format_value(std::ostream&) const override
-        {
-        }
-
-    private:
-        virtual void update_value(const argument&) override
-        {
-            if (ref_ != nullptr)
+            for (int i = 1; i < argc; i++)
             {
-                *ref_ = true;
+                arguments_.emplace_back(argv[i]);
             }
-
-            ++given_;
         }
 
-        virtual void prepare() override
+        auto begin() const
         {
+            return arguments_.begin();
         }
 
-        virtual void check() override
+        auto end() const
         {
+            return arguments_.end();
         }
 
-        friend class parser;
+        auto size() const
+        {
+            return arguments_.size();
+        }
 
     private:
-        std::string name_;
-        std::string description_;
-        nitro::lang::optional<std::string> short_;
-        int* ref_;
-        int given_;
+        std::vector<argument> arguments_;
     };
+
 } // namespace broken_options
 } // namespace nitro
-
-#endif // INCLUDE_NITRO_BROKEN_OPTIONS_TOGGLE_HPP

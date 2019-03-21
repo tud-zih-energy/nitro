@@ -146,7 +146,7 @@ namespace broken_options
             value_.push_back(arg.value());
         }
 
-        void update() override
+        void prepare() override
         {
             if (default_.size())
             {

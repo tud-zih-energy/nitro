@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015-2016, Technische Universität Dresden, Germany
+ * Copyright (c) 2015-2019, Technische Universität Dresden, Germany
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without modification, are permitted
@@ -58,287 +58,34 @@ namespace broken_options
         {
         }
 
-    public:
-        broken_options::option& option(const std::string& name,
-                                       const std::string& description = std::string(""))
-        {
-            if (multi_options_.count(name) > 0)
-            {
-                raise<parser_error>("Trying to redefine multi_option as option. Name: ", name);
-            }
-
-            if (toggles_.count(name) > 0)
-            {
-                raise<parser_error>("Trying to redefine toggle as multi_option. Name: ", name);
-            }
-
-            if (options_.count(name) == 0)
-            {
-                auto res = options_.emplace(std::piecewise_construct, std::forward_as_tuple(name),
-                                            std::forward_as_tuple(name, description));
-                arguments_.add(res.first->second);
-            }
-            return options_.at(name);
-        }
-
-        broken_options::multi_option& multi_option(const std::string& name,
-                                                   const std::string& description = std::string(""))
-        {
-            if (options_.count(name) > 0)
-            {
-                raise<parser_error>("Trying to redefine option as multi_option. Name: ", name);
-            }
-
-            if (toggles_.count(name) > 0)
-            {
-                raise<parser_error>("Trying to redefine toggle as multi_option. Name: ", name);
-            }
-
-            if (multi_options_.count(name) == 0)
-            {
-                auto res =
-                    multi_options_.emplace(std::piecewise_construct, std::forward_as_tuple(name),
-                                           std::forward_as_tuple(name, description));
-                arguments_.add(res.first->second);
-            }
-            return multi_options_.at(name);
-        }
-
-        broken_options::toggle& toggle(const std::string& name,
-                                       const std::string& description = std::string(""))
-        {
-            if (options_.count(name) > 0)
-            {
-                raise<parser_error>("Trying to redefine option as multi_option. Name: ", name);
-            }
-
-            if (multi_options_.count(name) > 0)
-            {
-                raise<parser_error>("Trying to redefine multi_option as option. Name: ", name);
-            }
-
-            if (toggles_.count(name) == 0)
-            {
-                auto res = toggles_.emplace(std::piecewise_construct, std::forward_as_tuple(name),
-                                            std::forward_as_tuple(name, description));
-                arguments_.add(res.first->second);
-            }
-            return toggles_.at(name);
-        }
-
-        void ignore_unknown(bool ignore = true)
-        {
-            force_positional_ = ignore;
-        }
-
-        options parse(int argc, const char* const argv[])
-        {
-            for (auto& option : options_)
-            {
-                option.second.update();
-            }
-
-            for (auto& option : multi_options_)
-            {
-                option.second.update();
-            }
-
-            for (auto& option : toggles_)
-            {
-                option.second.update();
-            }
-
-            bool only_positionals = false;
-            std::vector<std::string> positionals;
-
-            for (int i = 1; i < argc; i++)
-            {
-                argument current_arg(argv[i]);
-
-                if (current_arg.is_double_dash())
-                {
-                    only_positionals = true;
-
-                    continue;
-                }
-
-                if (only_positionals || current_arg.is_value())
-                {
-                    positionals.push_back(current_arg.data());
-
-                    continue;
-                }
-
-                bool match_found = false;
-                for (auto& option : options_)
-                {
-
-                    if (current_arg.has_value())
-                    {
-                        if (option.second.matches(current_arg.name()))
-                        {
-                            match_found = true;
-
-                            option.second.update_value(current_arg);
-
-                            break;
-                        }
-                    }
-                    else
-                    {
-                        if (option.second.matches(current_arg.data()))
-                        {
-                            match_found = true;
-
-                            option.second.update_value(std::string(argv[++i]));
-
-                            break;
-                        }
-                    }
-                }
-
-                for (auto& option : multi_options_)
-                {
-                    if (match_found)
-                    {
-                        // could already be set in previous loop
-                        break;
-                    }
-
-                    if (current_arg.has_value())
-                    {
-                        if (option.second.matches(current_arg.name()))
-                        {
-                            match_found = true;
-
-                            option.second.update_value(current_arg);
-
-                            break;
-                        }
-                    }
-                    else
-                    {
-                        if (option.second.matches(current_arg.name()))
-                        {
-                            match_found = true;
-
-                            option.second.update_value(std::string(argv[++i]));
-
-                            break;
-                        }
-                    }
-                }
-
-                for (auto& option : toggles_)
-                {
-                    if (option.second.matches(current_arg.name()))
-                    {
-                        match_found = true;
-                        option.second.update_value(current_arg);
-                    }
-                }
-
-                if (force_positional_)
-                {
-                    positionals.push_back(current_arg.name());
-
-                    if (i < argc - 1)
-                    {
-                        argument next_argument(argv[++i]);
-                        if (next_argument.is_value())
-                        {
-                            positionals.emplace_back(next_argument.data());
-                        }
-                    }
-
-                    continue;
-                }
-
-                if (!match_found)
-                {
-                    raise<parsing_error>("Argument '", current_arg.data(),
-                                         "' could not be parsed.");
-                }
-            }
-
-            for (auto& option : options_)
-            {
-                option.second.check();
-            }
-
-            for (auto& option : multi_options_)
-            {
-                option.second.check();
-            }
-
-            for (auto& option : toggles_)
-            {
-                option.second.check();
-            }
-
-            return options(options_, multi_options_, toggles_, positionals);
-        }
+        auto parse(int argc, const char* const argv[]) -> options;
 
     public:
-        std::ostream& usage(std::ostream& s = std::cout, bool print_default_group = true)
-        {
-            std::string short_list;
-            std::string option_list;
+        auto option(const std::string& name, const std::string& description = std::string(""))
+            -> broken_options::option&;
+        auto multi_option(const std::string& name, const std::string& description = std::string(""))
+            -> broken_options::multi_option&;
+        auto toggle(const std::string& name, const std::string& description = std::string(""))
+            -> broken_options::toggle&;
 
-            for (auto& toggle : toggles_)
-            {
-                if (toggle.second.has_short_name())
-                {
-                    short_list += toggle.second.short_name();
-                }
-            }
+        void accept_positionals(std::size_t amount = std::numeric_limits<std::size_t>::max());
+        void positional_name(const std::string& name);
 
-            s << "usage: " << app_name_;
+    public:
+        std::ostream& usage(std::ostream& s = std::cout, bool print_default_group = true);
 
-            if (!short_list.empty())
-            {
-                std::sort(short_list.begin(), short_list.end());
-                s << " [-" << short_list << "]";
-            }
+    private:
+        template <typename Iter>
+        bool parse_options(Iter& it, Iter end);
 
-            for (auto& opt : options_)
-            {
-                if (opt.second.has_default())
-                {
-                    option_list += " [--" + opt.second.name() + "]";
-                }
-                else
-                {
-                    option_list += " --" + opt.second.name();
-                }
-            }
+        template <typename Iter>
+        bool parse_multi_options(Iter& it, Iter end);
 
-            for (auto& mopt : multi_options_)
-            {
-                if (mopt.second.has_default())
-                {
-                    option_list += " [--" + mopt.second.name() + "]";
-                }
-                else
-                {
-                    option_list += " --" + mopt.second.name();
-                }
-            }
+        template <typename Iter>
+        bool parse_toggles(Iter& it, Iter end);
 
-            s << option_list << std::endl << std::endl;
-
-            if (!about_.empty())
-            {
-                s << about_ << std::endl << std::endl;
-            }
-
-            if (print_default_group)
-            {
-                arguments_.usage(s);
-            }
-
-            return s;
-        }
+        void prepare();
+        void validate();
 
     private:
         std::string app_name_;
@@ -350,9 +97,12 @@ namespace broken_options
 
         group arguments_;
 
-        bool force_positional_ = false;
+        std::size_t allowed_positionals_ = 0;
+        std::string positional_name_ = "args";
     };
 } // namespace broken_options
 } // namespace nitro
+
+#include <nitro/broken_options/parser.ipp>
 
 #endif // INCLUDE_NITRO_BROKEN_OPTIONS_PARSER_HPP

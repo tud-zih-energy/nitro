@@ -125,7 +125,7 @@ namespace broken_options
 
     private:
         virtual void update_value(const argument& data) = 0;
-        virtual void update() = 0;
+        virtual void prepare() = 0;
         virtual void check() = 0;
 
         virtual bool matches(const argument& arg)

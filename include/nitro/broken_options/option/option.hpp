@@ -131,7 +131,7 @@ namespace broken_options
             value_ = arg.value();
         }
 
-        void update() override
+        void prepare() override
         {
         }
 

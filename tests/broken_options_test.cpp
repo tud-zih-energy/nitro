@@ -22,6 +22,9 @@ TEST_CASE("Usage descriptions work")
 
         std::stringstream s;
 
+        parser.accept_positionals(3);
+        parser.positional_name("command line");
+
         parser.toggle("tog", "some toggle").short_name("t");
         parser.toggle("togg", "some other toggle").short_name("u");
 
@@ -53,7 +56,7 @@ TEST_CASE("Usage descriptions work")
 
         REQUIRE(
             s.str() ==
-            R"EXPECTED(usage: app_name [-tu] --opt --opt_long [--opt_nos] --opt_nosd [--opt_with_d] [--some_long_named_option] --mopt
+            R"EXPECTED(usage: app_name [-tu] --opt --opt_long [--opt_nos] --opt_nosd [--opt_with_d] [--some_long_named_option] --mopt [command line ...]
 
 about
 
@@ -155,7 +158,33 @@ TEST_CASE("Simple named arguments can get parsed from command line", "[broken_op
 
         parser.option("opt3");
 
-        REQUIRE_THROWS_AS(parser.parse(argc, argv), nitro::broken_options::parsing_error);
+        REQUIRE_THROWS_WITH(parser.parse(argc, argv), "missing value for required option: opt3");
+    }
+
+    SECTION("Missing values for passed option without default throws")
+    {
+        int argc = 2;
+        const char* argv[] = { "", "--opt3" };
+
+        nitro::broken_options::parser parser;
+
+        parser.option("opt3");
+
+        REQUIRE_THROWS_WITH(parser.parse(argc, argv), "missing value for required option: opt3");
+    }
+
+    SECTION("Missing values for passed option without default throws if left out in between")
+    {
+        int argc = 6;
+        const char* argv[] = { "", "--opt1", "value1", "--opt2", "--opt3", "value3" };
+
+        nitro::broken_options::parser parser;
+
+        parser.option("opt1");
+        parser.option("opt2");
+        parser.option("opt3");
+
+        REQUIRE_THROWS_WITH(parser.parse(argc, argv), "missing value for required option: opt2");
     }
 }
 
@@ -313,6 +342,7 @@ TEST_CASE("positional arguments should work", "[broken_options]")
         const char* argv[] = { "", "--", "--opt1", "12", "--opt2", "13" };
 
         nitro::broken_options::parser parser;
+        parser.accept_positionals(4);
 
         auto options = parser.parse(argc, argv);
 
@@ -330,6 +360,7 @@ TEST_CASE("positional arguments should work", "[broken_options]")
         const char* argv[] = { "", "--", "--opt1", "12", "--opt2", "13" };
 
         nitro::broken_options::parser parser;
+        parser.accept_positionals(4);
 
         auto options = parser.parse(argc, argv);
 
@@ -341,25 +372,73 @@ TEST_CASE("positional arguments should work", "[broken_options]")
         REQUIRE(options.get(-1) == "13");
     }
 
-    SECTION("Given ignore_unknown(true), all unknown options should be interpreted as positionals")
+    SECTION("Given accept_positionals(), unknown options should still throw")
+    {
+        int argc = 8;
+        const char* argv[] = { "", "--unknown", "value", "--", "--opt1", "12", "--opt2", "13" };
+
+        nitro::broken_options::parser parser;
+        parser.accept_positionals();
+
+        REQUIRE_THROWS_AS(parser.parse(argc, argv), nitro::broken_options::parsing_error);
+    }
+
+    SECTION("Given positionals when non were accepted should throw")
     {
         int argc = 8;
         const char* argv[] = { "", "--unknown", "value", "--", "--opt1", "12", "--opt2", "13" };
 
         nitro::broken_options::parser parser;
 
-        parser.ignore_unknown();
+        REQUIRE_THROWS_AS(parser.parse(argc, argv), nitro::broken_options::parsing_error);
+    }
+
+    SECTION("Given more positionals than accepted should throw")
+    {
+        int argc = 8;
+        const char* argv[] = { "", "--unknown", "value", "--", "--opt1", "12", "--opt2", "13" };
+
+        nitro::broken_options::parser parser;
+        parser.accept_positionals(3);
+
+        REQUIRE_THROWS_AS(parser.parse(argc, argv), nitro::broken_options::parsing_error);
+    }
+
+    SECTION("positionals should be allowed between arguments")
+    {
+        const char* argv[] = { "",       "--opt1",      "value1", "positional0", "--opt2",
+                               "value2", "positional1", "--",     "positional2" };
+
+        nitro::broken_options::parser parser;
+        parser.option("opt1");
+        parser.option("opt2");
+        parser.accept_positionals(3);
+
+        auto options = parser.parse(9, argv);
+
+        REQUIRE(options.positionals().size() == 3);
+
+        CHECK(options.get(0) == "positional0");
+        CHECK(options.get(1) == "positional1");
+        CHECK(options.get(2) == "positional2");
+
+        CHECK(options.get("opt1") == "value1");
+        CHECK(options.get("opt2") == "value2");
+    }
+
+    SECTION("when double dash is repeated, it should be a positional")
+    {
+        int argc = 3;
+        const char* argv[] = { "", "--", "--" };
+
+        nitro::broken_options::parser parser;
+        parser.accept_positionals(1);
 
         auto options = parser.parse(argc, argv);
 
-        REQUIRE(options.positionals().size() == 6);
+        REQUIRE(options.positionals().size() == 1);
 
-        REQUIRE(options.get(0) == "--unknown");
-        REQUIRE(options.get(1) == "value");
-        REQUIRE(options.get(2) == "--opt1");
-        REQUIRE(options.get(3) == "12");
-        REQUIRE(options.get(4) == "--opt2");
-        REQUIRE(options.get(5) == "13");
+        CHECK(options.get(0) == "--");
     }
 }
 
