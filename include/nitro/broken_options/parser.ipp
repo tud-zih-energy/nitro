@@ -30,6 +30,11 @@
 
 #include <nitro/broken_options/argument_parser.hpp>
 
+#include <nitro/format/format.hpp>
+
+#include <set>
+#include <string>
+
 namespace nitro
 {
 namespace broken_options
@@ -110,6 +115,8 @@ namespace broken_options
 
     options parser::parse(int argc, const char* const argv[])
     {
+        check_consistency();
+
         prepare();
 
         bool only_positionals = false;
@@ -322,37 +329,49 @@ namespace broken_options
 
     void parser::prepare()
     {
-        for (auto& option : options_)
-        {
-            option.second.prepare();
-        }
-
-        for (auto& option : multi_options_)
-        {
-            option.second.prepare();
-        }
-
-        for (auto& option : toggles_)
-        {
-            option.second.prepare();
-        }
+        for_each_option([](auto& arg) { arg.prepare(); });
     }
 
     void parser::validate()
     {
+        for_each_option([](auto& arg) { arg.check(); });
+    }
+
+    void parser::check_consistency()
+    {
+        std::set<std::string> short_names;
+
+        for_each_option([&short_names](auto& arg) {
+            if (arg.has_short_name())
+            {
+                auto res = short_names.emplace(arg.short_name());
+
+                if (!res.second)
+                {
+                    raise<parser_error>(
+                        nitro::format("redefinition of short name '{}' from option '{}'") %
+                        arg.short_name() % arg.name());
+                }
+            }
+        });
+    }
+
+    template <typename F>
+    void parser::for_each_option(F f)
+    {
         for (auto& option : options_)
         {
-            option.second.check();
+            f(option.second);
         }
 
         for (auto& option : multi_options_)
         {
-            option.second.check();
+            f(option.second);
         }
 
         for (auto& option : toggles_)
         {
-            option.second.check();
+            f(option.second);
         }
     }
 

@@ -86,14 +86,14 @@ arguments:
     }
 }
 
-// TEST_CASE("Check if short option names are unique")
-// {
-//     nitro::broken_options::parser parser;
-//
-//     parser.option("opt1").short_name("o");
-//     auto& opt2 = parser.option("opt2");
-//     REQUIRE_THROWS_AS(opt2.short_name("o"), nitro::broken_options::parser_error);
-// }
+TEST_CASE("Check if short option names are unique")
+{
+    nitro::broken_options::parser parser;
+
+    parser.option("opt1").short_name("o");
+    auto& opt2 = parser.option("opt2").short_name("o");
+    REQUIRE_THROWS_AS(parser.parse(0, nullptr), nitro::broken_options::parser_error);
+}
 
 TEST_CASE("Simple named arguments can get parsed from command line", "[broken_options]")
 {

@@ -75,6 +75,8 @@ namespace broken_options
         std::ostream& usage(std::ostream& s = std::cout, bool print_default_group = true);
 
     private:
+        void check_consistency();
+
         template <typename Iter>
         bool parse_options(Iter& it, Iter end);
 
@@ -86,6 +88,9 @@ namespace broken_options
 
         void prepare();
         void validate();
+
+        template <typename F>
+        void for_each_option(F f);
 
     private:
         std::string app_name_;
