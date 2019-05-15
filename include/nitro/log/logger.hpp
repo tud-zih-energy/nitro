@@ -39,6 +39,9 @@ namespace nitro
 namespace log
 {
 
+    template <typename Clock>
+    class timestamp_clock_attribute;
+
     template <typename Record, template <typename> class Formater, typename Sink,
               template <typename> class Filter>
     class logger : Sink, Formater<Record>, Filter<Record>
@@ -50,6 +53,10 @@ namespace log
         template <severity_level Severity>
         using actual_stream_t =
             typename actual_stream<Severity, Record, Formater, Sink, Filter>::type;
+
+        static_assert(
+            detail::has_attribute_specialization<timestamp_clock_attribute, Record>::value,
+            "Record requires a timestamp attribute");
 
     public:
         static self& instance()
@@ -99,7 +106,7 @@ namespace log
             return actual_stream_t<severity_level::fatal>(tag);
         }
     };
-}
-} // namespace nitro::log
+} // namespace log
+} // namespace nitro
 
 #endif // INCLUDE_NITRO_LOG_LOGGER_HPP

@@ -48,12 +48,6 @@ namespace nitro
 namespace log
 {
     class tag_attribute;
-    class jiffy_attribute;
-
-    template <typename Clock>
-    class timestamp_clock_attribute;
-
-    using timestamp_attribute = timestamp_clock_attribute<std::chrono::high_resolution_clock>;
 
     template <typename Record, template <typename> class Formatter, typename Sink,
               template <typename> class Filter>
@@ -61,51 +55,10 @@ namespace log
 
     namespace detail
     {
-
-        template <typename Record, bool has_timestamp>
-        class set_timestamp_attribute
-        {
-        public:
-            void operator()(Record&)
-            {
-            }
-        };
-
-        template <typename Record>
-        class set_timestamp_attribute<Record, true>
-        {
-        public:
-            void operator()(Record& r)
-            {
-                r.timestamp() = r.timestamp_clock_get_time();
-            }
-        };
-
-        template <typename Record, bool has_timestamp>
-        class set_jiffy_attribute
-        {
-        public:
-            void operator()(Record&)
-            {
-            }
-        };
-
-        template <typename Record>
-        class set_jiffy_attribute<Record, true>
-        {
-        public:
-            void operator()(Record& r)
-            {
-                r.jiffy() = r.jiffy_get_time();
-            }
-        };
-
         template <typename Record>
         void set_timestamp(Record& r)
         {
-            set_timestamp_attribute<Record, detail::has_attribute_specialization<
-                                                timestamp_clock_attribute, Record>::value>()(r);
-            set_jiffy_attribute<Record, detail::has_attribute<jiffy_attribute, Record>::value>()(r);
+            r.timestamp() = r.timestamp_clock_get_time();
         }
 
         template <typename Record, bool has_tag>
@@ -297,7 +250,7 @@ namespace log
             typename detail::actual_stream<Severity >= severity_level::NITRO_LOG_MIN_SEVERITY,
                                            Record, Formatter, Sink, Filter, Severity>::type;
     };
-}
-} // namespace nitro::log
+} // namespace log
+} // namespace nitro
 
 #endif // INCLUDE_NITRO_LOG_STREAM_HPP

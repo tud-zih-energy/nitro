@@ -137,32 +137,6 @@ set_target_properties(nitro-env-static PROPERTIES
     OUTPUT_NAME nitro-env
 )
 
-if(NOT WIN32)
-add_library(nitro-jiffy SHARED src/jiffy/jiffy.cpp)
-target_link_libraries(nitro-jiffy
-    PUBLIC
-        Nitro::core
-)
-target_sources(nitro-jiffy PRIVATE
-    $<$<STREQUAL:$<PLATFORM_ID>,Darwin>:src/jiffy/jiffy-mac.cpp>
-    $<$<STREQUAL:$<PLATFORM_ID>,Linux>:src/jiffy/jiffy-linux.cpp>
-)
-endif()
-
-add_library(nitro-jiffy-static STATIC src/jiffy/jiffy.cpp)
-target_link_libraries(nitro-jiffy-static
-    PUBLIC
-        Nitro::core
-)
-set_target_properties(nitro-jiffy-static PROPERTIES
-    POSITION_INDEPENDENT_CODE ${NITRO_POSITION_INDEPENDENT_CODE}
-    OUTPUT_NAME nitro-jiffy
-)
-target_sources(nitro-jiffy-static PRIVATE
-    $<$<STREQUAL:$<PLATFORM_ID>,Darwin>:src/jiffy/jiffy-mac.cpp>
-    $<$<STREQUAL:$<PLATFORM_ID>,Linux>:src/jiffy/jiffy-linux.cpp>
-    $<$<STREQUAL:$<PLATFORM_ID>,Windows>:src/jiffy/jiffy-win.cpp>
-)
 
 add_library(nitro INTERFACE)
 target_link_libraries(nitro
@@ -171,7 +145,6 @@ target_link_libraries(nitro
         Nitro::log
         Nitro::dl
         Nitro::env
-        Nitro::jiffy
 )
 
 set_target_properties(nitro-core PROPERTIES EXPORT_NAME core)
@@ -179,10 +152,8 @@ set_target_properties(nitro-dl PROPERTIES EXPORT_NAME dl)
 set_target_properties(nitro-log PROPERTIES EXPORT_NAME log)
 if(WIN32)
     set_target_properties(nitro-env-static PROPERTIES EXPORT_NAME env)
-    set_target_properties(nitro-jiffy-static PROPERTIES EXPORT_NAME jiffy)
 else()
     set_target_properties(nitro-env PROPERTIES EXPORT_NAME env)
-    set_target_properties(nitro-jiffy PROPERTIES EXPORT_NAME jiffy)
 endif()
 
 add_library(Nitro::nitro ALIAS nitro)
@@ -190,7 +161,6 @@ add_library(Nitro::core ALIAS nitro-core)
 add_library(Nitro::dl ALIAS nitro-dl)
 add_library(Nitro::log ALIAS nitro-log)
 add_library(Nitro::env ALIAS nitro-env-static)
-add_library(Nitro::jiffy ALIAS nitro-jiffy-static)
 
 if(CMAKE_CURRENT_SOURCE_DIR STREQUAL CMAKE_SOURCE_DIR)
     # build Debug with all warnings
@@ -208,7 +178,6 @@ if(CMAKE_CURRENT_SOURCE_DIR STREQUAL CMAKE_SOURCE_DIR)
                 nitro-dl
                 nitro-log
                 nitro-env-static
-                nitro-jiffy-static
             EXPORT NitroTargets
             LIBRARY DESTINATION lib
             ARCHIVE DESTINATION lib
@@ -223,8 +192,6 @@ if(CMAKE_CURRENT_SOURCE_DIR STREQUAL CMAKE_SOURCE_DIR)
                 nitro-log
                 nitro-env
                 nitro-env-static
-                nitro-jiffy
-                nitro-jiffy-static
             EXPORT NitroTargets
             LIBRARY DESTINATION lib
             ARCHIVE DESTINATION lib
@@ -249,7 +216,7 @@ if(CMAKE_CURRENT_SOURCE_DIR STREQUAL CMAKE_SOURCE_DIR)
     include(CTest)
     add_subdirectory(tests)
 else()
-    set_target_properties(nitro-env nitro-jiffy nitro-env-static nitro-jiffy-static PROPERTIES EXCLUDE_FROM_ALL TRUE)
+    set_target_properties(nitro-env nitro-env-static PROPERTIES EXCLUDE_FROM_ALL TRUE)
 endif()
 
 endif()

@@ -29,12 +29,6 @@ NitroTest(env_get_test.cpp)
 target_link_libraries(Nitro.env_get_test Nitro::env)
 set_tests_properties(Nitro.env_get_test PROPERTIES ENVIRONMENT "TEST_1=THIS_WAS_SET")
 
-NitroTest(jiffy_test.cpp)
-target_link_libraries(Nitro.jiffy_test Nitro::jiffy)
-
-NitroTest(logging_jiffy_test.cpp)
-target_link_libraries(Nitro.logging_jiffy_test Nitro::log Nitro::jiffy)
-
 NitroTest(broken_options_test.cpp)
 
 NitroTest(tuple_operators_test.cpp)
