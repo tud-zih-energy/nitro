@@ -18,7 +18,7 @@ Currently the following modules are available:
 
 ## Supported Compiler and Platforms
 
-With the exception of the `jiffy`, `dl`, and `env` module, which are platform dependent, every other Nitro module can be built with a C++14 compliant compiler.
+With the exception of the `dl` and `env` module, which are platform dependent, every other Nitro module can be built with a C++14 compliant compiler.
 
 The currently tested compilers are:
 
