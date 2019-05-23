@@ -12,7 +12,6 @@ Currently the following modules are available:
 *   `nitro::broken_options` - Yet another library for argument parsing
 *   `nitro::dl` - A type-safe wrapper for `dlopen()`
 *   `nitro::env` - A platform-dependent library for getting information about the environment, e.g., hostname
-*   `nitro::jiffy` - A wrapper for date and time handling compatible to `std::chrono`
 *   `nitro::lang` - A collection of various classes used to supplement the standard library
 *   `nitro::log` - A lightweight logging library with support for compile-time filtering
 *   `nitro::meta` - A collection of template meta functions
