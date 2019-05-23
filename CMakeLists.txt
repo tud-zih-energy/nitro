@@ -24,15 +24,50 @@
 # THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 if(TARGET Nitro::nitro)
-    message(AUTHOR_WARNING "Nitro targets were already defined. Skipping.")
+    if(Git_FOUND)
+        _is_git(${CMAKE_CURRENT_SOURCE_DIR} IN_GIT)
+    endif()
+    if(IN_GIT)
+        execute_process(COMMAND ${GIT_EXECUTABLE} describe --always --tags --dirty
+            WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
+            OUTPUT_VARIABLE THIS_NITRO_VERSION_STRING
+        )
+        string(STRIP ${THIS_NITRO_VERSION_STRING} THIS_NITRO_VERSION_STRING)
+    else()
+        message(AUTHOR_WARNING "Cannot detect Nitro version.")
+        set(THIS_NITRO_VERSION_STRING "unknown")
+    endif()
+
+    if(THIS_NITRO_VERSION_STRING STREQUAL NITRO_VERSION_STRING)
+        message(STATUS "Compatible Nitro targets were already defined. Skipping.")
+    else()
+        message(AUTHOR_WARNING "A different version of Nitro already defined the Nitro targets")
+    endif()
 else()
 
 cmake_minimum_required(VERSION 3.2)
 
-project(Nitro)
+project(Nitro VERSION 1.0.0)
 
 include(cmake/GitSubmoduleUpdate.cmake)
 git_submodule_update()
+
+if(Git_FOUND)
+    _is_git(${CMAKE_CURRENT_SOURCE_DIR} IN_GIT)
+endif()
+if(IN_GIT)
+    execute_process(COMMAND ${GIT_EXECUTABLE} describe --always --tags --dirty
+        WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
+        OUTPUT_VARIABLE _NITRO_VERSION_STRING
+    )
+    string(STRIP ${_NITRO_VERSION_STRING} _NITRO_VERSION_STRING)
+else()
+    message(AUTHOR_WARNING "Cannot detect Nitro version.")
+    set(_NITRO_VERSION_STRING "unknown")
+endif()
+
+set(NITRO_VERSION_STRING ${_NITRO_VERSION_STRING} CACHE INTERNAL "")
+unset(_NITRO_VERSION_STRING)
 
 include(common/DefaultBuildType.cmake)
 include(common/UnsetIfUpdated.cmake)
@@ -48,11 +83,8 @@ if (NOT NITRO_LOG_LEVEL)
                 "The minimum required severity level of log messages available during runtime.")
     endif()
 
-    set_property(CACHE NITRO_LOG_LEVEL PROPERTY "STRINGS" "fatal" "error" "warn" "info" "debug"
-            "trace")
+    set_property(CACHE NITRO_LOG_LEVEL PROPERTY "STRINGS" "fatal" "error" "warn" "info" "debug" "trace")
 endif()
-
-set(Nitro_VERSION 1.0)
 
 option(NITRO_POSITION_INDEPENDENT_CODE "Whether to build Nitro libraries with position independent code" OFF)
 
