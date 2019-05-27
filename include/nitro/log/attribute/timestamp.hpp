@@ -61,7 +61,7 @@ namespace log
     };
 
     using timestamp_attribute = timestamp_clock_attribute<std::chrono::high_resolution_clock>;
-}
-} // namespace nitro::log
+} // namespace log
+} // namespace nitro
 
 #endif // INCLUDE_NITRO_LOG_TIMESTAMP_ATTRIBUTE_HPP

@@ -53,7 +53,7 @@ namespace log
             return m_message;
         }
     };
-}
-} // namespace nitro::log
+} // namespace log
+} // namespace nitro
 
 #endif // INCLUDE_NITRO_LOG_MESSAGE_ATTRIBUTE_HPP

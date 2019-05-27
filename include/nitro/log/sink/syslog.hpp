@@ -32,7 +32,8 @@
 
 #include <string>
 
-extern "C" {
+extern "C"
+{
 #include <syslog.h>
 }
 
@@ -82,6 +83,6 @@ namespace log
                 }
             }
         };
-    }
-}
-}
+    } // namespace sink
+} // namespace log
+} // namespace nitro

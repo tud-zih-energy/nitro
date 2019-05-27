@@ -85,7 +85,7 @@ namespace lang
         private:
             T container_;
         };
-    }
+    } // namespace detail
 
     template <typename T>
     inline auto reverse(const T& container)
@@ -118,7 +118,7 @@ namespace lang
     {
         return reverse(std::vector<T>(std::move(l)));
     }
-}
-} // namespace nitr::lang
+} // namespace lang
+} // namespace nitro
 
 #endif // INCLUDE_NITRO_LANG_REVERSE_HPP

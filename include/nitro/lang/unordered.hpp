@@ -42,5 +42,5 @@ namespace lang
 
     template <typename T>
     using unordered_set = std::unordered_set<T, nitro::lang::hash_wrapper<T>>;
-}
-}
+} // namespace lang
+} // namespace nitro

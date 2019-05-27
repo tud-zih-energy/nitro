@@ -59,12 +59,12 @@ namespace lang
             // l is only for meta bullshit
             (void)l;
         }
-    }
+    } // namespace helper
 
     template <typename... Ts, typename F>
     inline void tuple_foreach(std::tuple<Ts...>& t, F f)
     {
         helper::for_each(t, f, helper::gen_seq<sizeof...(Ts)>());
     }
-}
-}
+} // namespace lang
+} // namespace nitro

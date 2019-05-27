@@ -43,7 +43,7 @@ namespace log
         static_assert(detail::has_attribute<message_attribute, record>::value,
                       "Record must have a message attribute!");
     };
-}
-} // namespace nitro::log
+} // namespace log
+} // namespace nitro
 
 #endif // INCLUDE_NITRO_LOG_RECORD_HPP

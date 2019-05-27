@@ -30,7 +30,8 @@
 
 #include <nitro/except/raise.hpp>
 
-extern "C" {
+extern "C"
+{
 #include <limits.h>
 #if defined(_MSC_VER) || defined(_MSC_EXTENSIONS)
 #include <Winsock2.h>
@@ -62,5 +63,5 @@ namespace env
 
         return c_hostname;
     }
-}
-}
+} // namespace env
+} // namespace nitro

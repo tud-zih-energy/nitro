@@ -51,7 +51,7 @@ namespace log
             return hostname_;
         }
     };
-}
-} // namespace nitro::log
+} // namespace log
+} // namespace nitro
 
 #endif // INCLUDE_NITRO_LOG_HOSTNAME_ATTRIBUTE_HPP

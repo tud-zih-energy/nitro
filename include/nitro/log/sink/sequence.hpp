@@ -54,6 +54,6 @@ namespace log
 
         template <typename... Sinks>
         std::tuple<Sinks...> sequence<Sinks...>::sinks;
-    }
-}
-}
+    } // namespace sink
+} // namespace log
+} // namespace nitro

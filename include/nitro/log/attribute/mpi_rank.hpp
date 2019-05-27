@@ -86,7 +86,7 @@ namespace log
             return get_mpi_rank();
         }
     };
-}
-} // namespace nitro::log
+} // namespace log
+} // namespace nitro
 
 #endif // INCLUDE_NITRO_LOG_MPI_RANK_ATTRIBUTE_HPP

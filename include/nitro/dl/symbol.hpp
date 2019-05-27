@@ -118,7 +118,7 @@ namespace dl
 
         std::shared_ptr<void> library;
     };
-}
-} // namespace nitr::args
+} // namespace dl
+} // namespace nitro
 
 #endif // INCLUDE_NITRO_DL_SYMBOL_HPP

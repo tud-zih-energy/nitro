@@ -32,6 +32,7 @@ extern "C"
 {
 #if defined(_MSC_VER) || defined(_MSC_EXTENSIONS)
 #include <windows.h>
+
 #include <tlhelp32.h>
 #else
 #include <unistd.h>
@@ -47,37 +48,43 @@ namespace env
 #if defined(_MSC_VER) || defined(_MSC_EXTENSIONS)
         return GetCurrentProcessId();
 #else
-		return getpid();
+        return getpid();
 #endif
     }
 
     int get_parent_pid()
     {
 #if defined(_MSC_VER) || defined(_MSC_EXTENSIONS)
-		HANDLE hSnapshot;
-		PROCESSENTRY32 pe32;
-		DWORD ppid = 0, pid = nitro::env::get_pid();
+        HANDLE hSnapshot;
+        PROCESSENTRY32 pe32;
+        DWORD ppid = 0, pid = nitro::env::get_pid();
 
-		hSnapshot = CreateToolhelp32Snapshot(TH32CS_SNAPPROCESS, 0);
-		__try {
-			if (hSnapshot == INVALID_HANDLE_VALUE) __leave;
+        hSnapshot = CreateToolhelp32Snapshot(TH32CS_SNAPPROCESS, 0);
+        __try
+        {
+            if (hSnapshot == INVALID_HANDLE_VALUE)
+                __leave;
 
-			ZeroMemory(&pe32, sizeof(pe32));
-			pe32.dwSize = sizeof(pe32);
-			if (!Process32First(hSnapshot, &pe32)) __leave;
+            ZeroMemory(&pe32, sizeof(pe32));
+            pe32.dwSize = sizeof(pe32);
+            if (!Process32First(hSnapshot, &pe32))
+                __leave;
 
-			do {
-				if (pe32.th32ProcessID == pid) {
-					ppid = pe32.th32ParentProcessID;
-					break;
-				}
-			} while (Process32Next(hSnapshot, &pe32));
-
-		}
-		__finally {
-			if (hSnapshot != INVALID_HANDLE_VALUE) CloseHandle(hSnapshot);
-		}
-		return ppid;
+            do
+            {
+                if (pe32.th32ProcessID == pid)
+                {
+                    ppid = pe32.th32ParentProcessID;
+                    break;
+                }
+            } while (Process32Next(hSnapshot, &pe32));
+        }
+        __finally
+        {
+            if (hSnapshot != INVALID_HANDLE_VALUE)
+                CloseHandle(hSnapshot);
+        }
+        return ppid;
 #else
         return getppid();
 #endif

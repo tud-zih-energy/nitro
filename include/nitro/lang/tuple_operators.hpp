@@ -80,7 +80,7 @@ namespace lang
         {
             return t;
         }
-    }
+    } // namespace helper
 
     template <typename T>
     struct tuple_operators : virtual hashable
@@ -138,7 +138,7 @@ namespace lang
         // should be safe though, as the const is moved into the tuple
         return helper::constify(const_cast<T&>(t).as_tuple());
     }
-}
-}
+} // namespace lang
+} // namespace nitro
 
 #endif // INCLUDE_NITRO_TUPLE_OPERATORS_HPP

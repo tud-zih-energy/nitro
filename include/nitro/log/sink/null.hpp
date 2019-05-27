@@ -47,8 +47,8 @@ namespace log
             {
             }
         };
-    }
-}
-} // namespace nitro::log::sink
+    } // namespace sink
+} // namespace log
+} // namespace nitro
 
 #endif // INCLUDE_NITRO_LOG_SINK_STDOUT_HPP

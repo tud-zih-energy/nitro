@@ -87,7 +87,7 @@ namespace lang
             hash_combine_impl(seed, hash(std::get<I>(v)));
             hash_combine_tuple<I + 1>(seed, v);
         }
-    }
+    } // namespace detail
 
     template <typename... T>
     inline auto hash(const std::tuple<T...>& t)
@@ -138,5 +138,5 @@ namespace lang
             return hash(t);
         }
     };
-}
-}
+} // namespace lang
+} // namespace nitro

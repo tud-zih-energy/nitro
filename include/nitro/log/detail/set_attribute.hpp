@@ -70,8 +70,8 @@ namespace log
                                 record, Attributes...>()(r, v);
             }
         };
-    }
-}
-} // namespace nitro::log::detail
+    } // namespace detail
+} // namespace log
+} // namespace nitro
 
 #endif // INCLUDE_NITRO_LOG_DETAIL_SET_ATTRIBUTE_HPP

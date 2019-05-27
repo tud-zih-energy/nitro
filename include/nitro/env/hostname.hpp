@@ -37,6 +37,6 @@ namespace env
 {
     std::string hostname();
 }
-}
+} // namespace nitro
 
 #endif // INCLUDE_NITRO_ENV_HOSTNAME_HPP

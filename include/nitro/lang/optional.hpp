@@ -104,7 +104,7 @@ namespace lang
     private:
         std::unique_ptr<T> data_;
     };
-}
-} // namespace nitr::lang
+} // namespace lang
+} // namespace nitro
 
 #endif // INCLUDE_NITRO_LANG_OPTIONAL_HPP

@@ -61,8 +61,8 @@ namespace lang
 
     public:
         using base::operator bool;
-        using base::get_deleter;
         using base::get;
+        using base::get_deleter;
 
         using base::operator=;
 
@@ -88,5 +88,5 @@ namespace lang
         return { new T(std::forward<Args>(args)...),
                  [](void* ptr) { delete static_cast<T*>(ptr); } };
     }
-}
-}
+} // namespace lang
+} // namespace nitro

@@ -56,7 +56,7 @@ namespace log
             return m_severity;
         }
     };
-}
-} // namespace nitro::log
+} // namespace log
+} // namespace nitro
 
 #endif // INCLUDE_NITRO_LOG_SEVERITY_ATTRIBUTE_HPP

@@ -65,8 +65,8 @@ namespace log
 
         template <typename Record, unsigned N>
         severity_level severity_filter<Record, N>::sev = severity_level::trace;
-    }
-}
-} // namespace nitro::log::filter
+    } // namespace filter
+} // namespace log
+} // namespace nitro
 
 #endif // INCLUDE_NITRO_LOG_FILTER_SEVERITY_FILTER_HPP

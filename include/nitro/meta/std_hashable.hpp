@@ -44,5 +44,5 @@ namespace meta
             std::is_integral<T>::value || std::is_floating_point<T>::value ||
             is_variadic_member<T, std::string, std::wstring, std::u16string, std::u32string>::value;
     };
-}
-}
+} // namespace meta
+} // namespace nitro

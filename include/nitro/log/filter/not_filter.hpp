@@ -52,8 +52,8 @@ namespace log
         class not_filter<not_filter<F1>> : public F1
         {
         };
-    }
-}
-} // namespace nitro::log::filter
+    } // namespace filter
+} // namespace log
+} // namespace nitro
 
 #endif // INCLUDE_NITRO_LOG_FILTER_NOT_FILTER_HPP

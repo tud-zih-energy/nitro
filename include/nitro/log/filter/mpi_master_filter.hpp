@@ -47,8 +47,8 @@ namespace log
                 return r.mpi_rank() == 0;
             }
         };
-    }
-}
-} // namespace nitro::log::filter
+    } // namespace filter
+} // namespace log
+} // namespace nitro
 
 #endif // INCLUDE_NITRO_LOG_FILTERL_MPI_MASTER_FILTER_HPP

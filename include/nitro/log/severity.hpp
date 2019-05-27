@@ -109,7 +109,7 @@ namespace log
 
         return s;
     }
-}
-} // namespace nitro::log
+} // namespace log
+} // namespace nitro
 
 #endif // INCLUDE_NITRO_LOG_SEVERITY_HPP

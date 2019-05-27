@@ -74,7 +74,7 @@ namespace meta
     {
         static const bool value = false;
     };
-}
-} // namespace nitro::meta
+} // namespace meta
+} // namespace nitro
 
 #endif // INCLUDE_NITRO_META_VARIADIC_HPP

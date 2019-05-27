@@ -50,7 +50,7 @@ namespace log
             return my_omp_thread_id;
         }
     };
-}
-} // namespace nitro::log
+} // namespace log
+} // namespace nitro
 
 #endif // INCLUDE_NITRO_LOG_OMP_THREAD_ID_ATTRIBUTE_HPP

@@ -76,7 +76,7 @@ namespace lang
                 }
             }
         };
-    }
+    } // namespace detail
 
     template <typename... E, typename F, typename... Args>
     auto make_catch(F& f, Args... args)
@@ -92,5 +92,5 @@ namespace lang
                       "value, or be void.");
         return detail::catch_wrapper<E...>()(f, args...);
     }
-}
-}
+} // namespace lang
+} // namespace nitro

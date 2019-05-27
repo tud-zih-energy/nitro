@@ -56,7 +56,7 @@ namespace dl
     private:
         std::string dlerror_;
     };
-}
-} // namespace nitr::args
+} // namespace dl
+} // namespace nitro
 
 #endif // INCLUDE_NITRO_DL_EXCEPTION_HPP

@@ -52,8 +52,8 @@ namespace log
                 return F1::filter(r) && F2::filter(r);
             }
         };
-    }
-}
-} // namespace nitro::log::filter
+    } // namespace filter
+} // namespace log
+} // namespace nitro
 
 #endif // INCLUDE_NITRO_LOG_FILTER_AND_FILTER_HPP

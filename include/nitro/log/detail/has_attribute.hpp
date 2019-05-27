@@ -58,8 +58,8 @@ namespace log
             static const bool value =
                 nitro::meta::is_variadic_member_specialization<Attribute, Attributes...>::value;
         };
-    }
-}
-} // namespace nitro::log::detail
+    } // namespace detail
+} // namespace log
+} // namespace nitro
 
 #endif // INCLUDE_NITRO_LOG_DETAIL_HAS_ATTRIBUTE_HPP

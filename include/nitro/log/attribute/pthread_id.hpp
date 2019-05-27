@@ -50,7 +50,7 @@ namespace log
             return reinterpret_cast<std::uint64_t>(my_pthread_id);
         }
     };
-}
-} // namespace nitro::log
+} // namespace log
+} // namespace nitro
 
 #endif // INCLUDE_NITRO_LOG_PTHREAD_ID_ATTRIBUTE_HPP

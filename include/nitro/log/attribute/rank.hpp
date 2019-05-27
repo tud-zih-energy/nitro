@@ -56,7 +56,7 @@ namespace log
             return get_rank();
         }
     };
-}
-} // namespace nitro::log
+} // namespace log
+} // namespace nitro
 
 #endif // INCLUDE_NITRO_LOG_RANK_ATTRIBUTE_HPP

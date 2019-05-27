@@ -47,8 +47,8 @@ namespace log
                 return true;
             }
         };
-    }
-}
-} // namespace nitro::log::filter
+    } // namespace filter
+} // namespace log
+} // namespace nitro
 
 #endif // INCLUDE_NITRO_LOG_FILTER_NULL_FILTER_HPP

@@ -49,8 +49,8 @@ namespace log
                 std::cerr << formatted_record;
             }
         };
-    }
-}
-} // namespace nitro::log::sink
+    } // namespace sink
+} // namespace log
+} // namespace nitro
 
 #endif // INCLUDE_NITRO_LOG_SINK_STDERR_HPP

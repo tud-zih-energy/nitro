@@ -1,8 +1,9 @@
 #include <cmath>
 
-extern "C" {
-double nitro_cos(double x)
+extern "C"
 {
-    return std::cos(x);
-}
+    double nitro_cos(double x)
+    {
+        return std::cos(x);
+    }
 }

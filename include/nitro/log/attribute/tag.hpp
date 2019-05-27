@@ -53,7 +53,7 @@ namespace log
             return m_tag;
         }
     };
-}
-} // namespace nitro::log
+} // namespace log
+} // namespace nitro
 
 #endif // INCLUDE_NITRO_LOG_TAG_ATTRIBUTE_HPP
