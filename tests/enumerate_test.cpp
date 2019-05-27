@@ -69,43 +69,49 @@ template <long FROM, long TO>
 class Range
 {
 public:
-    // member typedefs provided through inheriting from std::iterator
-    class iterator : public std::iterator<std::input_iterator_tag, // iterator_category
-                                          long,                    // value_type
-                                          long,                    // difference_type
-                                          const long*,             // pointer
-                                          long                     // reference
-                                          >
+    class iterator
     {
-        long num = FROM;
-
     public:
-        explicit iterator(long _num = 0) : num(_num)
+        using iterator_category = std::input_iterator_tag;
+        using value_type = long;
+        using difference_type = long;
+        using pointer = const long*;
+        using reference = long;
+
+        explicit iterator(value_type _num = FROM) : num(_num)
         {
         }
+
         iterator& operator++()
         {
             num = TO >= FROM ? num + 1 : num - 1;
             return *this;
         }
+
         iterator operator++(int)
         {
             iterator retval = *this;
             ++(*this);
             return retval;
         }
+
         bool operator==(iterator other) const
         {
             return num == other.num;
         }
+
         bool operator!=(iterator other) const
         {
             return !(*this == other);
         }
+
         reference operator*() const
         {
             return num;
         }
+
+    private:
+        value_type num;
     };
 
     iterator begin() const
