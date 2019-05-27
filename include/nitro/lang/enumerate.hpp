@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015-2016, Technische Universität Dresden, Germany
+ * Copyright (c) 2015-2019, Technische Universität Dresden, Germany
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without modification, are permitted
@@ -26,8 +26,7 @@
  * WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef INCLUDE_NITRO_LANG_REVERSE_HPP
-#define INCLUDE_NITRO_LANG_REVERSE_HPP
+#pragma once
 
 #include <vector>
 
@@ -50,7 +49,7 @@ namespace lang
             template <typename U>
             struct proxy
             {
-                proxy(std::size_t index, U& value) : index_(index), value_(value)
+                proxy(std::size_t index, U value) : index_(index), value_(value)
                 {
                 }
 
@@ -64,19 +63,19 @@ namespace lang
                     return index_;
                 }
 
-                U& value()
+                U value()
                 {
                     return value_;
                 }
 
-                const U& value() const
+                const U value() const
                 {
                     return value_;
                 }
 
             private:
                 std::size_t index_;
-                U& value_;
+                U value_;
             };
 
             struct iterator
@@ -166,7 +165,7 @@ namespace lang
         private:
             T container_;
         };
-    }
+    } // namespace detail
 
     template <typename T>
     inline auto enumerate(const T& container)
@@ -199,7 +198,5 @@ namespace lang
     {
         return enumerate(std::vector<T>(std::move(container)));
     }
-}
-} // namespace nitr::lang
-
-#endif // INCLUDE_NITRO_LANG_REVERSE_HPP
+} // namespace lang
+} // namespace nitro

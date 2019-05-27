@@ -65,6 +65,60 @@ struct Wrapper
     Container& c;
 };
 
+template <long FROM, long TO>
+class Range
+{
+public:
+    // member typedefs provided through inheriting from std::iterator
+    class iterator : public std::iterator<std::input_iterator_tag, // iterator_category
+                                          long,                    // value_type
+                                          long,                    // difference_type
+                                          const long*,             // pointer
+                                          long                     // reference
+                                          >
+    {
+        long num = FROM;
+
+    public:
+        explicit iterator(long _num = 0) : num(_num)
+        {
+        }
+        iterator& operator++()
+        {
+            num = TO >= FROM ? num + 1 : num - 1;
+            return *this;
+        }
+        iterator operator++(int)
+        {
+            iterator retval = *this;
+            ++(*this);
+            return retval;
+        }
+        bool operator==(iterator other) const
+        {
+            return num == other.num;
+        }
+        bool operator!=(iterator other) const
+        {
+            return !(*this == other);
+        }
+        reference operator*() const
+        {
+            return num;
+        }
+    };
+
+    iterator begin() const
+    {
+        return iterator(FROM);
+    }
+
+    iterator end() const
+    {
+        return iterator(TO >= FROM ? TO + 1 : TO - 1);
+    }
+};
+
 TEST_CASE("referenced containers can be enumerated", "[lang]")
 {
     std::vector<int> reference = { { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9 } };
@@ -226,6 +280,24 @@ TEST_CASE("iterators without a default constructoir can be used", "[lang]")
         Wrapper<std::vector<int>> c(vec);
 
         for (auto i : enumerate(c))
+        {
+            CHECK(i.index() == index);
+            CHECK(i.value() == reference[index]);
+
+            index++;
+        }
+    }
+}
+
+TEST_CASE("Iterator which return a copy when dereferenced work")
+{
+    std::vector<int> reference = { { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9 } };
+
+    SECTION("iteration works")
+    {
+        std::size_t index = 0;
+
+        for (auto i : enumerate(Range<0, 9>()))
         {
             CHECK(i.index() == index);
             CHECK(i.value() == reference[index]);
