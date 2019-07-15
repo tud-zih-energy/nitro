@@ -81,6 +81,15 @@ TEST_CASE("Simple format strings", "[format]")
 
         REQUIRE(out == std::string(ref_str));
     }
+
+    SECTION("can format strings with {} literals")
+    {
+        const char* ref_str = "{ 1, 2, 3 }";
+
+        std::string out = "{ {}, {}, {} }"_nf % 1 % 2 % 3;
+
+        REQUIRE(out == std::string(ref_str));
+    }
 }
 
 TEST_CASE("Args works")
