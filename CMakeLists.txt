@@ -169,6 +169,8 @@ set_target_properties(nitro-env-static PROPERTIES
     OUTPUT_NAME nitro-env
 )
 
+add_library(nitro-broken-options INTERFACE)
+target_link_libraries(nitro-broken-options INTERFACE Nitro::core Nitro::env)
 
 add_library(nitro INTERFACE)
 target_link_libraries(nitro
@@ -182,6 +184,7 @@ target_link_libraries(nitro
 set_target_properties(nitro-core PROPERTIES EXPORT_NAME core)
 set_target_properties(nitro-dl PROPERTIES EXPORT_NAME dl)
 set_target_properties(nitro-log PROPERTIES EXPORT_NAME log)
+set_target_properties(nitro-broken-options PROPERTIES EXPORT_NAME broken-options)
 if(WIN32)
     set_target_properties(nitro-env-static PROPERTIES EXPORT_NAME env)
 else()
@@ -193,6 +196,7 @@ add_library(Nitro::core ALIAS nitro-core)
 add_library(Nitro::dl ALIAS nitro-dl)
 add_library(Nitro::log ALIAS nitro-log)
 add_library(Nitro::env ALIAS nitro-env-static)
+add_library(Nitro::broken-options ALIAS nitro-broken-options)
 
 if(CMAKE_CURRENT_SOURCE_DIR STREQUAL CMAKE_SOURCE_DIR)
     # build Debug with all warnings
@@ -210,6 +214,7 @@ if(CMAKE_CURRENT_SOURCE_DIR STREQUAL CMAKE_SOURCE_DIR)
                 nitro-dl
                 nitro-log
                 nitro-env-static
+                nitro-broken-options
             EXPORT NitroTargets
             LIBRARY DESTINATION lib
             ARCHIVE DESTINATION lib
@@ -224,6 +229,7 @@ if(CMAKE_CURRENT_SOURCE_DIR STREQUAL CMAKE_SOURCE_DIR)
                 nitro-log
                 nitro-env
                 nitro-env-static
+                nitro-broken-options
             EXPORT NitroTargets
             LIBRARY DESTINATION lib
             ARCHIVE DESTINATION lib

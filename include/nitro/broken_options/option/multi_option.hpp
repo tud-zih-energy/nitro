@@ -33,6 +33,7 @@
 #include <nitro/broken_options/fwd.hpp>
 #include <nitro/broken_options/option/base.hpp>
 
+#include <nitro/env/get.hpp>
 #include <nitro/except/raise.hpp>
 #include <nitro/lang/optional.hpp>
 
@@ -148,19 +149,41 @@ namespace broken_options
 
         void prepare() override
         {
-            if (default_.size())
-            {
-                for (auto& item : default_)
-                {
-                    update_value(item);
-                }
-            }
         }
 
         void check() override
         {
             if (value_.empty())
             {
+                if (has_env())
+                {
+                    auto env_value = nitro::env::get(env());
+
+                    if (!env_value.empty())
+                    {
+                        std::string element;
+                        std::stringstream str;
+                        str << env_value;
+
+                        while (std::getline(str, element, ';'))
+                        {
+                            update_value(element);
+                        }
+
+                        return;
+                    }
+                }
+
+                if (default_.size())
+                {
+                    for (auto& item : default_)
+                    {
+                        update_value(item);
+                    }
+
+                    return;
+                }
+
                 raise<parsing_error>("missing value for required option: ", name());
             }
         }

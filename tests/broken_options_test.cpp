@@ -52,15 +52,23 @@ TEST_CASE("Usage descriptions work")
 
         parser.multi_option("mopt", "some multi opt").short_name("m");
 
+        parser.option("env-opt", "This is an option to set cool stuff.").env("ENV_OPT");
+        parser.option("env-opt-2").env("ENV_OPT2");
+
         parser.usage(s);
 
         REQUIRE(
             s.str() ==
-            R"EXPECTED(usage: app_name [-tu] --opt --opt_long [--opt_nos] --opt_nosd [--opt_with_d] [--some_long_named_option] --mopt [command line ...]
+            R"EXPECTED(usage: app_name [-tu] --env-opt --env-opt-2 --opt --opt_long [--opt_nos] --opt_nosd [--opt_with_d] [--some_long_named_option] --mopt [command line ...]
 
 about
 
 arguments:
+  --env-opt arg                           This is an option to set cool stuff.
+                                          Can be set using the environment
+                                          variable 'ENV_OPT'.
+  --env-opt-2 arg                         Can be set using the environment
+                                          variable 'ENV_OPT2'.
   -m [ --mopt ] arg                       some multi opt
   -o [ --opt ] arg                        some opt
   --opt_long arg                          an option with an very very very very
@@ -655,5 +663,139 @@ TEST_CASE("Toggles should work", "[broken_options]")
         REQUIRE(options.given("opt_a"));
         REQUIRE(options.given("opt_b"));
         REQUIRE(!options.given("opt_c"));
+    }
+}
+
+TEST_CASE("Reading the value from the ENV variables", "[broken_options]")
+{
+    SECTION("for options when not given a value")
+    {
+        int argc = 1;
+        const char* argv[] = { "" };
+
+        nitro::broken_options::parser parser;
+
+        parser.option("opt1").env("OPT1");
+
+        auto options = parser.parse(argc, argv);
+
+        REQUIRE(options.get("opt1") == "OPT1_VALUE");
+    }
+
+    SECTION("for options with a default when not given a value")
+    {
+        int argc = 1;
+        const char* argv[] = { "" };
+
+        nitro::broken_options::parser parser;
+
+        parser.option("opt1").env("OPT1").default_value("DEFAULT");
+
+        auto options = parser.parse(argc, argv);
+
+        REQUIRE(options.get("opt1") == "OPT1_VALUE");
+    }
+
+    SECTION("for options with a default when given a value")
+    {
+        int argc = 3;
+        const char* argv[] = { "", "--opt1", "foo" };
+
+        nitro::broken_options::parser parser;
+
+        parser.option("opt1").env("OPT1").default_value("DEFAULT");
+
+        auto options = parser.parse(argc, argv);
+
+        REQUIRE(options.get("opt1") == "foo");
+    }
+
+    SECTION("for toggles when not given a value and env TRUE")
+    {
+        int argc = 1;
+        const char* argv[] = { "" };
+
+        nitro::broken_options::parser parser;
+
+        parser.toggle("opt2").env("OPT2");
+
+        auto options = parser.parse(argc, argv);
+
+        REQUIRE(options.given("opt2"));
+    }
+
+    SECTION("for toggles when not given a value and env FALSE")
+    {
+        int argc = 1;
+        const char* argv[] = { "" };
+
+        nitro::broken_options::parser parser;
+
+        parser.toggle("opt3").env("OPT3");
+
+        auto options = parser.parse(argc, argv);
+
+        REQUIRE(!options.given("opt3"));
+    }
+
+    SECTION("for toggles when given a value and env FALSE")
+    {
+        int argc = 2;
+        const char* argv[] = { "", "--opt3" };
+
+        nitro::broken_options::parser parser;
+
+        parser.toggle("opt3").env("OPT3");
+
+        auto options = parser.parse(argc, argv);
+
+        REQUIRE(options.given("opt3"));
+    }
+
+    SECTION("for multi options when not given a value")
+    {
+        int argc = 1;
+        const char* argv[] = { "" };
+
+        nitro::broken_options::parser parser;
+
+        parser.multi_option("opt4").env("OPT4");
+
+        auto options = parser.parse(argc, argv);
+
+        REQUIRE(options.count("opt4") == 2);
+        CHECK(options.get("opt4", 0) == "OPT4_VALUE0");
+        CHECK(options.get("opt4", 1) == "OPT4_VALUE1");
+    }
+
+    SECTION("for multi options with a default when not given a value")
+    {
+        int argc = 1;
+        const char* argv[] = { "" };
+
+        nitro::broken_options::parser parser;
+
+        parser.multi_option("opt4").env("OPT4").default_value({ "DEFAULT" });
+
+        auto options = parser.parse(argc, argv);
+
+        REQUIRE(options.count("opt4") == 2);
+        CHECK(options.get("opt4", 0) == "OPT4_VALUE0");
+        CHECK(options.get("opt4", 1) == "OPT4_VALUE1");
+    }
+
+    SECTION("for multi options with a default when given a value")
+    {
+        int argc = 3;
+        const char* argv[] = { "", "--opt4", "foo" };
+
+        nitro::broken_options::parser parser;
+
+        parser.multi_option("opt4").env("OPT4").default_value({ "foo" });
+
+        auto options = parser.parse(argc, argv);
+
+        REQUIRE(options.count("opt4") == 1);
+        CHECK(options.get("opt4", 0) == "foo");
     }
 }

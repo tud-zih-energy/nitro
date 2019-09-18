@@ -30,6 +30,9 @@ target_link_libraries(Nitro.env_get_test Nitro::env)
 set_tests_properties(Nitro.env_get_test PROPERTIES ENVIRONMENT "TEST_1=THIS_WAS_SET")
 
 NitroTest(broken_options_test.cpp)
+target_link_libraries(Nitro.broken_options_test Nitro::broken-options)
+set_tests_properties(Nitro.broken_options_test PROPERTIES ENVIRONMENT "OPT1=OPT1_VALUE;OPT2=TRUE;OPT3=FALSE;OPT4=OPT4_VALUE0\;OPT4_VALUE1")
+
 
 NitroTest(tuple_operators_test.cpp)
 

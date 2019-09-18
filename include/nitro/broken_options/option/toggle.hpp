@@ -88,6 +88,24 @@ namespace broken_options
 
         virtual void check() override
         {
+            if (has_env() && !given())
+            {
+                auto env_value = nitro::env::get(env());
+
+                if (!env_value.empty())
+                {
+                    // Python code would look like this:
+                    // if bool(env_value):
+                    // FeelsBadMan
+                    if (env_value == "TRUE" || env_value == "ON" || env_value == "YES" ||
+                        env_value == "true" || env_value == "on" || env_value == "yes" ||
+                        env_value == "1" || env_value == "Y")
+                    {
+                        update_value(env_value);
+                    }
+                    return;
+                }
+            }
         }
 
         friend class parser;

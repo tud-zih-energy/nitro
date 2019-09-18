@@ -67,6 +67,16 @@ namespace broken_options
             return name_;
         }
 
+        bool has_env() const
+        {
+            return static_cast<bool>(env_);
+        }
+
+        const std::string& env() const
+        {
+            return *env_;
+        }
+
         virtual void format_value(std::ostream& s) const = 0;
 
         std::ostream& format(std::ostream& s) const
@@ -103,6 +113,16 @@ namespace broken_options
 
             std::stringstream dstr;
             dstr << description_;
+
+            if (has_env())
+            {
+                if (!description_.empty())
+                {
+                    dstr << ' ';
+                }
+                dstr << "Can be set using the environment variable '" << *env_ << "'.";
+            }
+
             std::string word;
 
             while (std::getline(dstr, word, ' '))
@@ -162,6 +182,7 @@ namespace broken_options
 
     protected:
         nitro::lang::optional<std::string> short_;
+        nitro::lang::optional<std::string> env_;
     };
 
     template <typename Option>
@@ -169,6 +190,7 @@ namespace broken_options
     {
     public:
         using base::base;
+        using base::env;
         using base::short_name;
 
         Option& short_name(const std::string& short_name)
@@ -179,6 +201,18 @@ namespace broken_options
             }
 
             short_ = short_name;
+
+            return *static_cast<Option*>(this);
+        }
+
+        Option& env(const std::string& env_name)
+        {
+            if (has_env() && env() != env_name)
+            {
+                raise<parser_error>("Trying to redefine env");
+            }
+
+            env_ = env_name;
 
             return *static_cast<Option*>(this);
         }

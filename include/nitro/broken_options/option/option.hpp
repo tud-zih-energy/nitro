@@ -139,6 +139,18 @@ namespace broken_options
         {
             if (!value_)
             {
+                if (has_env())
+                {
+                    auto env_value = nitro::env::get(env());
+
+                    if (!env_value.empty())
+                    {
+                        update_value(env_value);
+
+                        return;
+                    }
+                }
+
                 if (default_)
                 {
                     update_value(*default_);
