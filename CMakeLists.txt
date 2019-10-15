@@ -69,8 +69,8 @@ endif()
 set(NITRO_VERSION_STRING ${_NITRO_VERSION_STRING} CACHE INTERNAL "")
 unset(_NITRO_VERSION_STRING)
 
-include(common/DefaultBuildType.cmake)
-include(common/UnsetIfUpdated.cmake)
+include(cmake/DefaultBuildType.cmake)
+include(cmake/UnsetIfUpdated.cmake)
 
 UnsetIfUpdated(NITRO_LOG_LEVEL CMAKE_BUILD_TYPE)
 
