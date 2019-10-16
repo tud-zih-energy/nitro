@@ -1,7 +1,7 @@
 #include <nitro/lang/string_ref.hpp>
 
 #define CATCH_CONFIG_MAIN
-#include <catch.hpp>
+#include <catch2/catch.hpp>
 
 void test_func(const std::string&)
 {

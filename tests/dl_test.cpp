@@ -1,5 +1,5 @@
 #define CATCH_CONFIG_MAIN
-#include <catch.hpp>
+#include <catch2/catch.hpp>
 
 #include <nitro/dl/dl.hpp>
 
@@ -17,7 +17,7 @@ TEST_CASE("library symbols can be loaded and used", "[dl]")
 
     SECTION("nitro_cos is loadable")
     {
-        REQUIRE_NOTHROW(auto cos = test_library.load<double(double)>("nitro_cos"));
+        REQUIRE_NOTHROW([&]() { auto cos = test_library.load<double(double)>("nitro_cos"); }());
     }
 
     SECTION("nitro_cos is callable")
@@ -39,7 +39,8 @@ TEST_CASE("self binary symbols can be loaded and used", "[dl]")
 
     SECTION("nitro_binary_cos is loadable")
     {
-        REQUIRE_NOTHROW(auto cos = test_library.load<double(double)>("nitro_binary_cos"));
+        REQUIRE_NOTHROW(
+            [&]() { auto cos = test_library.load<double(double)>("nitro_binary_cos"); }());
     }
 
     SECTION("nitro_binary_cos is callable")
