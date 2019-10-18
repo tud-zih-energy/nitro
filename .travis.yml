@@ -155,8 +155,10 @@ matrix:
     - os: osx
       osx_image: xcode10
 before_script:
+  - mkdir build
+  - cd build
   - cmake --version
-  - cmake .
+  - cmake ..
 script:
   - make
   - ctest -V .
