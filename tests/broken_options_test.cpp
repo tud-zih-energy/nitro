@@ -99,7 +99,7 @@ TEST_CASE("Check if short option names are unique")
     nitro::broken_options::parser parser;
 
     parser.option("opt1").short_name("o");
-    auto& opt2 = parser.option("opt2").short_name("o");
+    parser.option("opt2").short_name("o");
     REQUIRE_THROWS_AS(parser.parse(0, nullptr), nitro::broken_options::parser_error);
 }
 
@@ -279,7 +279,7 @@ TEST_CASE("Multiple arguments should work", "[broken_options]")
         REQUIRE_THROWS_AS(parser.parse(argc, argv), nitro::broken_options::parsing_error);
     }
 
-    SECTION("Giving two different values for the same option should work")
+    SECTION("Giving two different values for for a multi_option should work")
     {
         int argc = 5;
         const char* argv[] = { "", "--opt3", "12", "--opt3", "13" };
@@ -296,7 +296,7 @@ TEST_CASE("Multiple arguments should work", "[broken_options]")
         REQUIRE(options.get("opt3", 1) == "13");
     }
 
-    SECTION("Giving equal values twice for the same option should work")
+    SECTION("Giving equal values twice for a multi_option should work")
     {
         int argc = 5;
         const char* argv[] = { "", "--opt3", "12", "--opt3", "12" };
@@ -332,7 +332,7 @@ TEST_CASE("Multiple arguments should work", "[broken_options]")
         REQUIRE(values[1] == "12");
     }
 
-    SECTION("Defining an option also as a multi_option should not work")
+    SECTION("Defining an option also as a multi_option should throw")
     {
         nitro::broken_options::parser parser;
 
@@ -481,7 +481,7 @@ TEST_CASE("Giving values with an '=' should work ")
         REQUIRE(options.as<int>("opt1") == 12);
     }
 
-    SECTION("for toggles")
+    SECTION("for toggles it should throw")
     {
         int argc = 2;
         const char* argv[] = { "", "-o=12" };
@@ -490,9 +490,7 @@ TEST_CASE("Giving values with an '=' should work ")
 
         parser.toggle("opt1").short_name("o");
 
-        auto options = parser.parse(argc, argv);
-
-        REQUIRE(options.given("opt1"));
+        REQUIRE_THROWS_AS(parser.parse(argc, argv), nitro::broken_options::parsing_error);
     }
 }
 
@@ -645,6 +643,17 @@ TEST_CASE("Toggles should work", "[broken_options]")
         auto options = parser.parse(argc, argv);
 
         REQUIRE(!options.given("opt2"));
+    }
+
+    SECTION("when given a value")
+    {
+        int argc = 3;
+        const char* argv[] = { "", "-o", "value" };
+
+        nitro::broken_options::parser parser;
+        parser.toggle("opt2").short_name("o");
+
+        REQUIRE_THROWS_AS(parser.parse(argc, argv), nitro::broken_options::parsing_error);
     }
 
     SECTION("for multiple toggles in one arg")

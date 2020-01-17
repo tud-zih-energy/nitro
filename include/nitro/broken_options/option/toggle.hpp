@@ -72,8 +72,13 @@ namespace broken_options
         }
 
     private:
-        virtual void update_value(const argument&) override
+        virtual void update_value(const argument& arg) override
         {
+            if (arg.has_value())
+            {
+                raise<parsing_error>("a toggle cannot be given a value: ", name());
+            }
+
             if (ref_ != nullptr)
             {
                 *ref_ = true;
@@ -101,7 +106,7 @@ namespace broken_options
                         env_value == "true" || env_value == "on" || env_value == "yes" ||
                         env_value == "1" || env_value == "Y")
                     {
-                        update_value(env_value);
+                        update_value({ "--" + name() });
                     }
                     return;
                 }
