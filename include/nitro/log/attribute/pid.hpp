@@ -39,15 +39,21 @@ namespace log
     class pid_attribute
     {
         int my_pid;
+        int my_tid;
 
     public:
-        pid_attribute() : my_pid(nitro::env::get_pid())
+        pid_attribute() : my_pid(nitro::env::get_pid()), my_tid(nitro::env::get_tid())
         {
         }
 
         int pid() const
         {
             return my_pid;
+        }
+
+        int tid() const
+        {
+            return my_tid;
         }
     };
 } // namespace log
