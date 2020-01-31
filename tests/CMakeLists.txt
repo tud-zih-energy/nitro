@@ -52,3 +52,5 @@ NitroTest(quaint_ptr_test.cpp)
 NitroTest(is_callable_test.cpp)
 
 NitroTest(format_test.cpp)
+
+NitroTest(string_test.cpp)
