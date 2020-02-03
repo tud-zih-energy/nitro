@@ -37,6 +37,11 @@ extern "C"
 #else
 #include <unistd.h>
 #endif
+
+#ifdef __linux__
+#include <sys/syscall.h>
+#include <sys/types.h>
+#endif
 }
 
 namespace nitro
@@ -92,7 +97,11 @@ namespace env
 
     int get_tid()
     {
+#if __linux__
+        return syscall(SYS_gettid);
+#else
         return nitro::env::get_pid();
+#endif
     }
 
 } // namespace env
