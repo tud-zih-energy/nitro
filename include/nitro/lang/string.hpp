@@ -107,13 +107,14 @@ namespace lang
         return full.find(beginning) == 0;
     }
 
-    inline void replace_all(std::string& str, const std::string& from, const std::string& to)
+    inline void replace_all(std::string& str, const std::string& to_replace,
+                            const std::string& replacement)
     {
         size_t start_pos = 0;
-        while ((start_pos = str.find(from, start_pos)) != std::string::npos)
+        while ((start_pos = str.find(to_replace, start_pos)) != std::string::npos)
         {
-            str.replace(start_pos, from.length(), to);
-            start_pos += to.length();
+            str.replace(start_pos, to_replace.length(), replacement);
+            start_pos += replacement.length();
         }
     }
 } // namespace lang

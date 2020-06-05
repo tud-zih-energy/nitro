@@ -139,6 +139,19 @@ TEST_CASE("String starts_with works", "[lang]")
     {
         REQUIRE(nitro::lang::starts_with("Egg", "Egg and Spam") == false);
     }
+    SECTION("All strings start with the empty string")
+    {
+        REQUIRE(nitro::lang::starts_with("Egg", "") == true);
+    }
+    SECTION("The empty string starts with the empty string")
+    {
+        REQUIRE(nitro::lang::starts_with("", "") == true);
+    }
+
+    SECTION("the empty string starts with no string")
+    {
+        REQUIRE(nitro::lang::starts_with("", "Egg") == false);
+    }
 }
 
 TEST_CASE("String replace_all works", "[lang]")
@@ -154,5 +167,17 @@ TEST_CASE("String replace_all works", "[lang]")
         std::string str("Egg and Spam");
         nitro::lang::replace_all(str, " and Spam", ", Sausage and Spam");
         REQUIRE(str == "Egg, Sausage and Spam");
+    }
+    SECTION("Replacing with empty string")
+    {
+        std::string str("Egg, Spam, Spam, Spam");
+        nitro::lang::replace_all(str, ", Spam", "");
+        REQUIRE(str == "Egg");
+    }
+    SECTION("Replaces in an empty string")
+    {
+        std::string str("");
+        nitro::lang::replace_all(str, "Egg", "Spam");
+        REQUIRE(str == "");
     }
 }
