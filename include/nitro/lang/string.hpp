@@ -102,5 +102,20 @@ namespace lang
         return result;
     }
 
+    inline bool starts_with(const std::string& full, const std::string& beginning)
+    {
+        return full.find(beginning) == 0;
+    }
+
+    inline void replace_all(std::string& str, const std::string& to_replace,
+                            const std::string& replacement)
+    {
+        size_t start_pos = 0;
+        while ((start_pos = str.find(to_replace, start_pos)) != std::string::npos)
+        {
+            str.replace(start_pos, to_replace.length(), replacement);
+            start_pos += replacement.length();
+        }
+    }
 } // namespace lang
 } // namespace nitro

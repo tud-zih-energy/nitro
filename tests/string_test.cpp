@@ -122,3 +122,62 @@ TEST_CASE("String split works", "[lang]")
         REQUIRE(split[0] == "1234##5678##9101112");
     }
 }
+
+TEST_CASE("String starts_with works", "[lang]")
+{
+    SECTION("Egg and Spam starts with Egg")
+    {
+        REQUIRE(nitro::lang::starts_with("Egg and Spam", "Egg") == true);
+    }
+
+    SECTION("Egg and Spam doesn't sart with Spam")
+    {
+        REQUIRE(nitro::lang::starts_with("Egg and Spam", "Spam") == false);
+    }
+
+    SECTION("Egg doesn't start with Egg and Spam")
+    {
+        REQUIRE(nitro::lang::starts_with("Egg", "Egg and Spam") == false);
+    }
+    SECTION("All strings start with the empty string")
+    {
+        REQUIRE(nitro::lang::starts_with("Egg", "") == true);
+    }
+    SECTION("The empty string starts with the empty string")
+    {
+        REQUIRE(nitro::lang::starts_with("", "") == true);
+    }
+
+    SECTION("the empty string starts with no string")
+    {
+        REQUIRE(nitro::lang::starts_with("", "Egg") == false);
+    }
+}
+
+TEST_CASE("String replace_all works", "[lang]")
+{
+    SECTION("Egg, Bacon and Bacon becomes Egg, Spam and Spam")
+    {
+        std::string str("Egg, Bacon and Bacon");
+        nitro::lang::replace_all(str, "Bacon", "Spam");
+        REQUIRE(str == "Egg, Spam and Spam");
+    }
+    SECTION("replace_all handles replaces that are longer than the original")
+    {
+        std::string str("Egg and Spam");
+        nitro::lang::replace_all(str, " and Spam", ", Sausage and Spam");
+        REQUIRE(str == "Egg, Sausage and Spam");
+    }
+    SECTION("Replacing with empty string")
+    {
+        std::string str("Egg, Spam, Spam, Spam");
+        nitro::lang::replace_all(str, ", Spam", "");
+        REQUIRE(str == "Egg");
+    }
+    SECTION("Replaces in an empty string")
+    {
+        std::string str("");
+        nitro::lang::replace_all(str, "Egg", "Spam");
+        REQUIRE(str == "");
+    }
+}
