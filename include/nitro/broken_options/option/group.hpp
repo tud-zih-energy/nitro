@@ -38,10 +38,10 @@ namespace nitro
 {
 namespace broken_options
 {
-    class group
+    class option_group
     {
     public:
-        group(const std::string& name, const std::string& description = std::string(""))
+        option_group(const std::string& name, const std::string& description = std::string(""))
         : name_(name), description_(description)
         {
         }
@@ -51,7 +51,17 @@ namespace broken_options
             options_.emplace(option.name(), std::ref(option));
         }
 
-        void usage(std::ostream& s)
+        const std::string& name() const
+        {
+            return name_;
+        }
+
+        std::size_t size() const
+        {
+            return options_.size();
+        }
+
+        void usage(std::ostream& s) const
         {
             s << name_ << ":" << std::endl;
             if (description_.size())

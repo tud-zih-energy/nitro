@@ -43,19 +43,22 @@
 #include <map>
 #include <string>
 #include <vector>
+#include <set>
 
 namespace nitro
 {
 namespace broken_options
 {
+    class group_assigner;
 
     class parser
     {
     public:
         parser(const std::string& app_name = std::string("main"),
                const std::string& about = std::string(""))
-        : app_name_(app_name), about_(about), arguments_("arguments")
+        : app_name_(app_name), about_(about)
         {
+            create_group("arguments");
         }
 
         auto parse(int argc, const char* const argv[]) -> options;
@@ -66,6 +69,15 @@ namespace broken_options
         auto multi_option(const std::string& name, const std::string& description = std::string(""))
             -> broken_options::multi_option&;
         auto toggle(const std::string& name, const std::string& description = std::string(""))
+            -> broken_options::toggle&;
+
+        void create_group(const std::string& group_name, const std::string& description = std::string(""));
+        broken_options::group_assigner group(const std::string& group_name);
+        auto group_option(const std::string& group_name, const std::string& name, const std::string& description = std::string(""))
+            -> broken_options::option&;
+        auto group_multi_option(const std::string& group_name, const std::string& name, const std::string& description = std::string(""))
+            -> broken_options::multi_option&;
+        auto group_toggle(const std::string& group_name, const std::string& name, const std::string& description = std::string(""))
             -> broken_options::toggle&;
 
         void accept_positionals(std::size_t amount = std::numeric_limits<std::size_t>::max());
@@ -100,10 +112,34 @@ namespace broken_options
         std::map<std::string, broken_options::multi_option> multi_options_;
         std::map<std::string, broken_options::toggle> toggles_;
 
-        group arguments_;
+        std::map<std::string,option_group> groups_;
 
         std::size_t allowed_positionals_ = 0;
         std::string positional_name_ = "args";
+    };
+
+    class group_assigner
+    {
+    public:
+        group_assigner(const std::string& group_name, parser& parser)
+        :parser_(parser),group_name_(group_name)
+        {
+        }
+        auto option(const std::string& name, const std::string& description = std::string(""))
+        {
+            return parser_.group_option(group_name_,name,description);
+        }
+        auto multi_option(const std::string& name, const std::string& description = std::string(""))
+        {
+            return parser_.group_multi_option(group_name_,name,description);
+        }
+        auto toggle(const std::string& name, const std::string& description = std::string(""))
+        {
+            return parser_.group_toggle(group_name_,name,description);
+        }
+    private:
+        parser& parser_;
+        std::string group_name_;
     };
 } // namespace broken_options
 } // namespace nitro

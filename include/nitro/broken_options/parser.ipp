@@ -39,7 +39,29 @@ namespace nitro
 {
 namespace broken_options
 {
+    void parser::create_group(const std::string& group_name, const std::string& description)
+    {
+        if ( groups_.find(group_name) != groups_.end() )
+        {
+            raise<parser_error>("Trying to redefine group. Group name: ", group_name);
+        }
+
+        groups_.emplace(group_name,option_group(group_name,description));
+    }
+
+    broken_options::group_assigner parser::group(const std::string& group_name)
+    {
+        return group_assigner(group_name,*this);
+    }
+
     broken_options::option& parser::option(const std::string& name, const std::string& description)
+    {
+        return group_option("arguments",name,description);
+    }
+
+    broken_options::option& parser::group_option(const std::string& group_name, 
+                                                 const std::string& name, 
+                                                 const std::string& description)
     {
         if (multi_options_.count(name) > 0)
         {
@@ -55,13 +77,27 @@ namespace broken_options
         {
             auto res = options_.emplace(std::piecewise_construct, std::forward_as_tuple(name),
                                         std::forward_as_tuple(name, description));
-            arguments_.add(res.first->second);
+
+            auto group_loc = groups_.find(group_name);
+            if ( group_loc == groups_.end() )
+            {
+                groups_.emplace(group_name,option_group(group_name));
+                group_loc = groups_.find(group_name);
+            }
+            group_loc->second.add(res.first->second);
         }
         return options_.at(name);
     }
 
     broken_options::multi_option& parser::multi_option(const std::string& name,
                                                        const std::string& description)
+    {
+        return group_multi_option("arguments",name,description);
+    }
+
+    broken_options::multi_option& parser::group_multi_option(const std::string& group_name,
+                                                             const std::string& name,
+                                                             const std::string& description)
     {
         if (options_.count(name) > 0)
         {
@@ -77,12 +113,26 @@ namespace broken_options
         {
             auto res = multi_options_.emplace(std::piecewise_construct, std::forward_as_tuple(name),
                                               std::forward_as_tuple(name, description));
-            arguments_.add(res.first->second);
+
+            auto group_loc = groups_.find(group_name);
+            if ( group_loc == groups_.end() )
+            {
+                groups_.emplace(group_name,option_group(group_name));
+                group_loc = groups_.find(group_name);
+            }
+            group_loc->second.add(res.first->second);
         }
         return multi_options_.at(name);
     }
 
     broken_options::toggle& parser::toggle(const std::string& name, const std::string& description)
+    {
+        return group_toggle("arguments",name,description);
+    }
+
+    broken_options::toggle& parser::group_toggle(const std::string& group_name, 
+                                                 const std::string& name, 
+                                                 const std::string& description)
     {
         if (options_.count(name) > 0)
         {
@@ -98,7 +148,14 @@ namespace broken_options
         {
             auto res = toggles_.emplace(std::piecewise_construct, std::forward_as_tuple(name),
                                         std::forward_as_tuple(name, description));
-            arguments_.add(res.first->second);
+
+            auto group_loc = groups_.find(group_name);
+            if ( group_loc == groups_.end() )
+            {
+                groups_.emplace(group_name,option_group(group_name));
+                group_loc = groups_.find(group_name);
+            }
+            group_loc->second.add(res.first->second);
         }
         return toggles_.at(name);
     }
@@ -226,9 +283,17 @@ namespace broken_options
             s << about_ << std::endl << std::endl;
         }
 
-        if (print_default_group)
+        for (const auto& group_pair : groups_)
         {
-            arguments_.usage(s);
+            if (group.first == "arguments" && !print_default_group)
+            {
+                continue;
+            }
+
+            if (group_pair.second.size())
+            {
+                group_pair.second.usage(s);
+            }
         }
 
         return s;
