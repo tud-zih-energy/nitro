@@ -76,6 +76,10 @@ namespace broken_options
         {
             return *env_;
         }
+        const std::string& arg_name() const
+        {
+            return arg_name_;
+        }
 
         virtual void format_value(std::ostream& s) const = 0;
 
@@ -183,6 +187,7 @@ namespace broken_options
     protected:
         nitro::lang::optional<std::string> short_;
         nitro::lang::optional<std::string> env_;
+        std::string arg_name_ = "arg";
     };
 
     template <typename Option>
@@ -192,7 +197,19 @@ namespace broken_options
         using base::base;
         using base::env;
         using base::short_name;
+        using base::arg_name;
 
+        Option& arg_name(const std::string& metavar)
+        {
+            if (metavar.empty())
+            {
+                raise<parser_error>("Trying to assign empty string to argument name");
+            }
+
+            arg_name_ = metavar;
+
+            return *static_cast<Option*>(this);
+        }
         Option& short_name(const std::string& short_name)
         {
             if (short_ && *short_ != short_name)

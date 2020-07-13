@@ -959,3 +959,27 @@ TEST_CASE("Reading the value from the ENV variables", "[broken_options]")
         CHECK(options.get("opt4", 0) == "foo");
     }
 }
+TEST_CASE("Usage arg_name work")
+{
+    SECTION("arg_name for options work")
+    {
+        nitro::broken_options::parser parser("app_name", "about");
+
+        std::stringstream s;
+
+
+        parser.option("opt_nosd", "some opt without short and default").arg_name("test");
+
+        parser.usage(s);
+
+        REQUIRE(
+            s.str() ==
+            R"EXPECTED(usage: app_name --opt_nosd
+
+about
+
+arguments:
+  --opt_nosd test                         some opt without short and default
+)EXPECTED");
+    }
+}
