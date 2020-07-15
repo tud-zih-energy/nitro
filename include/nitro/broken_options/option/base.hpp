@@ -76,6 +76,7 @@ namespace broken_options
         {
             return *env_;
         }
+
         const std::string& arg_name() const
         {
             return arg_name_;
@@ -210,6 +211,7 @@ namespace broken_options
 
             return *static_cast<Option*>(this);
         }
+
         Option& short_name(const std::string& short_name)
         {
             if (short_ && *short_ != short_name)
