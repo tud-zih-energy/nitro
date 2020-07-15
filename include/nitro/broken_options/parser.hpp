@@ -41,9 +41,9 @@
 
 #include <iostream>
 #include <map>
+#include <set>
 #include <string>
 #include <vector>
-#include <set>
 
 namespace nitro
 {
@@ -71,13 +71,16 @@ namespace broken_options
         auto toggle(const std::string& name, const std::string& description = std::string(""))
             -> broken_options::toggle&;
 
-        void create_group(const std::string& group_name, const std::string& description = std::string(""));
-        broken_options::group_assigner group(const std::string& group_name);
-        auto group_option(const std::string& group_name, const std::string& name, const std::string& description = std::string(""))
+        broken_options::group_assigner group(const std::string& group_name,
+                                             const std::string& description = std::string(""));
+        auto group_option(const std::string& group_name, const std::string& name,
+                          const std::string& description = std::string(""))
             -> broken_options::option&;
-        auto group_multi_option(const std::string& group_name, const std::string& name, const std::string& description = std::string(""))
+        auto group_multi_option(const std::string& group_name, const std::string& name,
+                                const std::string& description = std::string(""))
             -> broken_options::multi_option&;
-        auto group_toggle(const std::string& group_name, const std::string& name, const std::string& description = std::string(""))
+        auto group_toggle(const std::string& group_name, const std::string& name,
+                          const std::string& description = std::string(""))
             -> broken_options::toggle&;
 
         void accept_positionals(std::size_t amount = std::numeric_limits<std::size_t>::max());
@@ -112,7 +115,7 @@ namespace broken_options
         std::map<std::string, broken_options::multi_option> multi_options_;
         std::map<std::string, broken_options::toggle> toggles_;
 
-        std::map<std::string,option_group> groups_;
+        std::map<std::string, option_group> groups_;
 
         std::size_t allowed_positionals_ = 0;
         std::string positional_name_ = "args";
@@ -122,21 +125,22 @@ namespace broken_options
     {
     public:
         group_assigner(const std::string& group_name, parser& parser)
-        :parser_(parser),group_name_(group_name)
+        : parser_(parser), group_name_(group_name)
         {
         }
         auto option(const std::string& name, const std::string& description = std::string(""))
         {
-            return parser_.group_option(group_name_,name,description);
+            return parser_.group_option(group_name_, name, description);
         }
         auto multi_option(const std::string& name, const std::string& description = std::string(""))
         {
-            return parser_.group_multi_option(group_name_,name,description);
+            return parser_.group_multi_option(group_name_, name, description);
         }
         auto toggle(const std::string& name, const std::string& description = std::string(""))
         {
-            return parser_.group_toggle(group_name_,name,description);
+            return parser_.group_toggle(group_name_, name, description);
         }
+
     private:
         parser& parser_;
         std::string group_name_;
