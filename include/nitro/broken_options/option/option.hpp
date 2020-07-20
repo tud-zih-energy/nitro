@@ -84,7 +84,7 @@ namespace broken_options
             }
             else
             {
-                s << " " << arg_name();
+                s << " " << metavar();
             }
         }
 

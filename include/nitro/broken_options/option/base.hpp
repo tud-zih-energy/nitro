@@ -77,7 +77,7 @@ namespace broken_options
             return *env_;
         }
 
-        const std::string& arg_name() const
+        const std::string& metavar() const
         {
             return arg_name_;
         }
@@ -198,16 +198,16 @@ namespace broken_options
         using base::base;
         using base::env;
         using base::short_name;
-        using base::arg_name;
+        using base::metavar;
 
-        Option& arg_name(const std::string& metavar)
+        Option& metavar(const std::string& arg_name)
         {
-            if (metavar.empty())
+            if (arg_name.empty())
             {
                 raise<parser_error>("Trying to assign empty string to argument name");
             }
 
-            arg_name_ = metavar;
+            arg_name_ = arg_name;
 
             return *static_cast<Option*>(this);
         }

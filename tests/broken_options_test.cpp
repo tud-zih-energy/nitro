@@ -959,7 +959,7 @@ TEST_CASE("Reading the value from the ENV variables", "[broken_options]")
         CHECK(options.get("opt4", 0) == "foo");
     }
 }
-TEST_CASE("Usage arg_name work")
+TEST_CASE("Usage metavar work")
 {
     SECTION("arg_name for options work")
     {
@@ -968,7 +968,7 @@ TEST_CASE("Usage arg_name work")
         std::stringstream s;
 
 
-        parser.option("opt_nosd", "some opt without short and default").arg_name("test");
+        parser.option("opt_nosd", "some opt without short and default").metavar("test");
 
         parser.usage(s);
 
