@@ -46,6 +46,11 @@ namespace lang
     {
     };
 
+#if _cplusplus != 201402L
+    template <typename... T>
+    inline auto hash(const std::variant<T...>& t);
+#endif
+
     template <typename... T>
     inline auto hash(const std::tuple<T...>& t);
 
@@ -87,6 +92,22 @@ namespace lang
             hash_combine_impl(seed, hash(std::get<I>(v)));
             hash_combine_tuple<I + 1>(seed, v);
         }
+
+#if _cplusplus != 201402L
+        template <std::size_t I, typename T>
+        inline typename std::enable_if<(I == std::variant_size<T>::value), void>::type
+        hash_combine_variant(std::size_t&, T const&)
+        {
+        }
+
+        template <std::size_t I, typename T>
+        inline typename std::enable_if<(I < std::variant_size<T>::value), void>::type
+        hash_combine_variant(std::size_t& seed, const T& v)
+        {
+            hash_combine_impl(seed, hash(std::get<I>(v)));
+            hash_combine_variant<I + 1>(seed, v);
+        }
+#endif
     } // namespace detail
 
     template <typename... T>
@@ -104,6 +125,16 @@ namespace lang
         detail::hash_combine_impl(seed, hash(t.second));
         return seed;
     }
+
+#if _cplusplus != 201402L
+    template <typename... T>
+    inline auto hash(const std::variant<T...>& t)
+    {
+        std::size_t seed = 0;
+        detail::hash_combine_variant<0>(seed, t);
+        return seed;
+    }
+#endif
 
     template <typename T>
     inline auto hash(const std::unique_ptr<T>& p)
