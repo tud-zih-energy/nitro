@@ -54,3 +54,5 @@ NitroTest(is_callable_test.cpp)
 NitroTest(format_test.cpp)
 
 NitroTest(string_test.cpp)
+
+NitroTest(unordered_test.cpp)

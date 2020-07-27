@@ -35,6 +35,7 @@
 #include <tuple>
 #include <type_traits>
 #include <utility>
+#include <variant>
 
 namespace nitro
 {
@@ -94,18 +95,10 @@ namespace lang
         }
 
 #if _cplusplus != 201402L
-        template <std::size_t I, typename T>
-        inline typename std::enable_if<(I == std::variant_size<T>::value), void>::type
-        hash_combine_variant(std::size_t&, T const&)
+        template <typename T, typename... U>
+        inline void hash_combine_variant(std::size_t& seed, const std::variant<U...>& v)
         {
-        }
-
-        template <std::size_t I, typename T>
-        inline typename std::enable_if<(I < std::variant_size<T>::value), void>::type
-        hash_combine_variant(std::size_t& seed, const T& v)
-        {
-            hash_combine_impl(seed, hash(std::get<I>(v)));
-            hash_combine_variant<I + 1>(seed, v);
+            hash_combine_impl(seed, hash(std::get<T>(v)));
         }
 #endif
     } // namespace detail
@@ -131,7 +124,10 @@ namespace lang
     inline auto hash(const std::variant<T...>& t)
     {
         std::size_t seed = 0;
-        detail::hash_combine_variant<0>(seed, t);
+
+        int _[] = { 0, (detail::hash_combine_variant<T>(seed, t), 0)... };
+        (void)_;
+
         return seed;
     }
 #endif
