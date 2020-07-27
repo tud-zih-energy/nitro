@@ -135,7 +135,21 @@ TEST_CASE("argument class works as intended")
         REQUIRE(without_value.value() == "");
         REQUIRE(without_value.as_named() == "ab");
 
+        REQUIRE_THROWS_AS(nitro::broken_options::argument("-="),
+                          nitro::broken_options::parsing_error);
         REQUIRE_THROWS_AS(nitro::broken_options::argument("--="),
+                          nitro::broken_options::parsing_error);
+        REQUIRE_THROWS_AS(nitro::broken_options::argument("---="),
+                          nitro::broken_options::parsing_error);
+        REQUIRE_THROWS_AS(nitro::broken_options::argument("---ab="),
+                          nitro::broken_options::parsing_error);
+        REQUIRE_THROWS_AS(nitro::broken_options::argument("---a=b"),
+                          nitro::broken_options::parsing_error);
+        REQUIRE_THROWS_AS(nitro::broken_options::argument("---=ab"),
+                          nitro::broken_options::parsing_error);
+        REQUIRE_THROWS_AS(nitro::broken_options::argument("--=ab"),
+                          nitro::broken_options::parsing_error);
+        REQUIRE_THROWS_AS(nitro::broken_options::argument("-=ab"),
                           nitro::broken_options::parsing_error);
     }
 }
