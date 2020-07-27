@@ -17,10 +17,6 @@ jobs:
 
     steps:
     - uses: actions/checkout@v2
-    - name: Install Protobuf
-      run: |
-        sudo apt update
-        sudo apt install libprotoc-dev protobuf-compiler
     - name: Run CMake configure
       env:
         CXX: ${{ matrix.compiler }}
@@ -44,7 +40,7 @@ jobs:
       run: sudo xcode-select -s /Applications/Xcode_${{ matrix.xcode }}.app/Contents/Developer
       if: matrix.xcode != 'default'
     - name: Run CMake configure
-      run: cmake . -DOPENSSL_ROOT_DIR=/usr/local/opt/openssl@1.1/
+      run: cmake .
     - name: Build
       run: make
     - name: Run CTest
