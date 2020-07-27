@@ -3,6 +3,143 @@
 
 #include <nitro/broken_options/parser.hpp>
 
+TEST_CASE("argument class works as intended")
+{
+    SECTION("double dash gets parsed correctly")
+    {
+        nitro::broken_options::argument arg("--");
+
+        REQUIRE(arg.is_double_dash());
+    }
+
+    SECTION("double dash does not get confised with a named argument")
+    {
+        nitro::broken_options::argument arg("--not-a-double-dash");
+
+        REQUIRE(!arg.is_double_dash());
+    }
+
+    SECTION("double dash does not get confised with a short")
+    {
+        nitro::broken_options::argument arg("-v");
+
+        REQUIRE(!arg.is_double_dash());
+    }
+
+    SECTION("Values get parsed as such")
+    {
+        nitro::broken_options::argument arg("some_value");
+        REQUIRE(arg.is_value());
+        REQUIRE(arg.value() == "some_value");
+        REQUIRE_THROWS_AS(arg.name(), nitro::broken_options::parser_error);
+    }
+
+    SECTION("Values get not confused with named arguments")
+    {
+        nitro::broken_options::argument arg("--some-arg");
+        REQUIRE(!arg.is_value());
+    }
+
+    SECTION("Values get not confused with short list")
+    {
+        nitro::broken_options::argument arg("-abcd");
+        REQUIRE(!arg.is_value());
+    }
+
+    SECTION("short arguments get recognized properly")
+    {
+        REQUIRE(nitro::broken_options::argument("-a").is_short());
+        REQUIRE(nitro::broken_options::argument("-ab").is_short());
+        REQUIRE(!nitro::broken_options::argument("--ab").is_short());
+        REQUIRE(!nitro::broken_options::argument("ab").is_short());
+        REQUIRE(!nitro::broken_options::argument("--").is_short());
+    }
+
+    SECTION("named arguments get recognized properly")
+    {
+        REQUIRE(!nitro::broken_options::argument("-a").is_named());
+        REQUIRE(!nitro::broken_options::argument("-ab").is_named());
+        REQUIRE(nitro::broken_options::argument("--ab").is_named());
+        REQUIRE(!nitro::broken_options::argument("ab").is_named());
+        REQUIRE(!nitro::broken_options::argument("--").is_named());
+    }
+
+    SECTION("arguments get recognized properly")
+    {
+        REQUIRE(nitro::broken_options::argument("-a").is_argument());
+        REQUIRE(nitro::broken_options::argument("-ab").is_argument());
+        REQUIRE(nitro::broken_options::argument("--ab").is_argument());
+        REQUIRE(!nitro::broken_options::argument("ab").is_argument());
+        REQUIRE(!nitro::broken_options::argument("--").is_argument());
+    }
+
+    SECTION("arguments get properly parsed")
+    {
+        nitro::broken_options::argument short_arg("-a");
+        REQUIRE(short_arg.is_argument());
+        REQUIRE(short_arg.is_short());
+        REQUIRE(!short_arg.is_named());
+        REQUIRE(!short_arg.has_value());
+        REQUIRE(short_arg.name() == "-a");
+        REQUIRE_THROWS_AS(short_arg.as_named(), nitro::broken_options::parser_error);
+        REQUIRE(short_arg.as_short_list().size() == 1);
+        REQUIRE(short_arg.as_short_list().count("a") == 1);
+
+        nitro::broken_options::argument named_arg("--ab");
+        REQUIRE(named_arg.is_argument());
+        REQUIRE(!named_arg.is_short());
+        REQUIRE(named_arg.is_named());
+        REQUIRE(!named_arg.has_value());
+        REQUIRE(named_arg.name() == "--ab");
+        REQUIRE(named_arg.as_named() == "ab");
+        REQUIRE_THROWS_AS(named_arg.as_short_list(), nitro::broken_options::parser_error);
+
+        nitro::broken_options::argument short_list("-ab");
+        REQUIRE(short_list.is_argument());
+        REQUIRE(short_list.is_short());
+        REQUIRE(!short_list.is_named());
+        REQUIRE(!short_list.has_value());
+        REQUIRE(short_list.name() == "-ab");
+        REQUIRE_THROWS_AS(short_list.as_named(), nitro::broken_options::parser_error);
+        REQUIRE(short_list.as_short_list().size() == 2);
+        REQUIRE(short_list.as_short_list().count("a") == 1);
+        REQUIRE(short_list.as_short_list().count("b") == 1);
+    }
+
+    SECTION("arguments with values get properly parsed")
+    {
+        nitro::broken_options::argument short_arg("-a=5");
+        REQUIRE(short_arg.is_argument());
+        REQUIRE(short_arg.is_short());
+        REQUIRE(!short_arg.is_named());
+        REQUIRE(short_arg.has_value());
+        REQUIRE(short_arg.value() == "5");
+        REQUIRE(short_arg.name() == "-a");
+        REQUIRE(short_arg.data() == "-a=5");
+
+        nitro::broken_options::argument named_arg("--ab=5");
+        REQUIRE(named_arg.is_argument());
+        REQUIRE(!named_arg.is_short());
+        REQUIRE(named_arg.is_named());
+        REQUIRE(named_arg.has_value());
+        REQUIRE(named_arg.value() == "5");
+        REQUIRE(named_arg.name() == "--ab");
+        REQUIRE(named_arg.data() == "--ab=5");
+    }
+
+    SECTION("Trying to break with edge cases")
+    {
+        nitro::broken_options::argument without_value("--ab=");
+
+        REQUIRE(without_value.has_value());
+        REQUIRE(without_value.value() == "");
+        REQUIRE(without_value.as_named() == "ab");
+
+        REQUIRE_THROWS_AS(nitro::broken_options::argument("--="),
+                          nitro::broken_options::parsing_error);
+    }
+}
+
 TEST_CASE("Using argc, argv from main does compile")
 {
     int argc;
