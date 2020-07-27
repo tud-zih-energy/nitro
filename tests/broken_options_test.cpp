@@ -143,6 +143,7 @@ TEST_CASE("Groups work")
 
 about
 
+
 group1:
   -o [ --opt ] arg                        some opt
   --opt_long arg                          an option with an very very very very
