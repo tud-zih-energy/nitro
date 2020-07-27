@@ -60,8 +60,8 @@ namespace broken_options
         }
         broken_options::option& option(const std::string& name,
                                        const std::string& description = std::string(""));
-        broken_options::multi_option& multi_option(const std::string& name,
-                                             const std::string& description = std::string(""));
+        broken_options::multi_option&
+        multi_option(const std::string& name, const std::string& description = std::string(""));
         broken_options::toggle& toggle(const std::string& name,
                                        const std::string& description = std::string(""));
 

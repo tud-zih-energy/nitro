@@ -182,7 +182,7 @@ group2:
 
         CHECK(actual.size() == expected.size());
 
-        for(unsigned long i=0; i<actual.size(); ++i)
+        for (unsigned long i = 0; i < actual.size(); ++i)
         {
             if (actual[i] != expected[i])
             {
