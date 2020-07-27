@@ -63,7 +63,7 @@ namespace broken_options
 
         void usage(std::ostream& s) const
         {
-            s << name_ << ":" << std::endl;
+            s << std::endl << name_ << ":" << std::endl;
             if (description_.size())
             {
                 s << std::endl << description_ << std::endl << std::endl;
