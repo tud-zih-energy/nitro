@@ -14,7 +14,10 @@ macro(NitroTest TEST)
     add_test(${TEST_NAME} ${TEST_NAME})
 endmacro()
 
-add_subdirectory(Catch)
+add_library(catch2 INTERFACE)
+target_include_directories(catch2 SYSTEM INTERFACE ${CMAKE_CURRENT_SOURCE_DIR}/Catch/single_include)
+add_library(Catch2::Catch2 ALIAS catch2)
+
 
 if(NOT CMAKE_C_COMPILER_ID MATCHES "MSVC")
     add_library(nitro_test_lib SHARED nitro_test_lib.cpp)
