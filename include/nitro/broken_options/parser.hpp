@@ -49,7 +49,26 @@ namespace nitro
 {
 namespace broken_options
 {
-    class group_assigner;
+    class parser;
+
+    class group_assigner
+    {
+    public:
+        group_assigner(const std::string& group_name, parser& parser)
+        : parser_(parser), group_name_(group_name)
+        {
+        }
+        broken_options::option& option(const std::string& name,
+                                       const std::string& description = std::string(""));
+        broken_options::multi_option& multi_option(const std::string& name,
+                                             const std::string& description = std::string(""));
+        broken_options::toggle& toggle(const std::string& name,
+                                       const std::string& description = std::string(""));
+
+    private:
+        parser& parser_;
+        std::string group_name_;
+    };
 
     class parser
     {
@@ -58,7 +77,7 @@ namespace broken_options
                const std::string& about = std::string(""))
         : app_name_(app_name), about_(about)
         {
-            create_group("arguments");
+            auto _ = group("arguments");
         }
 
         auto parse(int argc, const char* const argv[]) -> options;
@@ -119,31 +138,6 @@ namespace broken_options
 
         std::size_t allowed_positionals_ = 0;
         std::string positional_name_ = "args";
-    };
-
-    class group_assigner
-    {
-    public:
-        group_assigner(const std::string& group_name, parser& parser)
-        : parser_(parser), group_name_(group_name)
-        {
-        }
-        auto option(const std::string& name, const std::string& description = std::string(""))
-        {
-            return parser_.group_option(group_name_, name, description);
-        }
-        auto multi_option(const std::string& name, const std::string& description = std::string(""))
-        {
-            return parser_.group_multi_option(group_name_, name, description);
-        }
-        auto toggle(const std::string& name, const std::string& description = std::string(""))
-        {
-            return parser_.group_toggle(group_name_, name, description);
-        }
-
-    private:
-        parser& parser_;
-        std::string group_name_;
     };
 } // namespace broken_options
 } // namespace nitro

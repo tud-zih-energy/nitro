@@ -46,7 +46,7 @@ namespace broken_options
         {
             groups_.emplace(group_name, option_group(group_name, description));
         }
-        else if (description)
+        else if (description.size())
         {
             raise<parser_error>("Trying to redefine group. Name: ", group_name);
         }
@@ -285,7 +285,7 @@ namespace broken_options
 
         for (const auto& group_pair : groups_)
         {
-            if (group.first == "arguments" && !print_default_group)
+            if (group_pair.first == "arguments" && !print_default_group)
             {
                 continue;
             }
@@ -438,6 +438,22 @@ namespace broken_options
         {
             f(option.second);
         }
+    }
+
+    broken_options::option& group_assigner::option(const std::string& name,
+                                                   const std::string& description)
+    {
+        return parser_.group_option(group_name_, name, description);
+    }
+    broken_options::multi_option& group_assigner::multi_option(const std::string& name,
+                                                               const std::string& description)
+    {
+        return parser_.group_multi_option(group_name_, name, description);
+    }
+    broken_options::toggle& group_assigner::toggle(const std::string& name,
+                                                   const std::string& description)
+    {
+        return parser_.group_toggle(group_name_, name, description);
     }
 
 } // namespace broken_options
