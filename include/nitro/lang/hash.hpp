@@ -95,6 +95,25 @@ namespace lang
         }
 
 #if _cplusplus != 201402L
+        template <std::size_t I, typename T>
+        inline typename std::enable_if<(I == std::variant_size<T>::value), void>::type
+        hash_combine_variant(std::size_t&, const T&)
+        {
+        }
+
+        template <std::size_t I, typename T>
+        inline typename std::enable_if<(I < std::variant_size<T>::value), void>::type
+        hash_combine_variant(std::size_t& seed, const T& v)
+        {
+            if (auto x = std::get_if<I>(&v))
+            {
+                hash_combine_impl(seed, hash(*x));
+            }
+            else
+            {
+                hash_combine_variant<I + 1>(seed, v);
+            }
+        }
         template <typename T, typename... U>
         inline void hash_combine_variant(std::size_t& seed, const std::variant<U...>& v)
         {
@@ -128,8 +147,7 @@ namespace lang
     {
         std::size_t seed = 0;
 
-        int _[] = { 0, (detail::hash_combine_variant<T>(seed, t), 0)... };
-        (void)_;
+        detail::hash_combine_variant<0>(seed, t);
 
         return seed;
     }
