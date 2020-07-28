@@ -104,15 +104,47 @@ namespace broken_options
                     // FeelsBadMan
                     if (env_value == "TRUE" || env_value == "ON" || env_value == "YES" ||
                         env_value == "true" || env_value == "on" || env_value == "yes" ||
-                        env_value == "1" || env_value == "Y")
+                        env_value == "1" || env_value == "Y" || env_value == "with")
                     {
                         update_value({ "--" + name() });
+                    }
+                    if (env_value == "false" || env_value == "FALSE" ||env_value == "without" ||
+                        env_value == "0" || env_value == "NO" || env_value == "no" ||
+                        env_value == "without" || env_value == "n" || env_value == "off" ||
+                        env_value == "OFF")
+                    {
+                        update_value({ "--" + name()});
                     }
                     return;
                 }
             }
         }
+        bool matches(const argument& arg) override
+        {
+            if (!arg.is_argument())
+            {
+                return false;
+            }
 
+            if (has_short_name() && arg.is_short())
+            {
+                auto list = arg.as_short_list();
+
+                if (list.size() > 1 && arg.has_value())
+                {
+                    return false;
+                }
+
+                return list.count(short_name());
+            }
+            else if (arg.is_named())
+            {
+                return arg.as_named() == name();
+            }
+            
+            return false;
+        }
+        
         friend class parser;
 
     private:

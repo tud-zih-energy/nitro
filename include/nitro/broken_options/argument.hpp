@@ -34,6 +34,7 @@
 
 #include <nitro/except/raise.hpp>
 #include <nitro/lang/optional.hpp>
+#include <nitro/lang/string.hpp>
 
 #include <regex>
 #include <set>
@@ -99,6 +100,11 @@ namespace broken_options
             return is_value() || static_cast<bool>(value_);
         }
 
+        bool has_prefix() const
+        {
+            return nitro::lang::starts_with(name_,"--no-");
+        }
+
     public:
         const std::string& data() const noexcept
         {
@@ -113,6 +119,11 @@ namespace broken_options
             }
 
             return name_;
+        }
+
+        std::string name_without_prefix() const
+        {
+            return 
         }
 
         const std::string& value() const
