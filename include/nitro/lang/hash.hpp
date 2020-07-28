@@ -98,7 +98,10 @@ namespace lang
         template <typename T, typename... U>
         inline void hash_combine_variant(std::size_t& seed, const std::variant<U...>& v)
         {
-            hash_combine_impl(seed, hash(std::get<T>(v)));
+            if (auto x = std::get_if<T>(&v))
+            {
+                hash_combine_impl(seed, hash(*x));
+            }
         }
 #endif
     } // namespace detail

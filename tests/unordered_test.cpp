@@ -6,9 +6,9 @@
 
 TEST_CASE("Test Hashing")
 {
-    nitro::lang::unordered_set<std::variant<int,long>> test;
+    nitro::lang::unordered_set<std::variant<int, long>> test;
 
-    std::variant<int,long> x, y;
+    std::variant<int, long> x, y;
     x = 12;
     y = 25;
 
@@ -16,5 +16,4 @@ TEST_CASE("Test Hashing")
     test.insert(y);
 
     REQUIRE(test.size() == 2);
-    
 }
