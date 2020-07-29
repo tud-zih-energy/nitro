@@ -192,6 +192,178 @@ group2:
 
         REQUIRE(actual == expected);
     }
+
+    SECTION("Groups work 2")
+    {
+        nitro::broken_options::parser parser("app_name", "about");
+
+        std::stringstream s;
+
+        parser.accept_positionals(3);
+        parser.positional_name("command line");
+
+        auto grp1 = parser.group("group1");
+        auto grp2 = parser.group("group2");
+
+        grp1.toggle("tog", "some toggle").short_name("t");
+        grp1.toggle("togg", "some other toggle").short_name("u");
+
+        grp1.option("opt", "some opt").short_name("o");
+        grp1.option("opt_with_d", "some opt with a default")
+            .short_name("d")
+            .default_value("default value");
+
+        grp1.option("opt_nos", "some opt without a short, but a default")
+            .default_value("default value");
+        grp1.option("opt_nosd", "some opt without short and default");
+
+        grp1.option("opt_long", "an option with an very very very very very very very very very "
+                                "very very very very very very very very very very very very very "
+                                "very very very very very very very very long description");
+
+        grp2.option("some_long_named_option",
+                    "an option with an very very very very very very very very very "
+                    "very very very very very very very very very very very very very "
+                    "very very very very very very very very long description")
+            .short_name("x")
+            .default_value("some very long default parameter for this fucking thing");
+
+        grp2.multi_option("mopt", "some multi opt").short_name("m");
+
+        grp2.option("env-opt", "This is an option to set cool stuff.").env("ENV_OPT");
+        grp2.option("env-opt-2").env("ENV_OPT2");
+
+        parser.usage(s);
+
+        auto actual = s.str();
+        std::string expected =
+            R"EXPECTED(usage: app_name [-tu] --env-opt --env-opt-2 --opt --opt_long [--opt_nos] --opt_nosd [--opt_with_d] [--some_long_named_option] --mopt [command line ...]
+
+about
+
+
+group1:
+  -o [ --opt ] arg                        some opt
+  --opt_long arg                          an option with an very very very very
+                                          very very very very very very very
+                                          very very very very very very very
+                                          very very very very very very very
+                                          very very very very very long
+                                          description
+  --opt_nos [=default value]              some opt without a short, but a
+                                          default
+  --opt_nosd arg                          some opt without short and default
+  -d [ --opt_with_d ] [=default value]    some opt with a default
+  -t [ --tog ]                            some toggle
+  -u [ --togg ]                           some other toggle
+
+group2:
+  --env-opt arg                           This is an option to set cool stuff.
+                                          Can be set using the environment
+                                          variable 'ENV_OPT'.
+  --env-opt-2 arg                         Can be set using the environment
+                                          variable 'ENV_OPT2'.
+  -m [ --mopt ] arg                       some multi opt
+  -x [ --some_long_named_option ] [=some very long default parameter for this fucking thing]
+                                          an option with an very very very very
+                                          very very very very very very very
+                                          very very very very very very very
+                                          very very very very very very very
+                                          very very very very very long
+                                          description
+)EXPECTED";
+
+        CHECK(actual.size() == expected.size());
+
+        for (unsigned long i = 0; i < actual.size(); ++i)
+        {
+            if (actual[i] != expected[i])
+            {
+                std::cout << i << " " << actual[i] << " " << expected[i] << std::endl;
+            }
+        }
+
+        REQUIRE(actual == expected);
+    }
+
+    SECTION("Change Default Group")
+    {
+        nitro::broken_options::parser parser("app_name", "about");
+
+        std::stringstream s;
+
+        parser.default_group("test arguments");
+        parser.accept_positionals(3);
+        parser.positional_name("command line");
+
+        parser.toggle("tog", "some toggle").short_name("t");
+        parser.toggle("togg", "some other toggle").short_name("u");
+
+        parser.option("opt", "some opt").short_name("o");
+        parser.option("opt_with_d", "some opt with a default")
+            .short_name("d")
+            .default_value("default value");
+
+        parser.option("opt_nos", "some opt without a short, but a default")
+            .default_value("default value");
+        parser.option("opt_nosd", "some opt without short and default");
+
+        parser.option("opt_long",
+                      "an option with an very very very very very very very very very "
+                      "very very very very very very very very very very very very very "
+                      "very very very very very very very very long description");
+
+        parser
+            .option("some_long_named_option",
+                    "an option with an very very very very very very very very very "
+                    "very very very very very very very very very very very very very "
+                    "very very very very very very very very long description")
+            .short_name("x")
+            .default_value("some very long default parameter for this fucking thing");
+
+        parser.multi_option("mopt", "some multi opt").short_name("m");
+
+        parser.option("env-opt", "This is an option to set cool stuff.").env("ENV_OPT");
+        parser.option("env-opt-2").env("ENV_OPT2");
+
+        parser.usage(s);
+
+        REQUIRE(
+            s.str() ==
+            R"EXPECTED(usage: app_name [-tu] --env-opt --env-opt-2 --opt --opt_long [--opt_nos] --opt_nosd [--opt_with_d] [--some_long_named_option] --mopt [command line ...]
+
+about
+
+
+test arguments:
+  --env-opt arg                           This is an option to set cool stuff.
+                                          Can be set using the environment
+                                          variable 'ENV_OPT'.
+  --env-opt-2 arg                         Can be set using the environment
+                                          variable 'ENV_OPT2'.
+  -m [ --mopt ] arg                       some multi opt
+  -o [ --opt ] arg                        some opt
+  --opt_long arg                          an option with an very very very very
+                                          very very very very very very very
+                                          very very very very very very very
+                                          very very very very very very very
+                                          very very very very very long
+                                          description
+  --opt_nos [=default value]              some opt without a short, but a
+                                          default
+  --opt_nosd arg                          some opt without short and default
+  -d [ --opt_with_d ] [=default value]    some opt with a default
+  -x [ --some_long_named_option ] [=some very long default parameter for this fucking thing]
+                                          an option with an very very very very
+                                          very very very very very very very
+                                          very very very very very very very
+                                          very very very very very very very
+                                          very very very very very long
+                                          description
+  -t [ --tog ]                            some toggle
+  -u [ --togg ]                           some other toggle
+)EXPECTED");
+    }
 }
 
 TEST_CASE("Check if short option names are unique")

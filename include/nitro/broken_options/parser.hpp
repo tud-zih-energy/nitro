@@ -49,27 +49,6 @@ namespace nitro
 {
 namespace broken_options
 {
-    class parser;
-
-    class group_assigner
-    {
-    public:
-        group_assigner(const std::string& group_name, parser& parser)
-        : parser_(parser), group_name_(group_name)
-        {
-        }
-        broken_options::option& option(const std::string& name,
-                                       const std::string& description = std::string(""));
-        broken_options::multi_option&
-        multi_option(const std::string& name, const std::string& description = std::string(""));
-        broken_options::toggle& toggle(const std::string& name,
-                                       const std::string& description = std::string(""));
-
-    private:
-        parser& parser_;
-        std::string group_name_;
-    };
-
     class parser
     {
     public:
@@ -77,10 +56,12 @@ namespace broken_options
                const std::string& about = std::string(""))
         : app_name_(app_name), about_(about)
         {
-            auto _ = group("arguments");
+            group("arguments");
         }
 
         auto parse(int argc, const char* const argv[]) -> options;
+        void default_group(const std::string& group_name,
+                           const std::string& description = std::string(""));
 
     public:
         auto option(const std::string& name, const std::string& description = std::string(""))
@@ -90,17 +71,8 @@ namespace broken_options
         auto toggle(const std::string& name, const std::string& description = std::string(""))
             -> broken_options::toggle&;
 
-        broken_options::group_assigner group(const std::string& group_name,
-                                             const std::string& description = std::string(""));
-        auto group_option(const std::string& group_name, const std::string& name,
-                          const std::string& description = std::string(""))
-            -> broken_options::option&;
-        auto group_multi_option(const std::string& group_name, const std::string& name,
-                                const std::string& description = std::string(""))
-            -> broken_options::multi_option&;
-        auto group_toggle(const std::string& group_name, const std::string& name,
-                          const std::string& description = std::string(""))
-            -> broken_options::toggle&;
+        broken_options::option_group& group(const std::string& group_name,
+                                            const std::string& description = std::string(""));
 
         void accept_positionals(std::size_t amount = std::numeric_limits<std::size_t>::max());
         void positional_name(const std::string& name);
@@ -129,6 +101,7 @@ namespace broken_options
     private:
         std::string app_name_;
         std::string about_;
+        std::string default_group_name_ = "arguments";
 
         std::map<std::string, broken_options::option> options_;
         std::map<std::string, broken_options::multi_option> multi_options_;

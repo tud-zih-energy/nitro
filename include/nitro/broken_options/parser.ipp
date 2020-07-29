@@ -39,29 +39,52 @@ namespace nitro
 {
 namespace broken_options
 {
-    broken_options::group_assigner parser::group(const std::string& group_name,
-                                                 const std::string& description)
+    void parser::default_group(const std::string& group_name, const std::string& description)
+    {
+        if (options_.size() > 0)
+        {
+            raise<parser_error>("Default group have to be set before assignment of any options!");
+        }
+
+        if (multi_options_.size() > 0)
+        {
+            raise<parser_error>("Default group have to be set before assignment of any options!");
+        }
+
+        if (toggles_.size() > 0)
+        {
+            raise<parser_error>("Default group have to be set before assignment of any options!");
+        }
+
+        default_group_name_ = group_name;
+        if (groups_.find(group_name) == groups_.end())
+        {
+            groups_.emplace(group_name, option_group(group_name, options_, multi_options_, toggles_,
+                                                     description));
+        }
+        else if (description.size())
+        {
+            raise<parser_error>("Trying to redefine group. Name: ", group_name);
+        }
+    }
+
+    broken_options::option_group& parser::group(const std::string& group_name,
+                                                const std::string& description)
     {
         if (groups_.find(group_name) == groups_.end())
         {
-            groups_.emplace(group_name, option_group(group_name, description));
+            groups_.emplace(group_name, option_group(group_name, options_, multi_options_, toggles_,
+                                                     description));
         }
         else if (description.size())
         {
             raise<parser_error>("Trying to redefine group. Name: ", group_name);
         }
 
-        return group_assigner(group_name, *this);
+        return groups_.find(group_name)->second;
     }
 
     broken_options::option& parser::option(const std::string& name, const std::string& description)
-    {
-        return group_option("arguments", name, description);
-    }
-
-    broken_options::option& parser::group_option(const std::string& group_name,
-                                                 const std::string& name,
-                                                 const std::string& description)
     {
         if (multi_options_.count(name) > 0)
         {
@@ -78,11 +101,12 @@ namespace broken_options
             auto res = options_.emplace(std::piecewise_construct, std::forward_as_tuple(name),
                                         std::forward_as_tuple(name, description));
 
-            auto group_loc = groups_.find(group_name);
+            auto group_loc = groups_.find(default_group_name_);
             if (group_loc == groups_.end())
             {
-                groups_.emplace(group_name, option_group(group_name));
-                group_loc = groups_.find(group_name);
+                groups_.emplace(default_group_name_, option_group(default_group_name_, options_,
+                                                                  multi_options_, toggles_));
+                group_loc = groups_.find(default_group_name_);
             }
             group_loc->second.add(res.first->second);
         }
@@ -91,13 +115,6 @@ namespace broken_options
 
     broken_options::multi_option& parser::multi_option(const std::string& name,
                                                        const std::string& description)
-    {
-        return group_multi_option("arguments", name, description);
-    }
-
-    broken_options::multi_option& parser::group_multi_option(const std::string& group_name,
-                                                             const std::string& name,
-                                                             const std::string& description)
     {
         if (options_.count(name) > 0)
         {
@@ -114,11 +131,12 @@ namespace broken_options
             auto res = multi_options_.emplace(std::piecewise_construct, std::forward_as_tuple(name),
                                               std::forward_as_tuple(name, description));
 
-            auto group_loc = groups_.find(group_name);
+            auto group_loc = groups_.find(default_group_name_);
             if (group_loc == groups_.end())
             {
-                groups_.emplace(group_name, option_group(group_name));
-                group_loc = groups_.find(group_name);
+                groups_.emplace(default_group_name_, option_group(default_group_name_, options_,
+                                                                  multi_options_, toggles_));
+                group_loc = groups_.find(default_group_name_);
             }
             group_loc->second.add(res.first->second);
         }
@@ -126,13 +144,6 @@ namespace broken_options
     }
 
     broken_options::toggle& parser::toggle(const std::string& name, const std::string& description)
-    {
-        return group_toggle("arguments", name, description);
-    }
-
-    broken_options::toggle& parser::group_toggle(const std::string& group_name,
-                                                 const std::string& name,
-                                                 const std::string& description)
     {
         if (options_.count(name) > 0)
         {
@@ -149,11 +160,12 @@ namespace broken_options
             auto res = toggles_.emplace(std::piecewise_construct, std::forward_as_tuple(name),
                                         std::forward_as_tuple(name, description));
 
-            auto group_loc = groups_.find(group_name);
+            auto group_loc = groups_.find(default_group_name_);
             if (group_loc == groups_.end())
             {
-                groups_.emplace(group_name, option_group(group_name));
-                group_loc = groups_.find(group_name);
+                groups_.emplace(default_group_name_, option_group(default_group_name_, options_,
+                                                                  multi_options_, toggles_));
+                group_loc = groups_.find(default_group_name_);
             }
             group_loc->second.add(res.first->second);
         }
