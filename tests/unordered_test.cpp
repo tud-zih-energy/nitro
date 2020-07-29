@@ -1,3 +1,5 @@
+#if __cplusplus > 201402L
+
 #define CATCH_CONFIG_MAIN
 #include <catch2/catch.hpp>
 
@@ -19,3 +21,5 @@ TEST_CASE("Test Hashing")
 
     REQUIRE(test.size() == 3);
 }
+
+#endif
