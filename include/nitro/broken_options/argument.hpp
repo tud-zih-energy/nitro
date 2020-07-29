@@ -70,7 +70,7 @@ namespace broken_options
         }
 
     public:
-        bool is_value() const noexcept
+        bool is_value() const noexcept 
         {
             return name_[0] != '-';
         }
@@ -85,7 +85,7 @@ namespace broken_options
             return name_.size() > 1 && name_[0] == '-' && name_[1] != '-';
         }
 
-        bool is_named() const noexcept
+        bool is_named() const  noexcept
         {
             return name_.size() > 2 && name_[0] == '-' && name_[1] == '-' && name_[2] != '-';
         }
@@ -111,6 +111,12 @@ namespace broken_options
             return arg_;
         }
 
+        std::string name_without_prefix() const
+        {
+            std::string tmp = name();
+            return tmp.erase(0,5);
+        }
+
         const std::string& name() const
         {
             if (is_value())
@@ -119,11 +125,6 @@ namespace broken_options
             }
 
             return name_;
-        }
-
-        std::string name_without_prefix() const
-        {
-            return 
         }
 
         const std::string& value() const

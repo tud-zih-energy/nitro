@@ -84,7 +84,15 @@ namespace broken_options
                 *ref_ = true;
             }
 
-            ++given_;
+            if (arg.has_prefix())
+            {
+                given_ = 0;
+            }
+            else
+            {
+                ++given_;
+            }
+            //++given_;
         }
 
         virtual void prepare() override
