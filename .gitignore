@@ -30,3 +30,4 @@
 
 build
 .clang_complete
+.vscode
