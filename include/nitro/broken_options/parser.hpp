@@ -41,7 +41,6 @@
 
 #include <iostream>
 #include <map>
-#include <set>
 #include <string>
 #include <vector>
 
@@ -71,8 +70,8 @@ namespace broken_options
         auto toggle(const std::string& name, const std::string& description = std::string(""))
             -> broken_options::toggle&;
 
-        broken_options::option_group& group(const std::string& group_name,
-                                            const std::string& description = std::string(""));
+        broken_options::argument_group& group(const std::string& group_name,
+                                              const std::string& description = std::string(""));
 
         void accept_positionals(std::size_t amount = std::numeric_limits<std::size_t>::max());
         void positional_name(const std::string& name);
@@ -107,7 +106,7 @@ namespace broken_options
         std::map<std::string, broken_options::multi_option> multi_options_;
         std::map<std::string, broken_options::toggle> toggles_;
 
-        std::map<std::string, option_group> groups_;
+        std::map<std::string, argument_group> groups_;
 
         std::size_t allowed_positionals_ = 0;
         std::string positional_name_ = "args";

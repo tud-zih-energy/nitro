@@ -38,14 +38,14 @@ namespace nitro
 {
 namespace broken_options
 {
-    class option_group
+    class argument_group
     {
     public:
-        option_group(const std::string& name,
-                     std::map<std::string, broken_options::option>& all_options,
-                     std::map<std::string, broken_options::multi_option>& all_multi_options,
-                     std::map<std::string, broken_options::toggle>& all_toggles,
-                     const std::string& description = std::string(""))
+        argument_group(const std::string& name,
+                       std::map<std::string, broken_options::option>& all_options,
+                       std::map<std::string, broken_options::multi_option>& all_multi_options,
+                       std::map<std::string, broken_options::toggle>& all_toggles,
+                       const std::string& description = std::string(""))
         : name_(name), description_(description), all_options_(all_options),
           all_multi_options_(all_multi_options), all_toggles_(all_toggles)
         {
@@ -80,7 +80,8 @@ namespace broken_options
             }
         }
 
-        broken_options::option& option(const std::string& name, const std::string& description)
+        broken_options::option& option(const std::string& name,
+                                       const std::string& description = std::string())
         {
             if (all_multi_options_.count(name) > 0)
             {
@@ -104,7 +105,7 @@ namespace broken_options
         }
 
         broken_options::multi_option& multi_option(const std::string& name,
-                                                   const std::string& description)
+                                                   const std::string& description = std::string())
         {
             if (all_options_.count(name) > 0)
             {
@@ -127,7 +128,8 @@ namespace broken_options
             return all_multi_options_.at(name);
         }
 
-        broken_options::toggle& toggle(const std::string& name, const std::string& description)
+        broken_options::toggle& toggle(const std::string& name,
+                                       const std::string& description = std::string())
         {
             if (all_options_.count(name) > 0)
             {

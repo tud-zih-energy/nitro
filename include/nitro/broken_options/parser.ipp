@@ -59,8 +59,8 @@ namespace broken_options
         default_group_name_ = group_name;
         if (groups_.find(group_name) == groups_.end())
         {
-            groups_.emplace(group_name, option_group(group_name, options_, multi_options_, toggles_,
-                                                     description));
+            groups_.emplace(group_name, argument_group(group_name, options_, multi_options_,
+                                                       toggles_, description));
         }
         else if (description.size())
         {
@@ -68,13 +68,13 @@ namespace broken_options
         }
     }
 
-    broken_options::option_group& parser::group(const std::string& group_name,
-                                                const std::string& description)
+    broken_options::argument_group& parser::group(const std::string& group_name,
+                                                  const std::string& description)
     {
         if (groups_.find(group_name) == groups_.end())
         {
-            groups_.emplace(group_name, option_group(group_name, options_, multi_options_, toggles_,
-                                                     description));
+            groups_.emplace(group_name, argument_group(group_name, options_, multi_options_,
+                                                       toggles_, description));
         }
         else if (description.size())
         {
@@ -104,8 +104,8 @@ namespace broken_options
             auto group_loc = groups_.find(default_group_name_);
             if (group_loc == groups_.end())
             {
-                groups_.emplace(default_group_name_, option_group(default_group_name_, options_,
-                                                                  multi_options_, toggles_));
+                groups_.emplace(default_group_name_, argument_group(default_group_name_, options_,
+                                                                    multi_options_, toggles_));
                 group_loc = groups_.find(default_group_name_);
             }
             group_loc->second.add(res.first->second);
@@ -134,8 +134,8 @@ namespace broken_options
             auto group_loc = groups_.find(default_group_name_);
             if (group_loc == groups_.end())
             {
-                groups_.emplace(default_group_name_, option_group(default_group_name_, options_,
-                                                                  multi_options_, toggles_));
+                groups_.emplace(default_group_name_, argument_group(default_group_name_, options_,
+                                                                    multi_options_, toggles_));
                 group_loc = groups_.find(default_group_name_);
             }
             group_loc->second.add(res.first->second);
@@ -163,8 +163,8 @@ namespace broken_options
             auto group_loc = groups_.find(default_group_name_);
             if (group_loc == groups_.end())
             {
-                groups_.emplace(default_group_name_, option_group(default_group_name_, options_,
-                                                                  multi_options_, toggles_));
+                groups_.emplace(default_group_name_, argument_group(default_group_name_, options_,
+                                                                    multi_options_, toggles_));
                 group_loc = groups_.find(default_group_name_);
             }
             group_loc->second.add(res.first->second);
@@ -450,22 +450,6 @@ namespace broken_options
         {
             f(option.second);
         }
-    }
-
-    broken_options::option& group_assigner::option(const std::string& name,
-                                                   const std::string& description)
-    {
-        return parser_.group_option(group_name_, name, description);
-    }
-    broken_options::multi_option& group_assigner::multi_option(const std::string& name,
-                                                               const std::string& description)
-    {
-        return parser_.group_multi_option(group_name_, name, description);
-    }
-    broken_options::toggle& group_assigner::toggle(const std::string& name,
-                                                   const std::string& description)
-    {
-        return parser_.group_toggle(group_name_, name, description);
     }
 
 } // namespace broken_options
