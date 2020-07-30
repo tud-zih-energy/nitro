@@ -176,5 +176,39 @@ namespace broken_options
         std::map<std::string, broken_options::multi_option>& all_multi_options_;
         std::map<std::string, broken_options::toggle>& all_toggles_;
     };
+
+    class proxy_argument_group
+    {
+    private:
+        argument_group& argument_group_;
+
+    public:
+        proxy_argument_group(argument_group& argument_group) : argument_group_(argument_group)
+        {
+        }
+
+        broken_options::option& option(const std::string& name,
+                                       const std::string& description = std::string(""))
+        {
+            return argument_group_.option(name, description);
+        }
+
+        broken_options::multi_option& multi_option(const std::string& name,
+                                                   const std::string& description = std::string(""))
+        {
+            return argument_group_.multi_option(name, description);
+        }
+
+        broken_options::toggle& toggle(const std::string& name,
+                                       const std::string& description = std::string(""))
+        {
+            return argument_group_.toggle(name, description);
+        }
+
+        bool operator==(const proxy_argument_group& rhs) const
+        {
+            return &argument_group_ == &rhs.argument_group_;
+        }
+    };
 } // namespace broken_options
 } // namespace nitro

@@ -68,8 +68,8 @@ namespace broken_options
         }
     }
 
-    broken_options::argument_group& parser::group(const std::string& group_name,
-                                                  const std::string& description)
+    broken_options::proxy_argument_group parser::group(const std::string& group_name,
+                                                       const std::string& description)
     {
         if (groups_.find(group_name) == groups_.end())
         {
@@ -81,7 +81,7 @@ namespace broken_options
             raise<parser_error>("Trying to redefine group. Name: ", group_name);
         }
 
-        return groups_.find(group_name)->second;
+        return proxy_argument_group(groups_.at(group_name));
     }
 
     broken_options::option& parser::option(const std::string& name, const std::string& description)

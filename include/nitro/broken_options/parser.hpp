@@ -70,8 +70,8 @@ namespace broken_options
         auto toggle(const std::string& name, const std::string& description = std::string(""))
             -> broken_options::toggle&;
 
-        broken_options::argument_group& group(const std::string& group_name,
-                                              const std::string& description = std::string(""));
+        broken_options::proxy_argument_group
+        group(const std::string& group_name, const std::string& description = std::string(""));
 
         void accept_positionals(std::size_t amount = std::numeric_limits<std::size_t>::max());
         void positional_name(const std::string& name);

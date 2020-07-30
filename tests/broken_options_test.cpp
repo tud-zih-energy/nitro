@@ -202,8 +202,8 @@ group2:
         parser.accept_positionals(3);
         parser.positional_name("command line");
 
-        auto& grp1 = parser.group("group1", "some text");
-        auto& grp2 = parser.group("group2");
+        auto grp1 = parser.group("group1", "some text");
+        auto grp2 = parser.group("group2");
 
         grp1.toggle("tog", "some toggle").short_name("t");
         grp1.toggle("togg", "some other toggle").short_name("u");
@@ -378,8 +378,8 @@ test arguments:
 
         std::stringstream s;
 
-        auto& grp1 = parser.group("group1");
-        auto& grp2 = parser.group("group2");
+        auto grp1 = parser.group("group1");
+        auto grp2 = parser.group("group2");
 
         grp1.toggle("tog", "should work");
         REQUIRE_THROWS_AS(grp2.toggle("tog", "should fail"), nitro::broken_options::parser_error);
@@ -391,8 +391,8 @@ test arguments:
 
         std::stringstream s;
 
-        auto grp1 = &parser.group("group1");
-        auto grp2 = &parser.group("group1");
+        auto grp1 = parser.group("group1");
+        auto grp2 = parser.group("group1");
 
         REQUIRE(grp1 == grp2);
     }
