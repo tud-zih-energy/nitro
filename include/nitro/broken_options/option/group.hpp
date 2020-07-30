@@ -48,8 +48,8 @@ namespace broken_options
                        std::map<std::string, broken_options::multi_option>& all_multi_options,
                        std::map<std::string, broken_options::toggle>& all_toggles,
                        const std::string& description = std::string(""))
-        : name_(name), description_(description), all_options_(&all_options),
-          all_multi_options_(&all_multi_options), all_toggles_(&all_toggles)
+        : name_(name), description_(description), all_options_(all_options),
+          all_multi_options_(all_multi_options), all_toggles_(all_toggles)
         {
         }
 
@@ -85,69 +85,78 @@ namespace broken_options
         broken_options::option& option(const std::string& name,
                                        const std::string& description = std::string())
         {
-            if (all_multi_options_->count(name) > 0)
+            if (all_multi_options_.count(name) > 0)
             {
                 raise<parser_error>("Trying to redefine multi_option as option. Name: ", name);
             }
 
-            if (all_toggles_->count(name) > 0)
+            if (all_toggles_.count(name) > 0)
             {
-                raise<parser_error>("Trying to redefine toggle as multi_option. Name: ", name);
+                raise<parser_error>("Trying to redefine toggle as option. Name: ", name);
             }
 
-            if (all_options_->count(name) == 0)
+            if (all_options_.count(name) == 0)
             {
                 auto res =
-                    all_options_->emplace(std::piecewise_construct, std::forward_as_tuple(name),
-                                          std::forward_as_tuple(name, description));
+                    all_options_.emplace(std::piecewise_construct, std::forward_as_tuple(name),
+                                         std::forward_as_tuple(name, description));
 
                 add(res.first->second);
             }
-            return all_options_->at(name);
+            else if (options_.find(name) == options_.end())
+            {
+                raise<parser_error>("Trying to redefine option in another group. Name: ", name);
+            }
+            return all_options_.at(name);
         }
 
         broken_options::multi_option& multi_option(const std::string& name,
                                                    const std::string& description = std::string())
         {
-            if (all_options_->count(name) > 0)
+            if (all_options_.count(name) > 0)
             {
                 raise<parser_error>("Trying to redefine option as multi_option. Name: ", name);
             }
 
-            if (all_toggles_->count(name) > 0)
+            if (all_toggles_.count(name) > 0)
             {
                 raise<parser_error>("Trying to redefine toggle as multi_option. Name: ", name);
             }
 
-            if (all_multi_options_->count(name) == 0)
+            if (all_multi_options_.count(name) == 0)
             {
-                auto res = all_multi_options_->emplace(std::piecewise_construct,
-                                                       std::forward_as_tuple(name),
-                                                       std::forward_as_tuple(name, description));
+                auto res = all_multi_options_.emplace(std::piecewise_construct,
+                                                      std::forward_as_tuple(name),
+                                                      std::forward_as_tuple(name, description));
 
                 add(res.first->second);
             }
-            return all_multi_options_->at(name);
+            else if (options_.find(name) == options_.end())
+            {
+                raise<parser_error>("Trying to redefine multi_option in another group. Name: ",
+                                    name);
+            }
+            return all_multi_options_.at(name);
         }
 
         broken_options::toggle& toggle(const std::string& name,
                                        const std::string& description = std::string())
         {
-            if (all_options_->count(name) > 0)
+            if (all_options_.count(name) > 0)
             {
                 raise<parser_error>("Trying to redefine option as multi_option. Name: ", name);
             }
 
-            if (all_multi_options_->count(name) > 0)
+            if (all_multi_options_.count(name) > 0)
             {
                 raise<parser_error>("Trying to redefine multi_option as option. Name: ", name);
             }
 
-            if (all_toggles_->count(name) == 0)
+            if (all_toggles_.count(name) == 0)
             {
                 auto res =
-                    all_toggles_->emplace(std::piecewise_construct, std::forward_as_tuple(name),
-                                          std::forward_as_tuple(name, description));
+                    all_toggles_.emplace(std::piecewise_construct, std::forward_as_tuple(name),
+                                         std::forward_as_tuple(name, description));
 
                 add(res.first->second);
             }
@@ -155,7 +164,7 @@ namespace broken_options
             {
                 raise<parser_error>("Trying to redefine toggle in another group. Name: ", name);
             }
-            return all_toggles_->at(name);
+            return all_toggles_.at(name);
         }
 
     private:
@@ -163,9 +172,9 @@ namespace broken_options
         std::string description_;
         std::map<std::string, std::reference_wrapper<base>> options_;
 
-        std::map<std::string, broken_options::option>* all_options_;
-        std::map<std::string, broken_options::multi_option>* all_multi_options_;
-        std::map<std::string, broken_options::toggle>* all_toggles_;
+        std::map<std::string, broken_options::option>& all_options_;
+        std::map<std::string, broken_options::multi_option>& all_multi_options_;
+        std::map<std::string, broken_options::toggle>& all_toggles_;
     };
 } // namespace broken_options
 } // namespace nitro
