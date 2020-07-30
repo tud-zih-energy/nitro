@@ -35,7 +35,10 @@
 #include <tuple>
 #include <type_traits>
 #include <utility>
+
+#if __cplusplus > 201402L
 #include <variant>
+#endif
 
 namespace nitro
 {
