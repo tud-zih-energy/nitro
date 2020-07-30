@@ -94,7 +94,7 @@ namespace lang
             hash_combine_tuple<I + 1>(seed, v);
         }
 
-#if __cplusplus != 201402L
+#if __cplusplus > 201402L
         template <std::size_t I, typename T>
         inline typename std::enable_if<(I == std::variant_size<T>::value), void>::type
         hash_combine_variant(std::size_t&, const T&)
@@ -141,7 +141,7 @@ namespace lang
         return seed;
     }
 
-#if __cplusplus != 201402L
+#if __cplusplus > 201402L
     template <typename... T>
     inline auto hash(const std::variant<T...>& t)
     {
