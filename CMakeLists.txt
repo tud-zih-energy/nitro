@@ -129,6 +129,10 @@ if(NOT ${CMAKE_CXX_COMPILER_ID} STREQUAL "Intel")
     )
 endif()
 
+if(MSVC)
+    target_compile_options(nitro-core INTERFACE /Zc:__cplusplus)
+endif()
+
 add_library(nitro-dl INTERFACE)
 target_link_libraries(nitro-dl
     INTERFACE
