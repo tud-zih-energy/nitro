@@ -29,6 +29,9 @@
 #pragma once
 
 #include <nitro/broken_options/option/base.hpp>
+#include <nitro/broken_options/option/multi_option.hpp>
+#include <nitro/broken_options/option/option.hpp>
+#include <nitro/broken_options/option/toggle.hpp>
 
 #include <functional>
 #include <iostream>
@@ -41,9 +44,13 @@ namespace broken_options
     class group
     {
     public:
-        group(std::set<std::string>& all_arguments, const std::string& name,
+        std::string name;
+        std::string description;
+
+    public:
+        group(std::set<std::string>& all_argument_names, const std::string& name,
               const std::string& description = std::string(""))
-        : name_(name), description_(description), all_arguments_(all_arguments)
+        : name(name), description(description), all_argument_names_(all_argument_names)
         {
         }
 
@@ -52,29 +59,123 @@ namespace broken_options
             options_.emplace(option.name(), std::ref(option));
         }
 
-        void usage(std::ostream& s)
+        group& subgroup(const std::string& name, const std::string& description = std::string(""))
         {
-            s << name_ << ":" << std::endl;
-            if (description_.size())
+            if (std::count(sub_groups_.begin(), sub_groups_.end(), name) == 0)
+                sub_groups_.emplace_back(group(all_argument_names_, name, description));
+
+            return *std::find(sub_groups_.begin(), sub_groups_.end(), name);
+        }
+
+        void usage(std::ostream& s) const
+        {
+            s << name << ":" << std::endl;
+            if (description.size())
             {
-                s << std::endl << description_ << std::endl << std::endl;
+                s << std::endl << description << std::endl << std::endl;
             }
 
             for (auto& iter : options_)
             {
-                iter.second.get().format(s);
+                iter.second.format(s);
+            }
+            for (auto& iter : multi_options_)
+            {
+                iter.second.format(s);
+            }
+            for (auto& iter : toggles_)
+            {
+                iter.second.format(s);
             }
         }
 
-    private:
-        std::string name_;
-        std::string description_;
+        broken_options::option& option(const std::string& name, const std::string& description)
+        {
+            if (all_argument_names_.count(name) > 0)
+            {
+                raise<parser_error>("Trying to redefine argument name. Name: ", name);
+            }
 
-        std::set<std::string>& all_arguments_;
+            options_.emplace(std::piecewise_construct, std::forward_as_tuple(name),
+                             std::forward_as_tuple(name, description));
+            all_argument_names_.emplace(name);
+
+            return options_.at(name);
+        }
+
+        broken_options::multi_option& multi_option(const std::string& name,
+                                                   const std::string& description)
+        {
+            if (all_argument_names_.count(name) > 0)
+            {
+                raise<parser_error>("Trying to redefine argument name. Name: ", name);
+            }
+
+            multi_options_.emplace(std::piecewise_construct, std::forward_as_tuple(name),
+                                   std::forward_as_tuple(name, description));
+            all_argument_names_.emplace(name);
+
+            return multi_options_.at(name);
+        }
+
+        broken_options::toggle& toggle(const std::string& name, const std::string& description)
+        {
+            if (all_argument_names_.count(name) > 0)
+            {
+                raise<parser_error>("Trying to redefine argument name. Name: ", name);
+            }
+
+            toggles_.emplace(std::piecewise_construct, std::forward_as_tuple(name),
+                             std::forward_as_tuple(name, description));
+            all_argument_names_.emplace(name);
+
+            return toggles_.at(name);
+        }
+
+        std::map<std::string, broken_options::option&> get_all_options()
+        {
+            std::map<std::string, broken_options::option&> tmp;
+            tmp.insert(options_.begin(), options_.end());
+            for (auto& sg : sub_groups_)
+            {
+                auto add = sg.get_all_options();
+                tmp.insert(add.begin(), add.end());
+            }
+            return tmp;
+        }
+
+        std::map<std::string, broken_options::multi_option&> get_all_multi_options()
+        {
+            std::map<std::string, broken_options::multi_option&> tmp;
+            tmp.insert(multi_options_.begin(), multi_options_.end());
+            for (auto& sg : sub_groups_)
+            {
+                auto add = sg.get_all_multi_options();
+                tmp.insert(add.begin(), add.end());
+            }
+            return tmp;
+        }
+
+        std::map<std::string, broken_options::toggle&> get_all_toggles()
+        {
+            std::map<std::string, broken_options::toggle&> tmp;
+            tmp.insert(toggles_.begin(), toggles_.end());
+            for (auto& sg : sub_groups_)
+            {
+                auto add = sg.get_all_toggles();
+                tmp.insert(add.begin(), add.end());
+            }
+            return tmp;
+        }
+
+    private:
+        std::set<std::string>& all_argument_names_;
 
         std::map<std::string, broken_options::option> options_;
         std::map<std::string, broken_options::multi_option> multi_options_;
         std::map<std::string, broken_options::toggle> toggles_;
+
+        std::vector<broken_options::group> sub_groups_;
     };
 } // namespace broken_options
 } // namespace nitro

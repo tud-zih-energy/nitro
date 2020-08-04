@@ -38,6 +38,7 @@
 #include <nitro/broken_options/options.hpp>
 
 #include <nitro/except/raise.hpp>
+#include <nitro/lang/unordered.hpp>
 
 #include <iostream>
 #include <map>
@@ -54,13 +55,21 @@ namespace broken_options
     public:
         parser(const std::string& app_name = std::string("main"),
                const std::string& about = std::string(""))
-        : app_name_(app_name), about_(about), arguments_("arguments")
+        : app_name_(app_name), about_(about),
+          groups_({ nitro::broken_options::group(all_argument_names_, "arguments") }),
+          default_group_(groups_[0])
         {
         }
 
         auto parse(int argc, const char* const argv[]) -> options;
 
     public:
+        nitro::broken_options::group& group(const std::string& name,
+                                            const std::string& description = std::string(""));
+        nitro::broken_options::group&
+        default_group(const std::string& name = std::string(""),
+                      const std::string& description = std::string(""));
+
         auto option(const std::string& name, const std::string& description = std::string(""))
             -> broken_options::option&;
         auto multi_option(const std::string& name, const std::string& description = std::string(""))
@@ -76,6 +85,10 @@ namespace broken_options
 
     private:
         void check_consistency();
+
+        std::map<std::string, nitro::broken_options::option&> get_all_options() const;
+        std::map<std::string, nitro::broken_options::multi_option&> get_all_multi_options() const;
+        std::map<std::string, nitro::broken_options::toggle&> get_all_toggles() const;
 
         template <typename Iter>
         bool parse_options(Iter& it, Iter end);
@@ -96,11 +109,10 @@ namespace broken_options
         std::string app_name_;
         std::string about_;
 
-        std::map<std::string, broken_options::option> options_;
-        std::map<std::string, broken_options::multi_option> multi_options_;
-        std::map<std::string, broken_options::toggle> toggles_;
+        std::set<std::string> all_argument_names_;
+        std::vector<nitro::broken_options::group> groups_;
 
-        group arguments_;
+        nitro::broken_options::group& default_group_;
 
         std::size_t allowed_positionals_ = 0;
         std::string positional_name_ = "args";
