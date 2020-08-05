@@ -86,9 +86,9 @@ namespace broken_options
     private:
         void check_consistency();
 
-        std::map<std::string, nitro::broken_options::option&> get_all_options() const;
-        std::map<std::string, nitro::broken_options::multi_option&> get_all_multi_options() const;
-        std::map<std::string, nitro::broken_options::toggle&> get_all_toggles() const;
+        std::map<std::string, nitro::broken_options::option&> get_all_options();
+        std::map<std::string, nitro::broken_options::multi_option&> get_all_multi_options();
+        std::map<std::string, nitro::broken_options::toggle&> get_all_toggles();
 
         template <typename Iter>
         bool parse_options(Iter& it, Iter end);
