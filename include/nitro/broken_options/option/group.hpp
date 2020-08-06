@@ -54,11 +54,6 @@ namespace broken_options
         {
         }
 
-        void add(base& option)
-        {
-            options_.emplace(option.name(), std::ref(option));
-        }
-
         group& subgroup(const std::string& name, const std::string& description = std::string(""))
         {
             if (std::count(sub_groups_.begin(), sub_groups_.end(), name) == 0)
@@ -166,6 +161,16 @@ namespace broken_options
                 tmp.insert(add.begin(), add.end());
             }
             return tmp;
+        }
+
+        bool operator==(const group& rhs)
+        {
+            return name == rhs.name;
+        }
+
+        bool operator==(const std::string& rhs)
+        {
+            return name == rhs;
         }
 
     private:
