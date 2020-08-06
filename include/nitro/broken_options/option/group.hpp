@@ -130,7 +130,11 @@ namespace broken_options
         std::map<std::string, broken_options::option&> get_all_options()
         {
             std::map<std::string, broken_options::option&> tmp;
-            tmp.insert(options_.begin(), options_.end());
+            for (auto& it : options_)
+            {
+                tmp.emplace(it.first, it.second);
+            }
+
             for (auto& sg : sub_groups_)
             {
                 auto add = sg.get_all_options();
@@ -142,7 +146,11 @@ namespace broken_options
         std::map<std::string, broken_options::multi_option&> get_all_multi_options()
         {
             std::map<std::string, broken_options::multi_option&> tmp;
-            tmp.insert(multi_options_.begin(), multi_options_.end());
+            for (auto& it : multi_options_)
+            {
+                tmp.emplace(it.first, it.second);
+            }
+
             for (auto& sg : sub_groups_)
             {
                 auto add = sg.get_all_multi_options();
@@ -154,7 +162,11 @@ namespace broken_options
         std::map<std::string, broken_options::toggle&> get_all_toggles()
         {
             std::map<std::string, broken_options::toggle&> tmp;
-            tmp.insert(toggles_.begin(), toggles_.end());
+            for (auto& it : toggles_)
+            {
+                tmp.emplace(it.first, it.second);
+            }
+
             for (auto& sg : sub_groups_)
             {
                 auto add = sg.get_all_toggles();
