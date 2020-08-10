@@ -82,9 +82,15 @@ namespace broken_options
             {
                 iter.second.format(s);
             }
+
+            for (auto& iter : sub_groups_)
+            {
+                iter.usage(s);
+            }
         }
 
-        broken_options::option& option(const std::string& name, const std::string& description)
+        broken_options::option& option(const std::string& name,
+                                       const std::string& description = std::string(""))
         {
             if (all_argument_names_.count(name) > 0)
             {
@@ -99,7 +105,7 @@ namespace broken_options
         }
 
         broken_options::multi_option& multi_option(const std::string& name,
-                                                   const std::string& description)
+                                                   const std::string& description = std::string(""))
         {
             if (all_argument_names_.count(name) > 0)
             {
@@ -113,7 +119,8 @@ namespace broken_options
             return multi_options_.at(name);
         }
 
-        broken_options::toggle& toggle(const std::string& name, const std::string& description)
+        broken_options::toggle& toggle(const std::string& name,
+                                       const std::string& description = std::string(""))
         {
             if (all_argument_names_.count(name) > 0)
             {
@@ -175,12 +182,12 @@ namespace broken_options
             return tmp;
         }
 
-        bool operator==(const group& rhs)
+        bool operator==(const group& rhs) const
         {
             return name == rhs.name;
         }
 
-        bool operator==(const std::string& rhs)
+        bool operator==(const std::string& rhs) const
         {
             return name == rhs;
         }
