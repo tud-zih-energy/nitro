@@ -94,7 +94,16 @@ namespace broken_options
         {
             if (all_argument_names_.count(name) > 0)
             {
-                raise<parser_error>("Trying to redefine argument name. Name: ", name);
+                auto search = options_.find(name);
+                if (search == options_.end())
+                {
+                    raise<parser_error>(
+                        "Trying to redefine argument name in a different group. Name: ", name);
+                }
+                else
+                {
+                    return search->second;
+                }
             }
 
             options_.emplace(std::piecewise_construct, std::forward_as_tuple(name),
@@ -109,7 +118,16 @@ namespace broken_options
         {
             if (all_argument_names_.count(name) > 0)
             {
-                raise<parser_error>("Trying to redefine argument name. Name: ", name);
+                auto search = multi_options_.find(name);
+                if (search == multi_options_.end())
+                {
+                    raise<parser_error>(
+                        "Trying to redefine argument name in a different group. Name: ", name);
+                }
+                else
+                {
+                    return search->second;
+                }
             }
 
             multi_options_.emplace(std::piecewise_construct, std::forward_as_tuple(name),
@@ -124,7 +142,16 @@ namespace broken_options
         {
             if (all_argument_names_.count(name) > 0)
             {
-                raise<parser_error>("Trying to redefine argument name. Name: ", name);
+                auto search = toggles_.find(name);
+                if (search == toggles_.end())
+                {
+                    raise<parser_error>(
+                        "Trying to redefine argument name in a different group. Name: ", name);
+                }
+                else
+                {
+                    return search->second;
+                }
             }
 
             toggles_.emplace(std::piecewise_construct, std::forward_as_tuple(name),
