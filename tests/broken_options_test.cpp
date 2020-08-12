@@ -990,7 +990,7 @@ TEST_CASE("toggle with prefix ")
         REQUIRE(!options.given("arg"));
     }
 
-    SECTION("test default_value8) function with positiv value")
+    SECTION("test default_value() function with positiv value")
     {
         int argc = 1;
         const char* argv[] = { "" };
@@ -1004,7 +1004,7 @@ TEST_CASE("toggle with prefix ")
         REQUIRE(options.given("arg"));
     }
 
-    SECTION("test default_value8) function with negativ value")
+    SECTION("test default_value()) function with negativ value")
     {
         int argc = 1;
         const char* argv[] = { "" };
