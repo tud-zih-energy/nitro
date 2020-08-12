@@ -66,9 +66,32 @@ namespace broken_options
             return given_;
         }
 
+
+
     public:
         virtual void format_value(std::ostream&) const override
         {
+        }
+
+        static bool parse_env_value(const std::string& env_value)
+        {
+            if (env_value == "TRUE" || env_value == "ON" || env_value == "YES" ||
+                env_value == "true" || env_value == "on" || env_value == "yes" ||
+                env_value == "1" || env_value == "Y" || env_value == "with" ||
+                env_value == "True" || env_value == "On" || env_value == "WITH" ||
+                env_value == "With" || env_value == "y" || env_value == "Yes")
+            {
+                return true;
+            }
+            if (env_value == "false" || env_value == "FALSE" ||env_value == "without" ||
+                env_value == "0" || env_value == "NO" || env_value == "no" ||
+                env_value == "Without" || env_value == "n" || env_value == "off" ||
+                env_value == "OFF" || env_value == "N" || env_value == "False" ||
+                env_value == "Off" || env_value == "WITHOUT" || env_value == "No")
+            {
+                return false;
+            }
+            raise<parsing_error>("Can't parse env variable");
         }
 
     private:
@@ -99,6 +122,8 @@ namespace broken_options
         {
         }
 
+        
+
         virtual void check() override
         {
             if (has_env() && !given())
@@ -110,18 +135,13 @@ namespace broken_options
                     // Python code would look like this:
                     // if bool(env_value):
                     // FeelsBadMan
-                    if (env_value == "TRUE" || env_value == "ON" || env_value == "YES" ||
-                        env_value == "true" || env_value == "on" || env_value == "yes" ||
-                        env_value == "1" || env_value == "Y" || env_value == "with")
+                    if (parse_env_value(env_value))
                     {
                         update_value({ "--" + name() });
                     }
-                    if (env_value == "false" || env_value == "FALSE" ||env_value == "without" ||
-                        env_value == "0" || env_value == "NO" || env_value == "no" ||
-                        env_value == "without" || env_value == "n" || env_value == "off" ||
-                        env_value == "OFF")
+                    else
                     {
-                        update_value({ "--" + name()});
+                        update_value({ "--no-" + name()});
                     }
                     return;
                 }
@@ -147,9 +167,16 @@ namespace broken_options
             }
             else if (arg.is_named())
             {
-                return arg.as_named() == name();
+                if (arg.has_prefix())
+                {
+                    return arg.name_without_prefix() == name();
+                }
+                else
+                {
+                    return arg.as_named() == name();
+                }
             }
-            
+
             return false;
         }
         
