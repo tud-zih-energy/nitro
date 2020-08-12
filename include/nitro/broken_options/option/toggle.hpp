@@ -66,7 +66,17 @@ namespace broken_options
             return given_;
         }
 
-
+        int default_value(const bool& def)
+        {
+            if(def)
+            {
+                return given_ = 1;
+            }
+            else
+            {
+                return given_ = 0;
+            }
+        }
 
     public:
         virtual void format_value(std::ostream&) const override
@@ -121,8 +131,6 @@ namespace broken_options
         virtual void prepare() override
         {
         }
-
-        
 
         virtual void check() override
         {

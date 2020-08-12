@@ -990,18 +990,32 @@ TEST_CASE("toggle with prefix ")
         REQUIRE(!options.given("arg"));
     }
 
-    SECTION("test check() function")
+    SECTION("test default_value8) function with positiv value")
     {
         int argc = 1;
         const char* argv[] = { "" };
 
         nitro::broken_options::parser parser;
 
-        parser.toggle("arg").default(true);
+        parser.toggle("arg").default_value(true);
 
         auto options = parser.parse(argc, argv);
 
         REQUIRE(options.given("arg"));
+    }
+
+    SECTION("test default_value8) function with negativ value")
+    {
+        int argc = 1;
+        const char* argv[] = { "" };
+
+        nitro::broken_options::parser parser;
+
+        parser.toggle("arg").default_value(false);
+
+        auto options = parser.parse(argc, argv);
+
+        REQUIRE(!options.given("arg"));
     }
 
     SECTION("test negativ env_var")
