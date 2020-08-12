@@ -113,6 +113,10 @@ namespace broken_options
 
         std::string name_without_prefix() const
         {
+            if (!has_prefix())
+            {
+                raise<parser_error>("Trying to get the name without prefix but prefix is not given.");
+            }
             std::string tmp = name();
             return tmp.erase(0,5);
         }
