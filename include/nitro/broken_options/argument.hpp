@@ -117,8 +117,7 @@ namespace broken_options
             {
                 raise<parser_error>("Trying to get the name without prefix but prefix is not given.");
             }
-            std::string tmp = name();
-            return tmp.erase(0,5);
+            return name().substr(5);
         }
 
         const std::string& name() const
