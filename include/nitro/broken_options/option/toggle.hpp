@@ -160,24 +160,7 @@ namespace broken_options
 
         bool matches(const argument& arg) override
         {
-            if (!arg.is_argument())
-            {
-                return false;
-            }
-
-            if (has_short_name() && arg.is_short())
-            {
-                auto list = arg.as_short_list();
-
-                if (list.size() > 1 && arg.has_value())
-                {
-                    return false;
-                }
-
-                return list.count(short_name());
-            }
-
-            else if (arg.is_named())
+            if (arg.is_named())
             {
                 if (arg.has_prefix())
                 {
@@ -189,7 +172,7 @@ namespace broken_options
                 }
             }
 
-            return false;
+            return base::matches(arg);
         }
 
         friend class parser;
