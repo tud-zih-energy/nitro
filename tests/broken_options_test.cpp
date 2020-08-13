@@ -976,7 +976,7 @@ TEST_CASE("parsing toggles with prefix and default value")
         REQUIRE_THROWS_AS(arg.name_without_prefix(), nitro::broken_options::parser_error);
     }
 
-    SECTION("test check() function")
+    SECTION("parsing an argument with prefix and testing check() function")
     {
         int argc = 2;
         const char* argv[] = { "", "--no-arg" };
