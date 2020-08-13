@@ -960,9 +960,9 @@ TEST_CASE("Reading the value from the ENV variables", "[broken_options]")
     }
 }
 
-TEST_CASE("toggle with prefix ")
+TEST_CASE("parsing toggles with prefix and default value")
 {
-    SECTION("--no- test")
+    SECTION("test argument with --no- is parsed right")
     {
         nitro::broken_options::argument arg("--no-arg");
         REQUIRE(arg.has_prefix());
