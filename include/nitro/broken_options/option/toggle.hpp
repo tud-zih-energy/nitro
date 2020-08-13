@@ -66,7 +66,7 @@ namespace broken_options
             return given_;
         }
 
-        int default_value(const bool& def)
+        int default_value(bool def)
         {
             if(def)
             {
@@ -125,7 +125,6 @@ namespace broken_options
             {
                 ++given_;
             }
-            //++given_;
         }
 
         virtual void prepare() override
