@@ -961,7 +961,7 @@ TEST_CASE("Reading the value from the ENV variables", "[broken_options]")
 }
 TEST_CASE("Usage metavar work")
 {
-    SECTION("arg_name for options work")
+    SECTION("metavar for options work")
     {
         nitro::broken_options::parser parser("app_name", "about");
 

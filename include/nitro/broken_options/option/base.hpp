@@ -204,7 +204,7 @@ namespace broken_options
         {
             if (arg_name.empty())
             {
-                raise<parser_error>("Trying to assign empty string to argument name");
+                raise<parser_error>("Trying to assign empty string to metavar");
             }
 
             arg_name_ = arg_name;
