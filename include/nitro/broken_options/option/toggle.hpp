@@ -121,6 +121,7 @@ namespace broken_options
             {
                 given_ = 0;
             }
+
             else
             {
                 ++given_;
@@ -146,14 +147,17 @@ namespace broken_options
                     {
                         update_value({ "--" + name() });
                     }
+
                     else
                     {
                         update_value({ "--no-" + name()});
                     }
+
                     return;
                 }
             }
         }
+
         bool matches(const argument& arg) override
         {
             if (!arg.is_argument())
@@ -172,6 +176,7 @@ namespace broken_options
 
                 return list.count(short_name());
             }
+
             else if (arg.is_named())
             {
                 if (arg.has_prefix())
@@ -186,7 +191,7 @@ namespace broken_options
 
             return false;
         }
-        
+
         friend class parser;
 
     private:
