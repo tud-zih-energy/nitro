@@ -317,7 +317,7 @@ namespace broken_options
 
         for (auto& option : toggles_)
         {
-            if (option.second.matches(it->name()))
+            if (option.second.matches(*it))
             {
                 option.second.update_value(*it);
                 match_found = true;

@@ -148,11 +148,6 @@ namespace broken_options
             return s << std::endl;
         }
 
-    private:
-        virtual void update_value(const argument& data) = 0;
-        virtual void prepare() = 0;
-        virtual void check() = 0;
-
         virtual bool matches(const argument& arg)
         {
             if (!arg.is_argument())
@@ -178,6 +173,11 @@ namespace broken_options
 
             return false;
         }
+
+    private:
+        virtual void update_value(const argument& data) = 0;
+        virtual void prepare() = 0;
+        virtual void check() = 0;
 
         friend class parser;
 
