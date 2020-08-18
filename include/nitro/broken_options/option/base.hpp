@@ -197,8 +197,8 @@ namespace broken_options
     public:
         using base::base;
         using base::env;
-        using base::short_name;
         using base::metavar;
+        using base::short_name;
 
         Option& metavar(const std::string& arg_name)
         {

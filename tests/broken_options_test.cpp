@@ -967,14 +967,12 @@ TEST_CASE("Usage metavar work")
 
         std::stringstream s;
 
-
         parser.option("opt_nosd", "some opt without short and default").metavar("test");
 
         parser.usage(s);
 
-        REQUIRE(
-            s.str() ==
-            R"EXPECTED(usage: app_name --opt_nosd
+        REQUIRE(s.str() ==
+                R"EXPECTED(usage: app_name --opt_nosd
 
 about
 
@@ -989,14 +987,12 @@ arguments:
 
         std::stringstream s;
 
-
         parser.multi_option("mopt", "some multi opt").metavar("test");
 
         parser.usage(s);
 
-        REQUIRE(
-            s.str() ==
-            R"EXPECTED(usage: app_name --mopt
+        REQUIRE(s.str() ==
+                R"EXPECTED(usage: app_name --mopt
 
 about
 
@@ -1004,5 +1000,4 @@ arguments:
   --mopt test                             some multi opt
 )EXPECTED");
     }
-
 }
