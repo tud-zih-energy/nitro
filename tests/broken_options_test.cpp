@@ -982,4 +982,27 @@ arguments:
   --opt_nosd test                         some opt without short and default
 )EXPECTED");
     }
+
+    SECTION("metavar for multi options work")
+    {
+        nitro::broken_options::parser parser("app_name", "about");
+
+        std::stringstream s;
+
+
+        parser.multi_option("mopt", "some multi opt").metavar("test");
+
+        parser.usage(s);
+
+        REQUIRE(
+            s.str() ==
+            R"EXPECTED(usage: app_name --mopt
+
+about
+
+arguments:
+    --mopt test                           some multi opt
+)EXPECTED");
+    }
+
 }
