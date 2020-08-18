@@ -1001,7 +1001,7 @@ arguments:
 about
 
 arguments:
-    --mopt test                           some multi opt
+  --mopt test                             some multi opt
 )EXPECTED");
     }
 
