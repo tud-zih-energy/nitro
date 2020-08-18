@@ -68,7 +68,7 @@ namespace broken_options
 
         int default_value(bool def)
         {
-            if(def)
+            if (def)
             {
                 return given_ = 1;
             }
@@ -93,7 +93,7 @@ namespace broken_options
             {
                 return true;
             }
-            if (env_value == "false" || env_value == "FALSE" ||env_value == "without" ||
+            if (env_value == "false" || env_value == "FALSE" || env_value == "without" ||
                 env_value == "0" || env_value == "NO" || env_value == "no" ||
                 env_value == "Without" || env_value == "n" || env_value == "off" ||
                 env_value == "OFF" || env_value == "N" || env_value == "False" ||
@@ -150,7 +150,7 @@ namespace broken_options
 
                     else
                     {
-                        update_value({ "--no-" + name()});
+                        update_value({ "--no-" + name() });
                     }
 
                     return;

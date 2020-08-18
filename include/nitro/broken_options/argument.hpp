@@ -70,7 +70,7 @@ namespace broken_options
         }
 
     public:
-        bool is_value() const noexcept 
+        bool is_value() const noexcept
         {
             return name_[0] != '-';
         }
@@ -85,7 +85,7 @@ namespace broken_options
             return name_.size() > 1 && name_[0] == '-' && name_[1] != '-';
         }
 
-        bool is_named() const  noexcept
+        bool is_named() const noexcept
         {
             return name_.size() > 2 && name_[0] == '-' && name_[1] == '-' && name_[2] != '-';
         }
@@ -102,7 +102,7 @@ namespace broken_options
 
         bool has_prefix() const
         {
-            return nitro::lang::starts_with(name_,"--no-");
+            return nitro::lang::starts_with(name_, "--no-");
         }
 
     public:
@@ -115,7 +115,8 @@ namespace broken_options
         {
             if (!has_prefix())
             {
-                raise<parser_error>("Trying to get the name without prefix but prefix is not given.");
+                raise<parser_error>(
+                    "Trying to get the name without prefix but prefix is not given.");
             }
             return name().substr(5);
         }

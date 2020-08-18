@@ -966,7 +966,7 @@ TEST_CASE("parsing toggles with prefix and default value")
     {
         nitro::broken_options::argument arg("--no-arg");
         REQUIRE(arg.has_prefix());
-        REQUIRE(arg.name_without_prefix()== "arg") ;
+        REQUIRE(arg.name_without_prefix() == "arg");
     }
 
     SECTION("argument without prefix work")
@@ -1077,7 +1077,8 @@ TEST_CASE("parsing toggles with prefix and default value")
         using namespace nitro::broken_options;
 
         REQUIRE_THROWS_AS(toggle::parse_env_value("fddgh"), nitro::broken_options::parsing_error);
-        REQUIRE_THROWS_AS(toggle::parse_env_value("fdd-gdegh"), nitro::broken_options::parsing_error);
+        REQUIRE_THROWS_AS(toggle::parse_env_value("fdd-gdegh"),
+                          nitro::broken_options::parsing_error);
     }
 
     SECTION("arguments with prefix get properly parsed")
@@ -1094,4 +1095,3 @@ TEST_CASE("parsing toggles with prefix and default value")
         REQUIRE(named_arg.data() == "--no-ab=5");
     }
 }
-
