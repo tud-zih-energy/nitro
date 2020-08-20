@@ -960,6 +960,49 @@ TEST_CASE("Reading the value from the ENV variables", "[broken_options]")
     }
 }
 
+TEST_CASE("Usage metavar work")
+{
+    SECTION("metavar for options work")
+    {
+        nitro::broken_options::parser parser("app_name", "about");
+
+        std::stringstream s;
+
+        parser.option("opt_nosd", "some opt without short and default").metavar("test");
+
+        parser.usage(s);
+
+        REQUIRE(s.str() ==
+                R"EXPECTED(usage: app_name --opt_nosd
+
+about
+
+arguments:
+  --opt_nosd test                         some opt without short and default
+)EXPECTED");
+    }
+
+    SECTION("metavar for multi options work")
+    {
+        nitro::broken_options::parser parser("app_name", "about");
+
+        std::stringstream s;
+
+        parser.multi_option("mopt", "some multi opt").metavar("test");
+
+        parser.usage(s);
+
+        REQUIRE(s.str() ==
+                R"EXPECTED(usage: app_name --mopt
+
+about
+
+arguments:
+  --mopt test                             some multi opt
+)EXPECTED");
+    }
+}
+
 TEST_CASE("parsing toggles with prefix and default value")
 {
     SECTION("test argument with --no- is parsed right")

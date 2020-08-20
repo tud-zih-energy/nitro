@@ -30,3 +30,5 @@
 
 build
 .clang_complete
+cmake_build_debug
+Testing
