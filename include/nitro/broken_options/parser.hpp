@@ -56,7 +56,7 @@ namespace broken_options
         parser(const std::string& app_name = std::string("main"),
                const std::string& about = std::string(""))
         : app_name_(app_name), about_(about),
-          groups_({ nitro::broken_options::group(all_argument_names_, "arguments") }),
+          groups_({ nitro::broken_options::group(all_argument_names_, 0, "arguments") }),
           default_group_(groups_[0])
         {
         }
@@ -86,9 +86,9 @@ namespace broken_options
     private:
         void check_consistency();
 
-        std::map<std::string, nitro::broken_options::option&> get_all_options();
-        std::map<std::string, nitro::broken_options::multi_option&> get_all_multi_options();
-        std::map<std::string, nitro::broken_options::toggle&> get_all_toggles();
+        std::map<std::string, nitro::broken_options::option> get_all_options();
+        std::map<std::string, nitro::broken_options::multi_option> get_all_multi_options();
+        std::map<std::string, nitro::broken_options::toggle> get_all_toggles();
 
         template <typename Iter>
         bool parse_options(Iter& it, Iter end);

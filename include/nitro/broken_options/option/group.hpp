@@ -48,39 +48,46 @@ namespace broken_options
         std::string description;
 
     public:
-        group(std::set<std::string>& all_argument_names, const std::string& name,
-              const std::string& description = std::string(""))
-        : name(name), description(description), all_argument_names_(all_argument_names)
+        group(std::set<std::string>& all_argument_names, const int& position,
+              const std::string& name, const std::string& description = std::string(""))
+        : name(name), description(description), all_argument_names_(all_argument_names),
+          position_(position)
         {
         }
 
         group& subgroup(const std::string& name, const std::string& description = std::string(""))
         {
             if (std::count(sub_groups_.begin(), sub_groups_.end(), name) == 0)
-                sub_groups_.emplace_back(group(all_argument_names_, name, description));
+                sub_groups_.emplace_back(
+                    group(all_argument_names_, position_ + 1, name, description));
 
             return *std::find(sub_groups_.begin(), sub_groups_.end(), name);
         }
 
         void usage(std::ostream& s) const
         {
+            s << std::endl;
+            for (int i = 0; i < position_; ++i)
+                s << "  ";
+
             s << name << ":" << std::endl;
-            if (description.size())
+
+            if (!description.empty())
             {
                 s << std::endl << description << std::endl << std::endl;
             }
 
             for (auto& iter : options_)
             {
-                iter.second.format(s);
+                iter.second.format(s, position_);
             }
             for (auto& iter : multi_options_)
             {
-                iter.second.format(s);
+                iter.second.format(s, position_);
             }
             for (auto& iter : toggles_)
             {
-                iter.second.format(s);
+                iter.second.format(s, position_);
             }
 
             for (auto& iter : sub_groups_)
@@ -161,9 +168,9 @@ namespace broken_options
             return toggles_.at(name);
         }
 
-        std::map<std::string, broken_options::option&> get_all_options()
+        std::map<std::string, broken_options::option> get_all_options()
         {
-            std::map<std::string, broken_options::option&> tmp;
+            std::map<std::string, broken_options::option> tmp;
             for (auto& it : options_)
             {
                 tmp.emplace(it.first, it.second);
@@ -177,9 +184,9 @@ namespace broken_options
             return tmp;
         }
 
-        std::map<std::string, broken_options::multi_option&> get_all_multi_options()
+        std::map<std::string, broken_options::multi_option> get_all_multi_options()
         {
-            std::map<std::string, broken_options::multi_option&> tmp;
+            std::map<std::string, broken_options::multi_option> tmp;
             for (auto& it : multi_options_)
             {
                 tmp.emplace(it.first, it.second);
@@ -193,9 +200,9 @@ namespace broken_options
             return tmp;
         }
 
-        std::map<std::string, broken_options::toggle&> get_all_toggles()
+        std::map<std::string, broken_options::toggle> get_all_toggles()
         {
-            std::map<std::string, broken_options::toggle&> tmp;
+            std::map<std::string, broken_options::toggle> tmp;
             for (auto& it : toggles_)
             {
                 tmp.emplace(it.first, it.second);
@@ -227,6 +234,7 @@ namespace broken_options
         std::map<std::string, broken_options::toggle> toggles_;
 
         std::vector<broken_options::group> sub_groups_;
+        int position_;
     };
 } // namespace broken_options
 } // namespace nitro

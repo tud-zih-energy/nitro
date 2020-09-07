@@ -39,9 +39,9 @@ namespace nitro
 {
 namespace broken_options
 {
-    std::map<std::string, broken_options::option&> parser::get_all_options()
+    std::map<std::string, broken_options::option> parser::get_all_options()
     {
-        std::map<std::string, broken_options::option&> tmp;
+        std::map<std::string, broken_options::option> tmp;
         for (auto& sg : groups_)
         {
             auto add = sg.get_all_options();
@@ -50,9 +50,9 @@ namespace broken_options
         return tmp;
     }
 
-    std::map<std::string, broken_options::multi_option&> parser::get_all_multi_options()
+    std::map<std::string, broken_options::multi_option> parser::get_all_multi_options()
     {
-        std::map<std::string, broken_options::multi_option&> tmp;
+        std::map<std::string, broken_options::multi_option> tmp;
         for (auto& sg : groups_)
         {
             auto add = sg.get_all_multi_options();
@@ -61,9 +61,9 @@ namespace broken_options
         return tmp;
     }
 
-    std::map<std::string, broken_options::toggle&> parser::get_all_toggles()
+    std::map<std::string, broken_options::toggle> parser::get_all_toggles()
     {
-        std::map<std::string, broken_options::toggle&> tmp;
+        std::map<std::string, broken_options::toggle> tmp;
         for (auto& sg : groups_)
         {
             auto add = sg.get_all_toggles();
@@ -78,12 +78,14 @@ namespace broken_options
         for (nitro::broken_options::group& grp : groups_)
         {
             if (grp.name == name)
+            {
                 if (!description.empty())
                     grp.description = description;
-            return grp;
+                return grp;
+            }
         }
 
-        groups_.emplace_back(group(name, description));
+        groups_.emplace_back(broken_options::group(all_argument_names_, 0, name, description));
         return groups_.back();
     }
     nitro::broken_options::group& parser::default_group(const std::string& name,
@@ -134,6 +136,10 @@ namespace broken_options
 
         argument_parser args(argc, argv);
 
+        auto all_options = get_all_options();
+        auto all_multi_options = get_all_multi_options();
+        auto all_toggles = get_all_toggles();
+
         for (auto it = args.begin(); it != args.end(); ++it)
         {
             if (only_positionals || it->is_value())
@@ -176,7 +182,7 @@ namespace broken_options
 
         validate();
 
-        return options(get_all_options(), get_all_multi_options(), get_all_toggles(), positionals);
+        return options(all_options, all_multi_options, all_toggles, positionals);
     }
 
     std::ostream& parser::usage(std::ostream& s, bool print_default_group)
@@ -248,7 +254,7 @@ namespace broken_options
     template <typename Iter>
     bool parser::parse_options(Iter& it, Iter end)
     {
-        for (const auto& option : get_all_options())
+        for (auto& option : get_all_options())
         {
 
             if (it->has_value())
@@ -286,7 +292,7 @@ namespace broken_options
     template <typename Iter>
     bool parser::parse_multi_options(Iter& it, Iter end)
     {
-        for (const auto& option : get_all_multi_options())
+        for (auto& option : get_all_multi_options())
         {
             if (it->has_value())
             {
@@ -326,7 +332,7 @@ namespace broken_options
 
         bool match_found = false;
 
-        for (const auto& option : get_all_toggles())
+        for (auto& option : get_all_toggles())
         {
             if (option.second.matches(it->name()))
             {
@@ -370,17 +376,17 @@ namespace broken_options
     template <typename F>
     void parser::for_each_option(F f)
     {
-        for (const auto& option : get_all_options())
+        for (auto& option : get_all_options())
         {
             f(option.second);
         }
 
-        for (const auto& option : get_all_multi_options())
+        for (auto& option : get_all_multi_options())
         {
             f(option.second);
         }
 
-        for (const auto& option : get_all_toggles())
+        for (auto& option : get_all_toggles())
         {
             f(option.second);
         }

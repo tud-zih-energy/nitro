@@ -79,9 +79,11 @@ namespace broken_options
 
         virtual void format_value(std::ostream& s) const = 0;
 
-        std::ostream& format(std::ostream& s) const
+        std::ostream& format(std::ostream& s, int left_padding = 2) const
         {
-            s << "  " << std::left << std::setw(38);
+            for (int i = 0; i < left_padding; ++i)
+                s << " ";
+            s << std::left << std::setw(38);
 
             std::stringstream str;
 
@@ -148,7 +150,7 @@ namespace broken_options
         virtual void prepare() = 0;
         virtual void check() = 0;
 
-        virtual bool matches(const argument& arg)
+        virtual bool matches(const argument& arg) const
         {
             if (!arg.is_argument())
             {
