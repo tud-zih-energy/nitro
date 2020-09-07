@@ -221,8 +221,8 @@ group2:
         parser.accept_positionals(3);
         parser.positional_name("command line");
 
-        auto grp1 = parser.group("group1", "some text");
-        auto grp2 = parser.group("group2");
+        auto& grp1 = parser.group("group1", "some text");
+        auto& grp2 = parser.group("group2");
 
         grp1.toggle("tog", "some toggle").short_name("t");
         grp1.toggle("togg", "some other toggle").short_name("u");
