@@ -92,7 +92,7 @@ namespace broken_options
         broken_options::option& option(const std::string& name,
                                        const std::string& description = std::string(""))
         {
-            if (all_argument_names_.count(name) > 0)
+            if (all_argument_names_.find(name) != all_argument_names_.end())
             {
                 auto search = options_.find(name);
                 if (search == options_.end())
@@ -116,7 +116,7 @@ namespace broken_options
         broken_options::multi_option& multi_option(const std::string& name,
                                                    const std::string& description = std::string(""))
         {
-            if (all_argument_names_.count(name) > 0)
+            if (all_argument_names_.find(name) != all_argument_names_.end())
             {
                 auto search = multi_options_.find(name);
                 if (search == multi_options_.end())
@@ -130,9 +130,9 @@ namespace broken_options
                 }
             }
 
+            all_argument_names_.emplace(name);
             multi_options_.emplace(std::piecewise_construct, std::forward_as_tuple(name),
                                    std::forward_as_tuple(name, description));
-            all_argument_names_.emplace(name);
 
             return multi_options_.at(name);
         }
@@ -140,7 +140,7 @@ namespace broken_options
         broken_options::toggle& toggle(const std::string& name,
                                        const std::string& description = std::string(""))
         {
-            if (all_argument_names_.count(name) > 0)
+            if (all_argument_names_.find(name) != all_argument_names_.end())
             {
                 auto search = toggles_.find(name);
                 if (search == toggles_.end())

@@ -78,7 +78,7 @@ namespace broken_options
         for (nitro::broken_options::group& grp : groups_)
         {
             if (grp.name == name)
-                if (description.length())
+                if (!description.empty())
                     grp.description = description;
             return grp;
         }
@@ -89,9 +89,9 @@ namespace broken_options
     nitro::broken_options::group& parser::default_group(const std::string& name,
                                                         const std::string& description)
     {
-        if (name.length())
+        if (!name.empty())
             default_group_.name = name;
-        if (description.length())
+        if (!description.empty())
             default_group_.description = description;
 
         return default_group_;
