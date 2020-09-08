@@ -136,9 +136,9 @@ namespace broken_options
 
         argument_parser args(argc, argv);
 
-        auto all_options = get_all_options();
-        auto all_multi_options = get_all_multi_options();
-        auto all_toggles = get_all_toggles();
+        options_ = std::move(get_all_options());
+        multi_options_ = std::move(get_all_multi_options());
+        toggles_ = std::move(get_all_toggles());
 
         for (auto it = args.begin(); it != args.end(); ++it)
         {
@@ -161,9 +161,8 @@ namespace broken_options
                 continue;
             }
 
-            if (parse_options(it, args.end(), all_options) ||
-                parse_multi_options(it, args.end(), all_multi_options) ||
-                parse_toggles(it, args.end(), all_toggles))
+            if (parse_options(it, args.end()) || parse_multi_options(it, args.end()) ||
+                parse_toggles(it, args.end()))
             {
                 continue;
             }
@@ -179,7 +178,7 @@ namespace broken_options
 
         validate();
 
-        return options(all_options, all_multi_options, all_toggles, positionals);
+        return options(options_, multi_options_, toggles_, positionals);
     }
 
     std::ostream& parser::usage(std::ostream& s, bool print_default_group)
@@ -249,10 +248,9 @@ namespace broken_options
     }
 
     template <typename Iter>
-    bool parser::parse_options(Iter& it, Iter end,
-                               std::map<std::string, nitro::broken_options::option>& all_options)
+    bool parser::parse_options(Iter& it, Iter end)
     {
-        for (auto& option : all_options)
+        for (auto& option : options_)
         {
 
             if (it->has_value())
@@ -288,11 +286,9 @@ namespace broken_options
     }
 
     template <typename Iter>
-    bool parser::parse_multi_options(
-        Iter& it, Iter end,
-        std::map<std::string, nitro::broken_options::multi_option>& all_multi_options)
+    bool parser::parse_multi_options(Iter& it, Iter end)
     {
-        for (auto& option : all_multi_options)
+        for (auto& option : multi_options_)
         {
             if (it->has_value())
             {
@@ -326,14 +322,13 @@ namespace broken_options
     }
 
     template <typename Iter>
-    bool parser::parse_toggles(Iter& it, Iter end,
-                               std::map<std::string, nitro::broken_options::toggle>& all_toggles)
+    bool parser::parse_toggles(Iter& it, Iter end)
     {
         (void)end;
 
         bool match_found = false;
 
-        for (auto& option : all_toggles)
+        for (auto& option : toggles_)
         {
             if (option.second.matches(it->name()))
             {
@@ -377,21 +372,20 @@ namespace broken_options
     template <typename F>
     void parser::for_each_option(F f)
     {
-        for (auto& option : get_all_options())
+        for (auto& option : options_)
         {
             f(option.second);
         }
 
-        for (auto& option : get_all_multi_options())
+        for (auto& option : multi_options_)
         {
             f(option.second);
         }
 
-        for (auto& option : get_all_toggles())
+        for (auto& option : toggles_)
         {
             f(option.second);
         }
     }
-
 } // namespace broken_options
 } // namespace nitro

@@ -79,15 +79,15 @@ namespace broken_options
 
             for (auto& iter : options_)
             {
-                iter.second.format(s, position_);
+                iter.second.format(s, position_ * 2 + 2);
             }
             for (auto& iter : multi_options_)
             {
-                iter.second.format(s, position_);
+                iter.second.format(s, position_ * 2 + 2);
             }
             for (auto& iter : toggles_)
             {
-                iter.second.format(s, position_);
+                iter.second.format(s, position_ * 2 + 2);
             }
 
             for (auto& iter : sub_groups_)

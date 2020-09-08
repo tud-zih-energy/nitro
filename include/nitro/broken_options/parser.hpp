@@ -91,17 +91,13 @@ namespace broken_options
         std::map<std::string, nitro::broken_options::toggle> get_all_toggles();
 
         template <typename Iter>
-        bool parse_options(Iter& it, Iter end,
-                           std::map<std::string, nitro::broken_options::option>& all_options);
+        bool parse_options(Iter& it, Iter end);
 
         template <typename Iter>
-        bool parse_multi_options(
-            Iter& it, Iter end,
-            std::map<std::string, nitro::broken_options::multi_option>& all_multi_options);
+        bool parse_multi_options(Iter& it, Iter end);
 
         template <typename Iter>
-        bool parse_toggles(Iter& it, Iter end,
-                           std::map<std::string, nitro::broken_options::toggle>& all_toggles);
+        bool parse_toggles(Iter& it, Iter end);
 
         void prepare();
         void validate();
@@ -115,6 +111,10 @@ namespace broken_options
 
         std::set<std::string> all_argument_names_;
         std::vector<nitro::broken_options::group> groups_;
+
+        std::map<std::string, broken_options::option> options_;
+        std::map<std::string, broken_options::multi_option> multi_options_;
+        std::map<std::string, broken_options::toggle> toggles_;
 
         nitro::broken_options::group& default_group_;
 
