@@ -39,9 +39,9 @@ namespace nitro
 {
 namespace broken_options
 {
-    std::map<std::string, broken_options::option> parser::get_all_options()
+    std::map<std::string, broken_options::option&> parser::get_all_options()
     {
-        std::map<std::string, broken_options::option> tmp;
+        std::map<std::string, broken_options::option&> tmp;
         for (auto& sg : groups_)
         {
             auto add = sg.get_all_options();
@@ -50,9 +50,9 @@ namespace broken_options
         return tmp;
     }
 
-    std::map<std::string, broken_options::multi_option> parser::get_all_multi_options()
+    std::map<std::string, broken_options::multi_option&> parser::get_all_multi_options()
     {
-        std::map<std::string, broken_options::multi_option> tmp;
+        std::map<std::string, broken_options::multi_option&> tmp;
         for (auto& sg : groups_)
         {
             auto add = sg.get_all_multi_options();
@@ -61,9 +61,9 @@ namespace broken_options
         return tmp;
     }
 
-    std::map<std::string, broken_options::toggle> parser::get_all_toggles()
+    std::map<std::string, broken_options::toggle&> parser::get_all_toggles()
     {
-        std::map<std::string, broken_options::toggle> tmp;
+        std::map<std::string, broken_options::toggle&> tmp;
         for (auto& sg : groups_)
         {
             auto add = sg.get_all_toggles();
@@ -136,10 +136,6 @@ namespace broken_options
 
         argument_parser args(argc, argv);
 
-        options_ = std::move(get_all_options());
-        multi_options_ = std::move(get_all_multi_options());
-        toggles_ = std::move(get_all_toggles());
-
         for (auto it = args.begin(); it != args.end(); ++it)
         {
             if (only_positionals || it->is_value())
@@ -178,7 +174,7 @@ namespace broken_options
 
         validate();
 
-        return options(options_, multi_options_, toggles_, positionals);
+        return options(get_all_options(), get_all_multi_options(), get_all_toggles(), positionals);
     }
 
     std::ostream& parser::usage(std::ostream& s, bool print_default_group)
@@ -238,19 +234,22 @@ namespace broken_options
             s << about_ << std::endl << std::endl;
         }
 
-        if (print_default_group)
+        bool first = true;
+        for (const auto& grp : groups_)
         {
-            for (const auto& grp : groups_)
+            if (print_default_group || !first)
                 grp.usage(s);
-        }
 
+            if (first)
+                first = false;
+        }
         return s;
     }
 
     template <typename Iter>
     bool parser::parse_options(Iter& it, Iter end)
     {
-        for (auto& option : options_)
+        for (auto& option : get_all_options())
         {
 
             if (it->has_value())
@@ -288,7 +287,7 @@ namespace broken_options
     template <typename Iter>
     bool parser::parse_multi_options(Iter& it, Iter end)
     {
-        for (auto& option : multi_options_)
+        for (auto& option : get_all_multi_options())
         {
             if (it->has_value())
             {
@@ -328,7 +327,7 @@ namespace broken_options
 
         bool match_found = false;
 
-        for (auto& option : toggles_)
+        for (auto& option : get_all_toggles())
         {
             if (option.second.matches(it->name()))
             {
@@ -372,17 +371,17 @@ namespace broken_options
     template <typename F>
     void parser::for_each_option(F f)
     {
-        for (auto& option : options_)
+        for (auto& option : get_all_options())
         {
             f(option.second);
         }
 
-        for (auto& option : multi_options_)
+        for (auto& option : get_all_multi_options())
         {
             f(option.second);
         }
 
-        for (auto& option : toggles_)
+        for (auto& option : get_all_toggles())
         {
             f(option.second);
         }

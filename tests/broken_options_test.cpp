@@ -64,12 +64,14 @@ TEST_CASE("Usage descriptions work")
 
 about
 
+
 arguments:
   --env-opt arg                           This is an option to set cool stuff.
                                           Can be set using the environment
                                           variable 'ENV_OPT'.
   --env-opt-2 arg                         Can be set using the environment
                                           variable 'ENV_OPT2'.
+  -m [ --mopt ] arg                       some multi opt
   -o [ --opt ] arg                        some opt
   --opt_long arg                          an option with an very very very very
                                           very very very very very very very
@@ -88,7 +90,6 @@ arguments:
                                           very very very very very very very
                                           very very very very very long
                                           description
-  -m [ --mopt ] arg                       some multi opt
   -t [ --tog ]                            some toggle
   -u [ --togg ]                           some other toggle
 )EXPECTED";
@@ -156,13 +157,14 @@ TEST_CASE("Groups work")
             .env("ENV_OPT");
         parser.group("group2").option("env-opt-2").env("ENV_OPT2");
 
-        parser.usage(s);
+        parser.usage(s, false);
 
         auto actual = s.str();
         std::string expected =
             R"EXPECTED(usage: app_name [-tu] --env-opt --env-opt-2 --opt --opt_long [--opt_nos] --opt_nosd [--opt_with_d] [--some_long_named_option] --mopt [command line ...]
 
 about
+
 
 group1:
   -o [ --opt ] arg                        some opt
@@ -252,13 +254,14 @@ group2:
         grp2.option("env-opt", "This is an option to set cool stuff.").env("ENV_OPT");
         grp2.option("env-opt-2").env("ENV_OPT2");
 
-        parser.usage(s);
+        parser.usage(s, false);
 
         auto actual = s.str();
         std::string expected =
             R"EXPECTED(usage: app_name [-tu] --env-opt --env-opt-2 --opt --opt_long [--opt_nos] --opt_nosd [--opt_with_d] [--some_long_named_option] --mopt [command line ...]
 
 about
+
 
 group1:
 
@@ -359,12 +362,14 @@ group2:
 
 about
 
+
 test arguments:
   --env-opt arg                           This is an option to set cool stuff.
                                           Can be set using the environment
                                           variable 'ENV_OPT'.
   --env-opt-2 arg                         Can be set using the environment
                                           variable 'ENV_OPT2'.
+  -m [ --mopt ] arg                       some multi opt
   -o [ --opt ] arg                        some opt
   --opt_long arg                          an option with an very very very very
                                           very very very very very very very
@@ -383,7 +388,6 @@ test arguments:
                                           very very very very very very very
                                           very very very very very long
                                           description
-  -m [ --mopt ] arg                       some multi opt
   -t [ --tog ]                            some toggle
   -u [ --togg ]                           some other toggle
 )EXPECTED");

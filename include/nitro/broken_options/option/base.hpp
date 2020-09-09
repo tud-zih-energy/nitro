@@ -82,8 +82,8 @@ namespace broken_options
         std::ostream& format(std::ostream& s, int left_padding = 2) const
         {
             for (int i = 0; i < left_padding; ++i)
-                s << " ";
-            s << std::left << std::setw(38);
+                s << ' ';
+            s << std::left << std::setw(40 - left_padding);
 
             std::stringstream str;
 

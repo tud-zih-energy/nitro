@@ -40,10 +40,10 @@
 #include <nitro/except/raise.hpp>
 #include <nitro/lang/unordered.hpp>
 
+#include <deque>
 #include <iostream>
 #include <map>
 #include <string>
-#include <vector>
 
 namespace nitro
 {
@@ -57,7 +57,7 @@ namespace broken_options
                const std::string& about = std::string(""))
         : app_name_(app_name), about_(about),
           groups_({ nitro::broken_options::group(all_argument_names_, 0, "arguments") }),
-          default_group_(groups_[0])
+          default_group_(groups_.front())
         {
         }
 
@@ -86,9 +86,9 @@ namespace broken_options
     private:
         void check_consistency();
 
-        std::map<std::string, nitro::broken_options::option> get_all_options();
-        std::map<std::string, nitro::broken_options::multi_option> get_all_multi_options();
-        std::map<std::string, nitro::broken_options::toggle> get_all_toggles();
+        std::map<std::string, nitro::broken_options::option&> get_all_options();
+        std::map<std::string, nitro::broken_options::multi_option&> get_all_multi_options();
+        std::map<std::string, nitro::broken_options::toggle&> get_all_toggles();
 
         template <typename Iter>
         bool parse_options(Iter& it, Iter end);
@@ -110,11 +110,7 @@ namespace broken_options
         std::string about_;
 
         std::set<std::string> all_argument_names_;
-        std::vector<nitro::broken_options::group> groups_;
-
-        std::map<std::string, broken_options::option> options_;
-        std::map<std::string, broken_options::multi_option> multi_options_;
-        std::map<std::string, broken_options::toggle> toggles_;
+        std::deque<nitro::broken_options::group> groups_;
 
         nitro::broken_options::group& default_group_;
 

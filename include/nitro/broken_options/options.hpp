@@ -45,9 +45,9 @@ namespace broken_options
     class options
     {
     public:
-        options(const std::map<std::string, option>& option_map,
-                const std::map<std::string, multi_option>& multi_option_map,
-                const std::map<std::string, toggle>& toggle_map,
+        options(const std::map<std::string, option&>& option_map,
+                const std::map<std::string, multi_option&>& multi_option_map,
+                const std::map<std::string, toggle&>& toggle_map,
                 const std::vector<std::string>& positionals)
         : options_(option_map), multi_options_(multi_option_map), toggles_(toggle_map),
           positionals_(positionals)
@@ -115,9 +115,9 @@ namespace broken_options
         }
 
     private:
-        std::map<std::string, option> options_;
-        std::map<std::string, multi_option> multi_options_;
-        std::map<std::string, toggle> toggles_;
+        std::map<std::string, option&> options_;
+        std::map<std::string, multi_option&> multi_options_;
+        std::map<std::string, toggle&> toggles_;
         std::vector<std::string> positionals_;
     };
 } // namespace broken_options

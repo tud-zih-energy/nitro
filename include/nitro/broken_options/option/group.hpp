@@ -77,23 +77,16 @@ namespace broken_options
                 s << std::endl << description << std::endl << std::endl;
             }
 
+            std::map<std::string, const nitro::broken_options::base&> print_options;
             for (auto& iter : options_)
-            {
-                iter.second.format(s, position_ * 2 + 2);
-            }
+                print_options.emplace(iter.first, iter.second);
             for (auto& iter : multi_options_)
-            {
-                iter.second.format(s, position_ * 2 + 2);
-            }
+                print_options.emplace(iter.first, iter.second);
             for (auto& iter : toggles_)
-            {
-                iter.second.format(s, position_ * 2 + 2);
-            }
+                print_options.emplace(iter.first, iter.second);
 
-            for (auto& iter : sub_groups_)
-            {
-                iter.usage(s);
-            }
+            for (auto& iter : print_options)
+                iter.second.format(s, position_ * 2 + 2);
         }
 
         broken_options::option& option(const std::string& name,
@@ -168,9 +161,9 @@ namespace broken_options
             return toggles_.at(name);
         }
 
-        std::map<std::string, broken_options::option> get_all_options()
+        std::map<std::string, broken_options::option&> get_all_options()
         {
-            std::map<std::string, broken_options::option> tmp;
+            std::map<std::string, broken_options::option&> tmp;
             for (auto& it : options_)
             {
                 tmp.emplace(it.first, it.second);
@@ -184,9 +177,9 @@ namespace broken_options
             return tmp;
         }
 
-        std::map<std::string, broken_options::multi_option> get_all_multi_options()
+        std::map<std::string, broken_options::multi_option&> get_all_multi_options()
         {
-            std::map<std::string, broken_options::multi_option> tmp;
+            std::map<std::string, broken_options::multi_option&> tmp;
             for (auto& it : multi_options_)
             {
                 tmp.emplace(it.first, it.second);
@@ -200,9 +193,9 @@ namespace broken_options
             return tmp;
         }
 
-        std::map<std::string, broken_options::toggle> get_all_toggles()
+        std::map<std::string, broken_options::toggle&> get_all_toggles()
         {
-            std::map<std::string, broken_options::toggle> tmp;
+            std::map<std::string, broken_options::toggle&> tmp;
             for (auto& it : toggles_)
             {
                 tmp.emplace(it.first, it.second);
