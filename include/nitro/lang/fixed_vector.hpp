@@ -31,51 +31,144 @@
 #include <nitro/except/raise.hpp>
 
 #include <array>
+#include <type_traits>
 
 namespace nitro
 {
 namespace lang
 {
-
-    template <typename T, size_t N>
+    template <typename T>
     class fixed_vector
     {
     public:
-        using iterator = typename std::array<T, N>::iterator;
-        using reverse_iterator = typename std::array<T, N>::reverse_iterator;
-
-        fixed_vector() = default;
-
-        fixed_vector(const std::array<T, N>& array) : storage_(array)
+        class iterator : public std::iterator<std::input_iterator_tag, T>
         {
-            size_ = N;
+            T* p;
+
+        public:
+            iterator(T* x) : p(x)
+            {
+            }
+            iterator(const iterator& mit) : p(mit.p)
+            {
+            }
+            iterator& operator++()
+            {
+                ++p;
+                return *this;
+            }
+            iterator operator++(int)
+            {
+                iterator tmp(*this);
+                operator++();
+                return tmp;
+            }
+            bool operator==(const iterator& rhs) const
+            {
+                return p == rhs.p;
+            }
+            bool operator!=(const iterator& rhs) const
+            {
+                return p != rhs.p;
+            }
+            T& operator*()
+            {
+                return *p;
+            }
+        };
+
+        class reverse_iterator : public std::iterator<std::input_iterator_tag, T>
+        {
+            T* p;
+
+        public:
+            reverse_iterator(T* x) : p(x)
+            {
+            }
+            reverse_iterator(const reverse_iterator& mit) : p(mit.p)
+            {
+            }
+            reverse_iterator& operator++()
+            {
+                --p;
+                return *this;
+            }
+            reverse_iterator operator++(int)
+            {
+                reverse_iterator tmp(*this);
+                operator++();
+                return tmp;
+            }
+            bool operator==(const reverse_iterator& rhs) const
+            {
+                return p == rhs.p;
+            }
+            bool operator!=(const reverse_iterator& rhs) const
+            {
+                return p != rhs.p;
+            }
+            T& operator*()
+            {
+                return *p;
+            }
+        };
+
+        fixed_vector(const std::size_t& capacity)
+        {
+            capacity_ = capacity;
+            storage_ = std::make_unique<T[]>(capacity);
         }
 
-        template <size_t M>
-        fixed_vector(const std::array<T, M>& array)
+        template <typename iterabel>
+        fixed_vector(const std::size_t& capacity, const iterabel& array)
         {
-            if (M > N)
-                raise("Array does not fit into fixed_vector!");
+            if (array.size() > capacity)
+                raise("Size larger the capacity!");
 
-            emplace(array.begin(), array.end());
+            size_ = array.size();
+            capacity_ = capacity;
+            storage_ = std::make_unique<T[]>(capacity);
+
+            emplace_back(array.begin(), array.end());
         }
 
-        fixed_vector(const fixed_vector<T, N>&) = default;
+        template <typename iterabel, typename func>
+        fixed_vector(const std::size_t& capacity, const iterabel& array, const func& depackage_func)
+        {
+            if (array.size() > capacity)
+                raise("Size larger the capacity!");
+
+            size_ = array.size();
+            capacity_ = capacity;
+            storage_ = std::make_unique<T[]>(capacity);
+
+            emplace_back(array.begin(), array.end(), depackage_func);
+        }
+
+        fixed_vector(const fixed_vector<T>& v) : fixed_vector(v.capacity(), v)
+        {
+        }
+
+        fixed_vector operator=(const fixed_vector<T>& v)
+        {
+            return fixed_vector(v.capacity(), v);
+        }
+
         ~fixed_vector() = default;
 
-        bool empty()
+        bool empty() const
         {
             return size_ == 0;
         }
 
-        const std::size_t& size()
+        const std::size_t& size() const
         {
             return size_;
         }
 
-        std::size_t capacity()
+        std::size_t capacity() const
         {
-            return storage_.size();
+            return capacity_;
         }
 
         T& operator[](const std::size_t& key)
@@ -153,6 +246,12 @@ namespace lang
             emplace_back(start, end);
         }
 
+        template <typename iter, typename func>
+        void emplace(iter start, const iter& end, func depackage_func)
+        {
+            emplace_back(start, end, depackage_func);
+        }
+
         std::size_t emplace_back(const T& value)
         {
 
@@ -180,6 +279,69 @@ namespace lang
             }
         }
 
+        template <typename iter, typename func>
+        void emplace_back(iter start, const iter& end, func depackage_func)
+        {
+            while (start != end)
+            {
+                if (size_ >= capacity())
+                    raise("No capacity left!");
+
+                storage_[size_] = T(depackage_func(start));
+                ++size_;
+
+                ++start;
+            }
+        }
+
+        std::size_t insert(const T& value)
+        {
+
+            if (size_ >= capacity())
+                raise("No capacity left!");
+
+            storage_[size_] = value;
+            ++size_;
+
+            return size_ - 1;
+        }
+
+        template <typename iter>
+        void insert(iter start, const iter& end)
+        {
+            while (start != end)
+            {
+                if (size_ >= capacity())
+                    raise("No capacity left!");
+
+                storage_[size_] = *start;
+                ++size_;
+
+                ++start;
+            }
+        }
+
+        template <typename iter, typename func>
+        void insert(iter start, const iter& end, func depackage_func)
+        {
+            while (start != end)
+            {
+                if (size_ >= capacity())
+                    raise("No capacity left!");
+
+                storage_[size_] = depackage_func(start);
+                ++size_;
+
+                ++start;
+            }
+        }
+
+        template <typename iterabel>
+        void merge(iterabel array)
+        {
+            emplace_back(array.begin(), array.end());
+        }
+
         std::size_t push_back(const T& value)
         {
 
@@ -202,76 +364,76 @@ namespace lang
             return storage_[size_];
         }
 
-        fixed_vector<T, N>::iterator begin() noexcept
+        fixed_vector<T>::iterator begin() noexcept
         {
-            return iterator(storage_.begin());
+            return iterator(&storage_[0]);
         }
 
-        fixed_vector<T, N>::reverse_iterator rbegin() noexcept
+        fixed_vector<T>::reverse_iterator rbegin() noexcept
         {
-            return reverse_iterator(storage_.rbegin());
+            return reverse_iterator(&storage_[size_ - 1]);
         }
 
-        fixed_vector<T, N>::iterator end() noexcept
+        fixed_vector<T>::iterator end() noexcept
         {
-            return iterator(storage_.end());
+            return iterator(&storage_[size_]);
         }
 
-        fixed_vector<T, N>::reverse_iterator rend() noexcept
+        fixed_vector<T>::reverse_iterator rend() noexcept
         {
-            return reverse_iterator(storage_.rend());
+            return reverse_iterator(&storage_[-1]);
         }
 
-        const fixed_vector<T, N>::iterator begin() const noexcept
+        const fixed_vector<T>::iterator begin() const noexcept
         {
-            return iterator(storage_.begin());
+            return iterator(&storage_[0]);
         }
 
-        const fixed_vector<T, N>::reverse_iterator rbegin() const noexcept
+        const fixed_vector<T>::reverse_iterator rbegin() const noexcept
         {
-            return reverse_iterator(storage_.rbegin());
+            return reverse_iterator(&storage_[size_ - 1]);
         }
 
-        const fixed_vector<T, N>::iterator end() const noexcept
+        const fixed_vector<T>::iterator end() const noexcept
         {
-            return iterator(storage_.end());
+            return iterator(&storage_[size_]);
         }
 
-        const fixed_vector<T, N>::reverse_iterator rend() const noexcept
+        const fixed_vector<T>::reverse_iterator rend() const noexcept
         {
-            return reverse_iterator(storage_.rend());
+            return reverse_iterator(&storage_[-1]);
         }
 
-        const fixed_vector<T, N>::iterator cbegin() const noexcept
+        const fixed_vector<T>::iterator cbegin() const noexcept
         {
-            return iterator(storage_.begin());
+            return iterator(&storage_[0]);
         }
 
-        const fixed_vector<T, N>::reverse_iterator crbegin() const noexcept
+        const fixed_vector<T>::reverse_iterator crbegin() const noexcept
         {
-            return reverse_iterator(storage_.rbegin());
+            return reverse_iterator(&storage_[size_ - 1]);
         }
 
-        const fixed_vector<T, N>::iterator cend() const noexcept
+        const fixed_vector<T>::iterator cend() const noexcept
         {
-            return iterator(storage_.end());
+            return iterator(&storage_[size_]);
         }
 
-        const fixed_vector<T, N>::reverse_iterator crend() const noexcept
+        const fixed_vector<T>::reverse_iterator crend() const noexcept
         {
-            return reverse_iterator(storage_.rend());
+            return reverse_iterator(&storage_[-1]);
         }
 
         template <size_t I>
         T& get() noexcept
         {
-            return std::get<I>(storage_);
+            return this->at(I);
         }
 
         template <size_t I>
         const T& get() const noexcept
         {
-            return std::get<I>(storage_);
+            return this->at(I);
         }
 
         void erase(std::size_t key)
@@ -289,8 +451,9 @@ namespace lang
 
     private:
         std::size_t size_ = 0;
+        std::size_t capacity_ = 0;
 
-        std::array<T, N> storage_;
+        std::unique_ptr<T[]> storage_;
     };
 
 } // namespace lang
@@ -298,8 +461,8 @@ namespace lang
 
 namespace std
 {
-template <size_t I, typename T, size_t N>
-T& get(nitro::lang::fixed_vector<T, N>& c) noexcept
+template <size_t I, typename T>
+T& get(nitro::lang::fixed_vector<T>& c) noexcept
 {
     return c.at(I);
 }
