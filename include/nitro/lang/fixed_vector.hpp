@@ -125,7 +125,6 @@ namespace lang
             if (array.size() > capacity)
                 raise("Size larger the capacity!");
 
-            size_ = array.size();
             capacity_ = capacity;
             storage_ = std::make_unique<T[]>(capacity);
 
@@ -138,7 +137,6 @@ namespace lang
             if (array.size() > capacity)
                 raise("Size larger the capacity!");
 
-            size_ = array.size();
             capacity_ = capacity;
             storage_ = std::make_unique<T[]>(capacity);
 

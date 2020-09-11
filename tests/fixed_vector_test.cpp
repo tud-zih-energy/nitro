@@ -94,12 +94,12 @@ TEST_CASE("fixed vector at() access", "[lang]")
     REQUIRE(v.get<2>() == 9);
 }
 
-TEST_CASE("fixed vector merge two vectors", "[lang]")
+TEST_CASE("fixed vector merge two vectors #1", "[lang]")
 {
     std::array<std::int64_t, 6> a = { 0, 1, 2, 3, 4, 5 };
     std::array<std::int64_t, 6> b = { 6, 7, 8, 9, 10, 11 };
 
-    nitro::lang::fixed_vector<std::int64_t> v(6, a);
+    nitro::lang::fixed_vector<std::int64_t> v(12, a);
     nitro::lang::fixed_vector<std::int64_t> w(6, b);
 
     v.emplace(w.begin(), w.end());
@@ -107,12 +107,12 @@ TEST_CASE("fixed vector merge two vectors", "[lang]")
     REQUIRE(v.size() == 12);
 }
 
-TEST_CASE("fixed vector merge two vectors", "[lang]")
+TEST_CASE("fixed vector merge two vectors #2", "[lang]")
 {
     std::array<std::int64_t, 6> a = { 0, 1, 2, 3, 4, 5 };
     std::array<std::int64_t, 6> b = { 6, 7, 8, 9, 10, 11 };
 
-    nitro::lang::fixed_vector<std::int64_t> v(6, a);
+    nitro::lang::fixed_vector<std::int64_t> v(12, a);
     nitro::lang::fixed_vector<std::int64_t> w(6, b);
 
     v.merge(w);
