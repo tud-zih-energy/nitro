@@ -1009,6 +1009,7 @@ TEST_CASE("parsing toggles with prefix and default value")
     {
         nitro::broken_options::argument arg("--no-arg");
         REQUIRE(arg.has_prefix());
+        REQUIRE(arg.prefix() == "no");
         REQUIRE(arg.name_without_prefix() == "arg");
     }
 
@@ -1136,5 +1137,39 @@ TEST_CASE("parsing toggles with prefix and default value")
         REQUIRE(named_arg.name() == "--no-ab");
         REQUIRE(named_arg.name_without_prefix() == "ab");
         REQUIRE(named_arg.data() == "--no-ab=5");
+    }
+    SECTION("setting a prefix")
+    {
+        nitro::broken_options::argument arg("--without-arg");
+        REQUIRE(arg.has_prefix());
+        REQUIRE(arg.name() == "--without-arg");
+        REQUIRE(arg.name_without_prefix() == "arg");
+        REQUIRE(arg.prefix() == "without");
+    }
+    SECTION("test argument with negativ prefix")
+    {
+        int argc = 2;
+        const char* argv[] = { "", "--without-arg" };
+
+        nitro::broken_options::parser parser;
+
+        parser.toggle("arg");
+
+        auto options = parser.parse(argc, argv);
+
+        REQUIRE(!options.given("arg"));
+    }
+    SECTION("test argument with positiv prefix")
+    {
+        int argc = 2;
+        const char* argv[] = { "", "--yes-arg" };
+
+        nitro::broken_options::parser parser;
+
+        parser.toggle("arg");
+
+        auto options = parser.parse(argc, argv);
+
+        REQUIRE(options.given("arg"));
     }
 }
