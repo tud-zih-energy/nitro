@@ -49,6 +49,9 @@ namespace broken_options
     public:
         argument(const std::string& arg) : arg_(arg)
         {
+            std::regex rex;
+            rex = "^--([a-zA-Z]*)-.*";
+            std::smatch matches;
             auto sep = arg_.find("=");
             if (sep != std::string::npos)
             {
@@ -59,6 +62,10 @@ namespace broken_options
             {
                 name_ = arg_;
             }
+            if (std::regex_search(name_, matches, rex))
+                {
+                    prefix_ =  matches[1];
+                }
 
             if (!is_value() && !is_double_dash())
             {
@@ -102,13 +109,18 @@ namespace broken_options
 
         bool has_prefix() const
         {
-            return nitro::lang::starts_with(name_, "--no-");
+            return !prefix_.empty();
         }
 
     public:
         const std::string& data() const noexcept
         {
             return arg_;
+        }
+
+        const std::string& prefix() const
+        {
+            return prefix_;
         }
 
         std::string name_without_prefix() const
@@ -118,7 +130,8 @@ namespace broken_options
                 raise<parser_error>(
                     "Trying to get the name without prefix but prefix is not given.");
             }
-            return name().substr(5);
+            int end = 2 + prefix_.length() + 1;
+            return name().substr(end);
         }
 
         const std::string& name() const
@@ -178,6 +191,7 @@ namespace broken_options
     private:
         std::string arg_;
         std::string name_;
+        std::string prefix_;
         lang::optional<std::string> value_;
     };
 } // namespace broken_options
