@@ -125,7 +125,8 @@ namespace broken_options
                 arg.prefix() == "True" || arg.prefix() == "On" || arg.prefix() == "WITH" ||
                 arg.prefix() == "With" || arg.prefix() == "y" || arg.prefix() == "Yes")
                 {
-                    given_ = 1;
+                    given_ = 1
+                    ;
                 }
                 if (arg.prefix() == "false" || arg.prefix() == "FALSE" || arg.prefix() == "without" ||
                     arg.prefix() == "0" || arg.prefix() == "NO" || arg.prefix() == "no" ||
