@@ -362,62 +362,62 @@ namespace lang
             return storage_[size_];
         }
 
-        fixed_vector<T>::iterator begin() noexcept
+        typename fixed_vector<T>::iterator begin() noexcept
         {
             return iterator(&storage_[0]);
         }
 
-        fixed_vector<T>::reverse_iterator rbegin() noexcept
+        typename fixed_vector<T>::reverse_iterator rbegin() noexcept
         {
             return reverse_iterator(&storage_[size_ - 1]);
         }
 
-        fixed_vector<T>::iterator end() noexcept
+        typename fixed_vector<T>::iterator end() noexcept
         {
             return iterator(&storage_[size_]);
         }
 
-        fixed_vector<T>::reverse_iterator rend() noexcept
+        typename fixed_vector<T>::reverse_iterator rend() noexcept
         {
             return reverse_iterator(&storage_[-1]);
         }
 
-        const fixed_vector<T>::iterator begin() const noexcept
+        typename const fixed_vector<T>::iterator begin() const noexcept
         {
             return iterator(&storage_[0]);
         }
 
-        const fixed_vector<T>::reverse_iterator rbegin() const noexcept
+        typename const fixed_vector<T>::reverse_iterator rbegin() const noexcept
         {
             return reverse_iterator(&storage_[size_ - 1]);
         }
 
-        const fixed_vector<T>::iterator end() const noexcept
+        typename const fixed_vector<T>::iterator end() const noexcept
         {
             return iterator(&storage_[size_]);
         }
 
-        const fixed_vector<T>::reverse_iterator rend() const noexcept
+        typename const fixed_vector<T>::reverse_iterator rend() const noexcept
         {
             return reverse_iterator(&storage_[-1]);
         }
 
-        const fixed_vector<T>::iterator cbegin() const noexcept
+        typename const fixed_vector<T>::iterator cbegin() const noexcept
         {
             return iterator(&storage_[0]);
         }
 
-        const fixed_vector<T>::reverse_iterator crbegin() const noexcept
+        typename const fixed_vector<T>::reverse_iterator crbegin() const noexcept
         {
             return reverse_iterator(&storage_[size_ - 1]);
         }
 
-        const fixed_vector<T>::iterator cend() const noexcept
+        typename const fixed_vector<T>::iterator cend() const noexcept
         {
             return iterator(&storage_[size_]);
         }
 
-        const fixed_vector<T>::reverse_iterator crend() const noexcept
+        typename const fixed_vector<T>::reverse_iterator crend() const noexcept
         {
             return reverse_iterator(&storage_[-1]);
         }
