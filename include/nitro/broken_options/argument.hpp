@@ -1,4 +1,4 @@
-/*
+*
  * Copyright (c) 2015-2016, Technische Universität Dresden, Germany
  * All rights reserved.
  *
@@ -63,9 +63,9 @@ namespace broken_options
                 name_ = arg_;
             }
             if (std::regex_search(name_, matches, rex))
-                {
-                    prefix_ =  matches[1];
-                }
+            {
+                prefix_ = matches[1];
+            }
 
             if (!is_value() && !is_double_dash())
             {
