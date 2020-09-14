@@ -382,42 +382,42 @@ namespace lang
             return reverse_iterator(&storage_[-1]);
         }
 
-        typename const fixed_vector<T>::iterator begin() const noexcept
+        const typename fixed_vector<T>::iterator begin() const noexcept
         {
             return iterator(&storage_[0]);
         }
 
-        typename const fixed_vector<T>::reverse_iterator rbegin() const noexcept
+        const typename fixed_vector<T>::reverse_iterator rbegin() const noexcept
         {
             return reverse_iterator(&storage_[size_ - 1]);
         }
 
-        typename const fixed_vector<T>::iterator end() const noexcept
+        const typename fixed_vector<T>::iterator end() const noexcept
         {
             return iterator(&storage_[size_]);
         }
 
-        typename const fixed_vector<T>::reverse_iterator rend() const noexcept
+        const typename fixed_vector<T>::reverse_iterator rend() const noexcept
         {
             return reverse_iterator(&storage_[-1]);
         }
 
-        typename const fixed_vector<T>::iterator cbegin() const noexcept
+        const typename fixed_vector<T>::iterator cbegin() const noexcept
         {
             return iterator(&storage_[0]);
         }
 
-        typename const fixed_vector<T>::reverse_iterator crbegin() const noexcept
+        const typename fixed_vector<T>::reverse_iterator crbegin() const noexcept
         {
             return reverse_iterator(&storage_[size_ - 1]);
         }
 
-        typename const fixed_vector<T>::iterator cend() const noexcept
+        const typename fixed_vector<T>::iterator cend() const noexcept
         {
             return iterator(&storage_[size_]);
         }
 
-        typename const fixed_vector<T>::reverse_iterator crend() const noexcept
+        const typename fixed_vector<T>::reverse_iterator crend() const noexcept
         {
             return reverse_iterator(&storage_[-1]);
         }
