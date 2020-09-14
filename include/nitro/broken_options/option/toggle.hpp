@@ -120,19 +120,19 @@ namespace broken_options
             if (arg.has_prefix())
             {
                 if (arg.prefix() == "TRUE" || arg.prefix() == "ON" || arg.prefix() == "YES" ||
-                arg.prefix() == "true" || arg.prefix() == "on" || arg.prefix() == "yes" ||
-                arg.prefix() == "1" || arg.prefix() == "Y" || arg.prefix() == "with" ||
-                arg.prefix() == "True" || arg.prefix() == "On" || arg.prefix() == "WITH" ||
-                arg.prefix() == "With" || arg.prefix() == "y" || arg.prefix() == "Yes")
+                    arg.prefix() == "true" || arg.prefix() == "on" || arg.prefix() == "yes" ||
+                    arg.prefix() == "1" || arg.prefix() == "Y" || arg.prefix() == "with" ||
+                    arg.prefix() == "True" || arg.prefix() == "On" || arg.prefix() == "WITH" ||
+                    arg.prefix() == "With" || arg.prefix() == "y" || arg.prefix() == "Yes")
                 {
-                    given_ = 1
-                    ;
+                    given_ = 1;
                 }
-                if (arg.prefix() == "false" || arg.prefix() == "FALSE" || arg.prefix() == "without" ||
-                    arg.prefix() == "0" || arg.prefix() == "NO" || arg.prefix() == "no" ||
-                    arg.prefix() == "Without" || arg.prefix() == "n" || arg.prefix() == "off" ||
-                    arg.prefix() == "OFF" || arg.prefix() == "N" || arg.prefix() == "False" ||
-                    arg.prefix() == "Off" || arg.prefix() == "WITHOUT" || arg.prefix() == "No")
+                if (arg.prefix() == "false" || arg.prefix() == "FALSE" ||
+                    arg.prefix() == "without" || arg.prefix() == "0" || arg.prefix() == "NO" ||
+                    arg.prefix() == "no" || arg.prefix() == "Without" || arg.prefix() == "n" ||
+                    arg.prefix() == "off" || arg.prefix() == "OFF" || arg.prefix() == "N" ||
+                    arg.prefix() == "False" || arg.prefix() == "Off" || arg.prefix() == "WITHOUT" ||
+                    arg.prefix() == "No")
                 {
                     given_ = 0;
                 }
