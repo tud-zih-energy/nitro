@@ -57,13 +57,12 @@ namespace lang
             emplace_back(array.begin(), array.end());
         }
 
-        fixed_vector(const fixed_vector<T>& v) : fixed_vector(v.capacity(), v)
+        fixed_vector(const fixed_vector<T>& v) : fixed_vector(v.capacity_, v)
         {
         }
 
-        fixed_vector operator=(const fixed_vector<T>& v)
+        fixed_vector(fixed_vector<T>&& v) : capacity_(v.capacity_), data_(std::move(v.data_))
         {
-            return fixed_vector(v.capacity(), v);
         }
 
         ~fixed_vector() = default;
@@ -166,7 +165,6 @@ namespace lang
 
         std::size_t emplace_back(const T& value)
         {
-
             if (size_ >= capacity())
                 raise("No capacity left!");
 
@@ -193,7 +191,6 @@ namespace lang
 
         std::size_t insert(const T& value)
         {
-
             if (size_ >= capacity())
                 raise("No capacity left!");
 
@@ -241,7 +238,6 @@ namespace lang
 
         std::size_t push_back(const T& value)
         {
-
             if (size_ >= capacity())
                 raise("No capacity left!");
 
@@ -253,7 +249,6 @@ namespace lang
 
         T pop_back(const std::size_t& key)
         {
-
             if (size_ == 0)
                 raise("Container is empty!");
 
