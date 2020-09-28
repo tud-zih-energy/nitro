@@ -85,7 +85,7 @@ namespace lang
             storage_ = std::make_unique<T[]>(capacity);
         }
 
-        template <typename iterabel>
+        template <typename Iterabel>
         fixed_vector(const std::size_t& capacity, const iterabel& array)
         {
             if (array.size() > capacity)
