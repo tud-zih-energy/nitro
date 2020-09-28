@@ -80,17 +80,14 @@ namespace lang
         };
 
         fixed_vector(const std::size_t& capacity)
+        : capacity_(capacity), data_(std::make_shared<T[]>(capacity))
         {
-            capacity_ = capacity;
-            data_ = std::make_shared<T[]>(capacity);
         }
 
         template <typename Iterabel>
         fixed_vector(std::size_t capacity, const Iterabel& array)
+        : capacity_(capacity), data_(std::make_shared<T[]>(capacity))
         {
-            capacity_ = capacity;
-            data_ = std::make_shared<T[]>(capacity);
-
             emplace_back(array.begin(), array.end());
         }
 
