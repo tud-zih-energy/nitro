@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015-2017, Technische Universität Dresden, Germany
+ * Copyright (c) 2015-2020, Technische Universität Dresden, Germany
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without modification, are permitted
@@ -152,7 +152,7 @@ namespace lang
             if (size_ >= capacity_)
                 raise("No capacity left!");
 
-            replace(data_[size_], T(args...));
+            replace(data_[size_], T(std::forward<Args>(args)...));
             ++size_;
 
             return size_ - 1;
@@ -181,39 +181,24 @@ namespace lang
         }
 
         template <typename Iter>
-        void insert(Iter start, const Iter& end)
+        void insert(Iter pos, Iter start, Iter end)
         {
+            auto key = std::distance(begin(), pos);
+            if (key > size_)
+                raise("Key larger than size!");
+
             while (start != end)
             {
-                if (size_ >= capacity_)
+                if (key >= capacity_)
                     raise("No capacity left!");
 
-                data_[size_] = *start;
-                ++size_;
+                data_[key] = *start;
+
+                if (key == size_)
+                    ++size_;
 
                 ++start;
             }
-        }
-
-        template <typename Iter, typename func>
-        void insert(Iter start, const Iter& end, func depackage_func)
-        {
-            while (start != end)
-            {
-                if (size_ >= capacity_)
-                    raise("No capacity left!");
-
-                data_[size_] = depackage_func(start);
-                ++size_;
-
-                ++start;
-            }
-        }
-
-        template <typename Iterabel>
-        void merge(Iterabel array)
-        {
-            insert(array.begin(), array.end());
         }
 
         std::size_t push_back(const T& value)
@@ -227,13 +212,12 @@ namespace lang
             return size_ - 1;
         }
 
-        T pop_back(const std::size_t& key)
+        void pop_back()
         {
             if (size_ == 0)
                 raise("Container is empty!");
 
             --size_;
-            return data_[size_];
         }
 
         typename fixed_vector<T>::iterator begin() noexcept
