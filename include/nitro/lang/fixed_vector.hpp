@@ -45,16 +45,16 @@ namespace lang
 
         using reverse_iterator = typename std::vector<T>::reverse_iterator;
 
-        fixed_vector(const std::size_t& capacity)
-        : capacity_(capacity), data_(std::make_shared<T[]>(capacity))
+        fixed_vector(std::size_t capacity)
+        : capacity_(capacity), data_(std::make_unique<T[]>(capacity))
         {
         }
 
         template <typename Iterabel>
         fixed_vector(std::size_t capacity, const Iterabel& array)
-        : capacity_(capacity), data_(std::make_shared<T[]>(capacity))
+        : capacity_(capacity), data_(std::make_unique<T[]>(capacity))
         {
-            emplace_back(array.begin(), array.end());
+            insert(array.begin(), array.end());
         }
 
         fixed_vector(const fixed_vector<T>& v) : fixed_vector(v.capacity_, v)
@@ -72,7 +72,7 @@ namespace lang
             return size_ == 0;
         }
 
-        const std::size_t& size() const
+        std::size_t size() const
         {
             return size_;
         }
@@ -84,21 +84,15 @@ namespace lang
 
         T& operator[](const std::size_t& key)
         {
-            if (key >= capacity())
-                raise("Key is larger than capacity");
-
-            if (key > size())
-                raise("Key is larger than size, use append() instead");
-
             return data_[key];
         }
 
         T& at(const std::size_t& key)
         {
-            if (key >= capacity())
+            if (key >= capacity_)
                 raise("Key is larger than capacity");
 
-            if (key > size())
+            if (key > size_)
                 raise("Key is larger than size, use append() instead");
 
             return data_[key];
@@ -106,21 +100,15 @@ namespace lang
 
         const T& operator[](const std::size_t& key) const
         {
-            if (key >= capacity())
-                raise("Key is larger than capacity!");
-
-            if (key > size())
-                raise("Key is larger than size, use emplace_back() instead!");
-
             return data_[key];
         }
 
         const T& at(const std::size_t& key) const
         {
-            if (key >= capacity())
+            if (key >= capacity_)
                 raise("Key is larger than capacity!");
 
-            if (key > size())
+            if (key > size_)
                 raise("Key is larger than size, use emplace_back() instead!");
 
             return data_[key];
@@ -146,55 +134,47 @@ namespace lang
             return data_[size_ - 1];
         }
 
-        std::size_t emplace(const T& value)
+        template <class... Args>
+        void emplace(iterator pos, Args&&... args)
         {
-            return emplace_back(value);
-        }
+            auto key = std::distance(begin(), pos);
 
-        template <typename Iter>
-        void emplace(Iter start, const Iter& end)
-        {
-            emplace_back(start, end);
-        }
-
-        template <typename Iter, typename func>
-        void emplace(Iter start, const Iter& end, func depackage_func)
-        {
-            emplace_back(start, end, depackage_func);
-        }
-
-        std::size_t emplace_back(const T& value)
-        {
-            if (size_ >= capacity())
+            if (size_ >= capacity_)
                 raise("No capacity left!");
 
-            data_[size_] = T(value);
+            replace(data_[key], T(args...));
+            ++size_;
+        }
+
+        template <class... Args>
+        std::size_t emplace_back(Args&&... args)
+        {
+            if (size_ >= capacity_)
+                raise("No capacity left!");
+
+            replace(data_[size_], T(args...));
             ++size_;
 
             return size_ - 1;
         }
 
-        template <typename Iter>
-        void emplace_back(Iter start, const Iter& end)
-        {
-            while (start != end)
-            {
-                if (size_ >= capacity())
-                    raise("No capacity left!");
-
-                data_[size_] = T(*start);
-                ++size_;
-
-                ++start;
-            }
-        }
-
         std::size_t insert(const T& value)
         {
-            if (size_ >= capacity())
+            if (size_ >= capacity_)
                 raise("No capacity left!");
 
-            data_[size_] = value;
+            replace(data_[size_], value);
+            ++size_;
+
+            return size_ - 1;
+        }
+
+        std::size_t insert(T&& value)
+        {
+            if (size_ >= capacity_)
+                raise("No capacity left!");
+
+            replace(data_[size_], std::move(value));
             ++size_;
 
             return size_ - 1;
@@ -205,7 +185,7 @@ namespace lang
         {
             while (start != end)
             {
-                if (size_ >= capacity())
+                if (size_ >= capacity_)
                     raise("No capacity left!");
 
                 data_[size_] = *start;
@@ -220,7 +200,7 @@ namespace lang
         {
             while (start != end)
             {
-                if (size_ >= capacity())
+                if (size_ >= capacity_)
                     raise("No capacity left!");
 
                 data_[size_] = depackage_func(start);
@@ -230,15 +210,15 @@ namespace lang
             }
         }
 
-        template <typename iterabel>
-        void merge(iterabel array)
+        template <typename Iterabel>
+        void merge(Iterabel array)
         {
-            emplace_back(array.begin(), array.end());
+            insert(array.begin(), array.end());
         }
 
         std::size_t push_back(const T& value)
         {
-            if (size_ >= capacity())
+            if (size_ >= capacity_)
                 raise("No capacity left!");
 
             data_[size_] = value;
@@ -316,41 +296,61 @@ namespace lang
             return reverse_iterator(&data_[-1]);
         }
 
-        template <size_t I>
-        T& get() noexcept
-        {
-            return this->at(I);
-        }
-
-        template <size_t I>
-        const T& get() const noexcept
-        {
-            return this->at(I);
-        }
-
         void erase(std::size_t key)
         {
-            if (key >= size())
+            if (key >= size_)
                 raise("Key does not exsist!");
 
-            while (key + 1 < size() && key + 1 < capacity())
+            while (key + 1 < size_ && key + 1 < capacity_)
             {
-                data_[key] = data_[key + 1];
+                replace(data_[key], std::forward<T>(data_[key + 1]));
                 ++key;
             }
             --size_;
         }
 
-        std::shared_ptr<T[]> data()
+        void erase(iterator pos)
         {
-            return data_;
+            auto key = std::distance(begin(), pos);
+
+            if (key >= size_)
+                raise("Key does not exsist!");
+
+            while (key + 1 < size_ && key + 1 < capacity_)
+            {
+                replace(data_[key], data_[key + 1]);
+                ++key;
+            }
+            --size_;
+        }
+
+        T* data() noexcept
+        {
+            return data_.get();
+        }
+
+        const T* data() const noexcept
+        {
+            return data_.get();
         }
 
     private:
         std::size_t size_ = 0;
         std::size_t capacity_ = 0;
 
-        std::shared_ptr<T[]> data_;
+        std::unique_ptr<T[]> data_;
+
+        template <typename A>
+        std::enable_if_t<std::is_move_assignable<A>::value> replace(A& a, A&& b)
+        {
+            a = std::move(b);
+        }
+
+        template <typename A>
+        std::enable_if_t<!std::is_move_assignable<A>::value> replace(A& a, const A& b)
+        {
+            a = b;
+        }
     };
 
 } // namespace lang

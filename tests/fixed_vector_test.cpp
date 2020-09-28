@@ -67,7 +67,7 @@ TEST_CASE("fixed vector std::get access", "[lang]")
     nitro::lang::fixed_vector<std::int64_t> v(6, a);
 
     REQUIRE(std::get<2>(v) == 2);
-    REQUIRE(v.get<3>() == 3);
+    REQUIRE(std::get<3>(v) == 3);
 }
 
 TEST_CASE("fixed vector bracket access", "[lang]")
@@ -78,8 +78,8 @@ TEST_CASE("fixed vector bracket access", "[lang]")
 
     v[0] = 7;
     v[2] = 9;
-    REQUIRE(v.get<0>() == 7);
-    REQUIRE(v.get<2>() == 9);
+    REQUIRE(v[0] == 7);
+    REQUIRE(v[2] == 9);
 }
 
 TEST_CASE("fixed vector at() access", "[lang]")
@@ -90,8 +90,8 @@ TEST_CASE("fixed vector at() access", "[lang]")
 
     v.at(0) = 7;
     v.at(2) = 9;
-    REQUIRE(v.get<0>() == 7);
-    REQUIRE(v.get<2>() == 9);
+    REQUIRE(v.at(0) == 7);
+    REQUIRE(v.at(2) == 9);
 }
 
 TEST_CASE("fixed vector merge two vectors #1", "[lang]")
@@ -102,7 +102,7 @@ TEST_CASE("fixed vector merge two vectors #1", "[lang]")
     nitro::lang::fixed_vector<std::int64_t> v(12, a);
     nitro::lang::fixed_vector<std::int64_t> w(6, b);
 
-    v.emplace(w.begin(), w.end());
+    v.insert(w.begin(), w.end());
 
     REQUIRE(v.size() == 12);
 }
@@ -120,22 +120,25 @@ TEST_CASE("fixed vector merge two vectors #2", "[lang]")
     REQUIRE(v.size() == 12);
 }
 
+TEST_CASE("fixed vector with unique ptr", "[lang]")
+{
+    nitro::lang::fixed_vector<std::unique_ptr<std::int64_t>> v(2);
+    v.insert(std::move(std::make_unique<std::int64_t>(5)));
+    v.insert(std::move(std::make_unique<std::int64_t>(6)));
+
+    REQUIRE_NOTHROW(v.erase(0));
+}
+
 // TEST_CASE("fixed vector references in storage test", "[lang]")
 // {
-//
-//     nitro::lang::fixed_vector<std::int64_t&> v(6);
-//
+//     nitro::lang::fixed_vector<std::reference_wrapper<std::int64_t>> v(6);
 //     int64_t a = 1;
 //     int64_t b = 2;
 //     int64_t c = 3;
-//
-//     v.insert(a);
-//     v.insert(b);
-//     v.insert(c);
-//
-//     REQUIRE(v.get<0>() == 1);
-//
+//     v.emplace_back(std::ref(a));
+//     v.emplace_back(std::ref(b));
+//     v.emplace_back(std::ref(c));
+//     REQUIRE(v[0] == 1);
 //     a = 4;
-//
-//     REQUIRE(v.get<0>() == 4);
+//     REQUIRE(v[0] == 4);
 // }
