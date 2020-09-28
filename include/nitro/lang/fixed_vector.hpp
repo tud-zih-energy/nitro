@@ -41,41 +41,7 @@ namespace lang
     class fixed_vector
     {
     public:
-        class iterator : public std::iterator<std::input_iterator_tag, T>
-        {
-            T* p;
-
-        public:
-            iterator(T* x) : p(x)
-            {
-            }
-            iterator(const iterator& mit) : p(mit.p)
-            {
-            }
-            iterator& operator++()
-            {
-                ++p;
-                return *this;
-            }
-            iterator operator++(int)
-            {
-                iterator tmp(*this);
-                operator++();
-                return tmp;
-            }
-            bool operator==(const iterator& rhs) const
-            {
-                return p == rhs.p;
-            }
-            bool operator!=(const iterator& rhs) const
-            {
-                return p != rhs.p;
-            }
-            T& operator*()
-            {
-                return *p;
-            }
-        };
+        using iterator = typename std::vector<T>::iterator;
 
         class reverse_iterator : public std::iterator<std::input_iterator_tag, T>
         {
