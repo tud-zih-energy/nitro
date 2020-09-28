@@ -86,7 +86,7 @@ namespace lang
         }
 
         template <typename Iterabel>
-        fixed_vector(const std::size_t& capacity, const iterabel& array)
+        fixed_vector(std::size_t capacity, const iterabel& array)
         {
             if (array.size() > capacity)
                 raise("Size larger the capacity!");
