@@ -116,31 +116,16 @@ namespace lang
         fixed_vector(const std::size_t& capacity)
         {
             capacity_ = capacity;
-            storage_ = std::make_unique<T[]>(capacity);
+            data_ = std::make_shared<T[]>(capacity);
         }
 
-        template <typename iterabel>
-        fixed_vector(const std::size_t& capacity, const iterabel& array)
+        template <typename Iterabel>
+        fixed_vector(const std::size_t& capacity, const Iterabel& array)
         {
-            if (array.size() > capacity)
-                raise("Size larger the capacity!");
-
             capacity_ = capacity;
-            storage_ = std::make_unique<T[]>(capacity);
+            data_ = std::make_shared<T[]>(capacity);
 
             emplace_back(array.begin(), array.end());
-        }
-
-        template <typename iterabel, typename func>
-        fixed_vector(const std::size_t& capacity, const iterabel& array, const func& depackage_func)
-        {
-            if (array.size() > capacity)
-                raise("Size larger the capacity!");
-
-            capacity_ = capacity;
-            storage_ = std::make_unique<T[]>(capacity);
-
-            emplace_back(array.begin(), array.end(), depackage_func);
         }
 
         fixed_vector(const fixed_vector<T>& v) : fixed_vector(v.capacity(), v)
@@ -177,7 +162,7 @@ namespace lang
             if (key > size())
                 raise("Key is larger than size, use append() instead");
 
-            return storage_[key];
+            return data_[key];
         }
 
         T& at(const std::size_t& key)
@@ -188,7 +173,7 @@ namespace lang
             if (key > size())
                 raise("Key is larger than size, use append() instead");
 
-            return storage_[key];
+            return data_[key];
         }
 
         const T& operator[](const std::size_t& key) const
@@ -199,7 +184,7 @@ namespace lang
             if (key > size())
                 raise("Key is larger than size, use emplace_back() instead!");
 
-            return storage_[key];
+            return data_[key];
         }
 
         const T& at(const std::size_t& key) const
@@ -210,27 +195,27 @@ namespace lang
             if (key > size())
                 raise("Key is larger than size, use emplace_back() instead!");
 
-            return storage_[key];
+            return data_[key];
         }
 
         T& front() noexcept
         {
-            return storage_[0];
+            return data_[0];
         }
 
         const T& front() const noexcept
         {
-            return storage_[0];
+            return data_[0];
         }
 
         T& back() noexcept
         {
-            return storage_[size_ - 1];
+            return data_[size_ - 1];
         }
 
         const T& back() const noexcept
         {
-            return storage_[size_ - 1];
+            return data_[size_ - 1];
         }
 
         std::size_t emplace(const T& value)
@@ -238,14 +223,14 @@ namespace lang
             return emplace_back(value);
         }
 
-        template <typename iter>
-        void emplace(iter start, const iter& end)
+        template <typename Iter>
+        void emplace(Iter start, const Iter& end)
         {
             emplace_back(start, end);
         }
 
-        template <typename iter, typename func>
-        void emplace(iter start, const iter& end, func depackage_func)
+        template <typename Iter, typename func>
+        void emplace(Iter start, const Iter& end, func depackage_func)
         {
             emplace_back(start, end, depackage_func);
         }
@@ -256,36 +241,21 @@ namespace lang
             if (size_ >= capacity())
                 raise("No capacity left!");
 
-            storage_[size_] = T(value);
+            data_[size_] = T(value);
             ++size_;
 
             return size_ - 1;
         }
 
-        template <typename iter>
-        void emplace_back(iter start, const iter& end)
+        template <typename Iter>
+        void emplace_back(Iter start, const Iter& end)
         {
             while (start != end)
             {
                 if (size_ >= capacity())
                     raise("No capacity left!");
 
-                storage_[size_] = T(*start);
-                ++size_;
-
-                ++start;
-            }
-        }
-
-        template <typename iter, typename func>
-        void emplace_back(iter start, const iter& end, func depackage_func)
-        {
-            while (start != end)
-            {
-                if (size_ >= capacity())
-                    raise("No capacity left!");
-
-                storage_[size_] = T(depackage_func(start));
+                data_[size_] = T(*start);
                 ++size_;
 
                 ++start;
@@ -298,36 +268,36 @@ namespace lang
             if (size_ >= capacity())
                 raise("No capacity left!");
 
-            storage_[size_] = value;
+            data_[size_] = value;
             ++size_;
 
             return size_ - 1;
         }
 
-        template <typename iter>
-        void insert(iter start, const iter& end)
+        template <typename Iter>
+        void insert(Iter start, const Iter& end)
         {
             while (start != end)
             {
                 if (size_ >= capacity())
                     raise("No capacity left!");
 
-                storage_[size_] = *start;
+                data_[size_] = *start;
                 ++size_;
 
                 ++start;
             }
         }
 
-        template <typename iter, typename func>
-        void insert(iter start, const iter& end, func depackage_func)
+        template <typename Iter, typename func>
+        void insert(Iter start, const Iter& end, func depackage_func)
         {
             while (start != end)
             {
                 if (size_ >= capacity())
                     raise("No capacity left!");
 
-                storage_[size_] = depackage_func(start);
+                data_[size_] = depackage_func(start);
                 ++size_;
 
                 ++start;
@@ -346,7 +316,7 @@ namespace lang
             if (size_ >= capacity())
                 raise("No capacity left!");
 
-            storage_[size_] = value;
+            data_[size_] = value;
             ++size_;
 
             return size_ - 1;
@@ -359,67 +329,67 @@ namespace lang
                 raise("Container is empty!");
 
             --size_;
-            return storage_[size_];
+            return data_[size_];
         }
 
         typename fixed_vector<T>::iterator begin() noexcept
         {
-            return iterator(&storage_[0]);
+            return iterator(&data_[0]);
         }
 
         typename fixed_vector<T>::reverse_iterator rbegin() noexcept
         {
-            return reverse_iterator(&storage_[size_ - 1]);
+            return reverse_iterator(&data_[size_ - 1]);
         }
 
         typename fixed_vector<T>::iterator end() noexcept
         {
-            return iterator(&storage_[size_]);
+            return iterator(&data_[size_]);
         }
 
         typename fixed_vector<T>::reverse_iterator rend() noexcept
         {
-            return reverse_iterator(&storage_[-1]);
+            return reverse_iterator(&data_[-1]);
         }
 
         const typename fixed_vector<T>::iterator begin() const noexcept
         {
-            return iterator(&storage_[0]);
+            return iterator(&data_[0]);
         }
 
         const typename fixed_vector<T>::reverse_iterator rbegin() const noexcept
         {
-            return reverse_iterator(&storage_[size_ - 1]);
+            return reverse_iterator(&data_[size_ - 1]);
         }
 
         const typename fixed_vector<T>::iterator end() const noexcept
         {
-            return iterator(&storage_[size_]);
+            return iterator(&data_[size_]);
         }
 
         const typename fixed_vector<T>::reverse_iterator rend() const noexcept
         {
-            return reverse_iterator(&storage_[-1]);
+            return reverse_iterator(&data_[-1]);
         }
 
         const typename fixed_vector<T>::iterator cbegin() const noexcept
         {
-            return iterator(&storage_[0]);
+            return iterator(&data_[0]);
         }
 
         const typename fixed_vector<T>::reverse_iterator crbegin() const noexcept
         {
-            return reverse_iterator(&storage_[size_ - 1]);
+            return reverse_iterator(&data_[size_ - 1]);
         }
 
         const typename fixed_vector<T>::iterator cend() const noexcept
         {
-            return iterator(&storage_[size_]);
+            return iterator(&data_[size_]);
         }
 
         const typename fixed_vector<T>::reverse_iterator crend() const noexcept
         {
-            return reverse_iterator(&storage_[-1]);
+            return reverse_iterator(&data_[-1]);
         }
 
         template <size_t I>
@@ -441,17 +411,22 @@ namespace lang
 
             while (key + 1 < size() && key + 1 < capacity())
             {
-                storage_[key] = storage_[key + 1];
+                data_[key] = data_[key + 1];
                 ++key;
             }
             --size_;
+        }
+
+        std::shared_ptr<T[]> data()
+        {
+            return data_;
         }
 
     private:
         std::size_t size_ = 0;
         std::size_t capacity_ = 0;
 
-        std::unique_ptr<T[]> storage_;
+        std::shared_ptr<T[]> data_;
     };
 
 } // namespace lang
