@@ -43,41 +43,7 @@ namespace lang
     public:
         using iterator = typename std::vector<T>::iterator;
 
-        class reverse_iterator : public std::iterator<std::input_iterator_tag, T>
-        {
-            T* p;
-
-        public:
-            reverse_iterator(T* x) : p(x)
-            {
-            }
-            reverse_iterator(const reverse_iterator& mit) : p(mit.p)
-            {
-            }
-            reverse_iterator& operator++()
-            {
-                --p;
-                return *this;
-            }
-            reverse_iterator operator++(int)
-            {
-                reverse_iterator tmp(*this);
-                operator++();
-                return tmp;
-            }
-            bool operator==(const reverse_iterator& rhs) const
-            {
-                return p == rhs.p;
-            }
-            bool operator!=(const reverse_iterator& rhs) const
-            {
-                return p != rhs.p;
-            }
-            T& operator*()
-            {
-                return *p;
-            }
-        };
+        using reverse_iterator = typename std::vector<T>::reverse_iterator;
 
         fixed_vector(const std::size_t& capacity)
         : capacity_(capacity), data_(std::make_shared<T[]>(capacity))
