@@ -28,6 +28,8 @@
 
 #include <nitro/env/process.hpp>
 
+#include <cstdint>
+
 extern "C"
 {
 #if defined(_MSC_VER) || defined(_MSC_EXTENSIONS)
@@ -41,6 +43,10 @@ extern "C"
 #ifdef __linux__
 #include <sys/syscall.h>
 #include <sys/types.h>
+#endif
+
+#if __APPLE__
+#include <pthread.h>
 #endif
 }
 
@@ -99,6 +105,16 @@ namespace env
     {
 #if __linux__
         return syscall(SYS_gettid);
+#elif __APPLE__
+        std::uint64_t tid;
+        // this technically has two possible errors:
+        // ESRCH - when the passed thread doesn't exist, but as we pass nullptr. So it always uses
+        // the current thread, which will needs to exist.
+        // EINVAL - if the output argument is provided with a nullptr, which we don't.
+        // Therefore, no checks required.
+        pthread_threadid_np(nullptr, &tid);
+
+        return static_cast<int>(tid);
 #else
         return nitro::env::get_pid();
 #endif
