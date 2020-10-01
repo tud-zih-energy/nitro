@@ -283,29 +283,16 @@ namespace lang
             return &data_[-1];
         }
 
-        void erase(std::size_t key)
+        void erase(T* pos)
         {
+            std::size_t key = std::distance(begin(), pos);
+
             if (key >= size_)
                 raise("Key does not exsist!");
 
             while (key + 1 < size_ && key + 1 < capacity_)
             {
                 replace(data_[key], std::forward<T>(data_[key + 1]));
-                ++key;
-            }
-            --size_;
-        }
-
-        void erase(T* pos)
-        {
-            auto key = std::distance(begin(), pos);
-
-            if (key >= size_)
-                raise("Key does not exsist!");
-
-            while (key + 1 < size_ && key + 1 < capacity_)
-            {
-                replace(data_[key], data_[key + 1]);
                 ++key;
             }
             --size_;

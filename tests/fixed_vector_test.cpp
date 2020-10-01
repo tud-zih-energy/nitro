@@ -30,7 +30,7 @@ TEST_CASE("fixed vector erase", "[lang]")
 
     v.emplace_back(5);
     v.emplace_back(7);
-    v.erase(0);
+    v.erase(v.begin());
 
     REQUIRE(v.back() == 7);
     REQUIRE(v.front() == 7);
@@ -113,7 +113,7 @@ TEST_CASE("fixed vector with unique ptr", "[lang]")
     v.insert(std::move(std::make_unique<std::int64_t>(5)));
     v.insert(std::move(std::make_unique<std::int64_t>(6)));
 
-    REQUIRE_NOTHROW(v.erase(0));
+    REQUIRE_NOTHROW(v.erase(v.begin()));
 }
 
 // TEST_CASE("fixed vector references in storage test", "[lang]")
