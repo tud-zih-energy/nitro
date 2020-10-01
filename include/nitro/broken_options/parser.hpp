@@ -38,7 +38,6 @@
 #include <nitro/broken_options/options.hpp>
 
 #include <nitro/except/raise.hpp>
-#include <nitro/lang/unordered.hpp>
 
 #include <deque>
 #include <iostream>

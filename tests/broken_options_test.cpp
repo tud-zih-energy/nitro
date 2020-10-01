@@ -263,9 +263,9 @@ arguments:
     }
 }
 
-TEST_CASE("Groups work")
+TEST_CASE("Groups")
 {
-    SECTION("Groups work")
+    SECTION("Groups output is correct")
     {
         nitro::broken_options::parser parser("app_name", "about");
 
@@ -365,7 +365,7 @@ group2:
         REQUIRE(actual == expected);
     }
 
-    SECTION("Groups work 2")
+    SECTION("Groups output is correct #2")
     {
         nitro::broken_options::parser parser("app_name", "about");
 
@@ -465,7 +465,7 @@ group2:
         REQUIRE(actual == expected);
     }
 
-    SECTION("Change Default Group")
+    SECTION("Change name of default group should work")
     {
         nitro::broken_options::parser parser("app_name", "about");
 
@@ -544,20 +544,7 @@ test arguments:
 )EXPECTED");
     }
 
-    SECTION("Multiple groups with same name should be one group")
-    {
-        nitro::broken_options::parser parser("app_name", "about");
-
-        std::stringstream s;
-
-        auto grp1 = parser.group("group1");
-        auto grp2 = parser.group("group2");
-
-        grp1.toggle("tog", "should work");
-        REQUIRE_THROWS_AS(grp2.toggle("tog", "should fail"), nitro::broken_options::parser_error);
-    }
-
-    SECTION("Groups work 2")
+    SECTION("Getting group with same name")
     {
         nitro::broken_options::parser parser("app_name", "about");
 

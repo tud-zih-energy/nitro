@@ -48,18 +48,17 @@ namespace broken_options
         std::string description;
 
     public:
-        group(std::set<std::string>& all_argument_names, int position,
-              const std::string& name, const std::string& description = std::string(""))
+        group(std::set<std::string>& all_argument_names, int position, const std::string& name,
+              const std::string& description = std::string(""))
         : name(name), description(description), all_argument_names_(all_argument_names),
-          position_(position)
+          level_(position)
         {
         }
 
         group& subgroup(const std::string& name, const std::string& description = std::string(""))
         {
             if (std::find(sub_groups_.begin(), sub_groups_.end(), name) == sub_groups_.end())
-                sub_groups_.emplace_back(
-                    group(all_argument_names_, position_ + 1, name, description));
+                sub_groups_.emplace_back(group(all_argument_names_, level_ + 1, name, description));
 
             return *std::find(sub_groups_.begin(), sub_groups_.end(), name);
         }
@@ -67,7 +66,7 @@ namespace broken_options
         void usage(std::ostream& s) const
         {
             s << std::endl;
-            for (int i = 0; i < position_; ++i)
+            for (int i = 0; i < level_; ++i)
                 s << "  ";
 
             s << name << ":" << std::endl;
@@ -78,15 +77,12 @@ namespace broken_options
             }
 
             std::map<std::string, const nitro::broken_options::base&> print_options;
-            for (auto& iter : options_)
-                print_options.emplace(iter.first, iter.second);
-            for (auto& iter : multi_options_)
-                print_options.emplace(iter.first, iter.second);
-            for (auto& iter : toggles_)
-                print_options.emplace(iter.first, iter.second);
+            print_options.emplace(options_.begin(), options_.end());
+            print_options.emplace(multi_options_.begin(), multi_options_.end());
+            print_options.emplace(toggles_.begin(), toggles_.end());
 
             for (auto& iter : print_options)
-                iter.second.format(s, position_ * 2 + 2);
+                iter.second.format(s, level_ * 2 + 2);
         }
 
         broken_options::option& option(const std::string& name,
@@ -94,15 +90,15 @@ namespace broken_options
         {
             if (all_argument_names_.find(name) != all_argument_names_.end())
             {
-                auto search = options_.find(name);
-                if (search == options_.end())
+                auto result = options_.find(name);
+                if (result == options_.end())
                 {
                     raise<parser_error>(
                         "Trying to redefine argument name in a different group. Name: ", name);
                 }
                 else
                 {
-                    return search->second;
+                    return result->second;
                 }
             }
 
@@ -118,15 +114,15 @@ namespace broken_options
         {
             if (all_argument_names_.find(name) != all_argument_names_.end())
             {
-                auto search = multi_options_.find(name);
-                if (search == multi_options_.end())
+                auto result = multi_options_.find(name);
+                if (result == multi_options_.end())
                 {
                     raise<parser_error>(
                         "Trying to redefine argument name in a different group. Name: ", name);
                 }
                 else
                 {
-                    return search->second;
+                    return result->second;
                 }
             }
 
@@ -142,15 +138,15 @@ namespace broken_options
         {
             if (all_argument_names_.find(name) != all_argument_names_.end())
             {
-                auto search = toggles_.find(name);
-                if (search == toggles_.end())
+                auto result = toggles_.find(name);
+                if (result == toggles_.end())
                 {
                     raise<parser_error>(
                         "Trying to redefine argument name in a different group. Name: ", name);
                 }
                 else
                 {
-                    return search->second;
+                    return result->second;
                 }
             }
 
@@ -164,10 +160,7 @@ namespace broken_options
         std::map<std::string, broken_options::option&> get_all_options()
         {
             std::map<std::string, broken_options::option&> tmp;
-            for (auto& it : options_)
-            {
-                tmp.emplace(it.first, it.second);
-            }
+            tmp.insert(options_.begin(), options_.end());
 
             for (auto& sg : sub_groups_)
             {
@@ -180,10 +173,7 @@ namespace broken_options
         std::map<std::string, broken_options::multi_option&> get_all_multi_options()
         {
             std::map<std::string, broken_options::multi_option&> tmp;
-            for (auto& it : multi_options_)
-            {
-                tmp.emplace(it.first, it.second);
-            }
+            tmp.insert(multi_options_.begin(), multi_options_.end());
 
             for (auto& sg : sub_groups_)
             {
@@ -196,10 +186,7 @@ namespace broken_options
         std::map<std::string, broken_options::toggle&> get_all_toggles()
         {
             std::map<std::string, broken_options::toggle&> tmp;
-            for (auto& it : toggles_)
-            {
-                tmp.emplace(it.first, it.second);
-            }
+            tmp.insert(toggles_.begin(), toggles_.end());
 
             for (auto& sg : sub_groups_)
             {
@@ -227,7 +214,7 @@ namespace broken_options
         std::map<std::string, broken_options::toggle> toggles_;
 
         std::vector<broken_options::group> sub_groups_;
-        int position_;
+        int level_;
     };
 } // namespace broken_options
 } // namespace nitro
