@@ -57,7 +57,7 @@ namespace broken_options
 
         group& subgroup(const std::string& name, const std::string& description = std::string(""))
         {
-            if (std::count(sub_groups_.begin(), sub_groups_.end(), name) == 0)
+            if (std::find(sub_groups_.begin(), sub_groups_.end(), name) == sub_groups_.end())
                 sub_groups_.emplace_back(
                     group(all_argument_names_, position_ + 1, name, description));
 
@@ -106,11 +106,11 @@ namespace broken_options
                 }
             }
 
-            options_.emplace(std::piecewise_construct, std::forward_as_tuple(name),
-                             std::forward_as_tuple(name, description));
             all_argument_names_.emplace(name);
-
-            return options_.at(name);
+            return options_
+                .emplace(std::piecewise_construct, std::forward_as_tuple(name),
+                         std::forward_as_tuple(name, description))
+                .first->second;
         }
 
         broken_options::multi_option& multi_option(const std::string& name,
@@ -131,10 +131,10 @@ namespace broken_options
             }
 
             all_argument_names_.emplace(name);
-            multi_options_.emplace(std::piecewise_construct, std::forward_as_tuple(name),
-                                   std::forward_as_tuple(name, description));
-
-            return multi_options_.at(name);
+            return multi_options_
+                .emplace(std::piecewise_construct, std::forward_as_tuple(name),
+                         std::forward_as_tuple(name, description))
+                .first->second;
         }
 
         broken_options::toggle& toggle(const std::string& name,
@@ -154,11 +154,11 @@ namespace broken_options
                 }
             }
 
-            toggles_.emplace(std::piecewise_construct, std::forward_as_tuple(name),
-                             std::forward_as_tuple(name, description));
             all_argument_names_.emplace(name);
-
-            return toggles_.at(name);
+            return toggles_
+                .emplace(std::piecewise_construct, std::forward_as_tuple(name),
+                         std::forward_as_tuple(name, description))
+                .first->second;
         }
 
         std::map<std::string, broken_options::option&> get_all_options()
