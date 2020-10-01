@@ -1302,6 +1302,7 @@ TEST_CASE("Usage metavar work")
 
 about
 
+
 arguments:
   --opt_nosd test                         some opt without short and default
 )EXPECTED");
@@ -1321,6 +1322,7 @@ arguments:
                 R"EXPECTED(usage: app_name --mopt
 
 about
+
 
 arguments:
   --mopt test                             some multi opt
