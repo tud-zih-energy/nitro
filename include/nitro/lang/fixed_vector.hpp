@@ -41,10 +41,6 @@ namespace lang
     class fixed_vector
     {
     public:
-        using iterator = typename std::vector<T>::iterator;
-
-        using reverse_iterator = typename std::vector<T>::reverse_iterator;
-
         fixed_vector(std::size_t capacity)
         : capacity_(capacity), data_(std::make_unique<T[]>(capacity))
         {
@@ -135,7 +131,7 @@ namespace lang
         }
 
         template <class... Args>
-        void emplace(iterator pos, Args&&... args)
+        void emplace(T* const pos, Args&&... args)
         {
             auto key = std::distance(begin(), pos);
 
@@ -181,7 +177,7 @@ namespace lang
         }
 
         template <typename Iter>
-        void insert(iterator pos, Iter start, Iter end)
+        void insert(T* const pos, Iter start, Iter end)
         {
             std::size_t key = std::distance(begin(), pos);
             if (key > size_)
@@ -227,64 +223,64 @@ namespace lang
             --size_;
         }
 
-        typename fixed_vector<T>::iterator begin() noexcept
+        T* begin() noexcept
         {
-            return iterator(&data_[0]);
+            return &data_[0];
         }
 
-        typename fixed_vector<T>::reverse_iterator rbegin() noexcept
+        T* rbegin() noexcept
         {
-            return reverse_iterator(&data_[size_ - 1]);
+            return &data_[size_ - 1];
         }
 
-        typename fixed_vector<T>::iterator end() noexcept
+        T* end() noexcept
         {
-            return iterator(&data_[size_]);
+            return &data_[size_];
         }
 
-        typename fixed_vector<T>::reverse_iterator rend() noexcept
+        T* rend() noexcept
         {
-            return reverse_iterator(&data_[-1]);
+            return &data_[-1];
         }
 
-        const typename fixed_vector<T>::iterator begin() const noexcept
+        const T* begin() const noexcept
         {
-            return iterator(&data_[0]);
+            return &data_[0];
         }
 
-        const typename fixed_vector<T>::reverse_iterator rbegin() const noexcept
+        const T* rbegin() const noexcept
         {
-            return reverse_iterator(&data_[size_ - 1]);
+            return &data_[size_ - 1];
         }
 
-        const typename fixed_vector<T>::iterator end() const noexcept
+        const T* end() const noexcept
         {
-            return iterator(&data_[size_]);
+            return &data_[size_];
         }
 
-        const typename fixed_vector<T>::reverse_iterator rend() const noexcept
+        const T* rend() const noexcept
         {
-            return reverse_iterator(&data_[-1]);
+            return &data_[-1];
         }
 
-        const typename fixed_vector<T>::iterator cbegin() const noexcept
+        const T* cbegin() const noexcept
         {
-            return iterator(&data_[0]);
+            return &data_[0];
         }
 
-        const typename fixed_vector<T>::reverse_iterator crbegin() const noexcept
+        const T* crbegin() const noexcept
         {
-            return reverse_iterator(&data_[size_ - 1]);
+            return &data_[size_ - 1];
         }
 
-        const typename fixed_vector<T>::iterator cend() const noexcept
+        const T* cend() const noexcept
         {
-            return iterator(&data_[size_]);
+            return &data_[size_];
         }
 
-        const typename fixed_vector<T>::reverse_iterator crend() const noexcept
+        const T* crend() const noexcept
         {
-            return reverse_iterator(&data_[-1]);
+            return &data_[-1];
         }
 
         void erase(std::size_t key)
@@ -300,7 +296,7 @@ namespace lang
             --size_;
         }
 
-        void erase(iterator pos)
+        void erase(T* pos)
         {
             auto key = std::distance(begin(), pos);
 
