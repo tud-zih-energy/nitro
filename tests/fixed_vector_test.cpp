@@ -102,20 +102,7 @@ TEST_CASE("fixed vector merge two vectors #1", "[lang]")
     nitro::lang::fixed_vector<std::int64_t> v(12, a);
     nitro::lang::fixed_vector<std::int64_t> w(6, b);
 
-    v.insert(w.begin(), w.end());
-
-    REQUIRE(v.size() == 12);
-}
-
-TEST_CASE("fixed vector merge two vectors #2", "[lang]")
-{
-    std::array<std::int64_t, 6> a = { 0, 1, 2, 3, 4, 5 };
-    std::array<std::int64_t, 6> b = { 6, 7, 8, 9, 10, 11 };
-
-    nitro::lang::fixed_vector<std::int64_t> v(12, a);
-    nitro::lang::fixed_vector<std::int64_t> w(6, b);
-
-    v.merge(w);
+    v.push_back(w.begin(), w.end());
 
     REQUIRE(v.size() == 12);
 }

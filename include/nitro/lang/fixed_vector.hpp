@@ -212,6 +212,12 @@ namespace lang
             return size_ - 1;
         }
 
+        template <typename Iter>
+        void push_back(Iter start, Iter end)
+        {
+            insert(this.end(), start, end)
+        }
+
         void pop_back()
         {
             if (size_ == 0)
