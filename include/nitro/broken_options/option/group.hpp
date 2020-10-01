@@ -48,7 +48,7 @@ namespace broken_options
         std::string description;
 
     public:
-        group(std::set<std::string>& all_argument_names, const int& position,
+        group(std::set<std::string>& all_argument_names, int position,
               const std::string& name, const std::string& description = std::string(""))
         : name(name), description(description), all_argument_names_(all_argument_names),
           position_(position)
