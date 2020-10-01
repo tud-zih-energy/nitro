@@ -54,7 +54,7 @@ namespace lang
         fixed_vector(std::size_t capacity, const Iterabel& array)
         : capacity_(capacity), data_(std::make_unique<T[]>(capacity))
         {
-            push_back(array.begin(), array.end());
+            insert(this->begin(), array.begin(), array.end());
         }
 
         fixed_vector(const fixed_vector<T>& v) : fixed_vector(v.capacity_, v)
@@ -181,9 +181,9 @@ namespace lang
         }
 
         template <typename Iter>
-        void insert(Iter pos, Iter start, Iter end)
+        void insert(iterator pos, Iter start, Iter end)
         {
-            auto key = std::distance(begin(), pos);
+            std::size_t key = std::distance(begin(), pos);
             if (key > size_)
                 raise("Key larger than size!");
 
@@ -215,7 +215,7 @@ namespace lang
         template <typename Iter>
         void push_back(Iter start, Iter end)
         {
-            insert(this->end(), start, end)
+            insert(this->end(), start, end);
         }
 
         void pop_back()
