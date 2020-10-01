@@ -158,7 +158,7 @@ namespace broken_options
             }
         }
 
-        bool matches(const argument& arg) override
+        bool matches(const argument& arg) const override
         {
             if (arg.is_named())
             {
