@@ -197,6 +197,7 @@ namespace lang
                 if (key == size_)
                     ++size_;
 
+                ++key;
                 ++start;
             }
         }
