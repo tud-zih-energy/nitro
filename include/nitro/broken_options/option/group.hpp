@@ -77,9 +77,12 @@ namespace broken_options
             }
 
             std::map<std::string, const nitro::broken_options::base&> print_options;
-            print_options.emplace(options_.begin(), options_.end());
-            print_options.emplace(multi_options_.begin(), multi_options_.end());
-            print_options.emplace(toggles_.begin(), toggles_.end());
+            for (auto& it : options_)
+                print_options.emplace(it->first, it->second);
+            for (auto& it : multi_options_)
+                print_options.emplace(it->first, it->second);
+            for (auto& it : toggles_)
+                print_options.emplace(it->first, it->second);
 
             for (auto& iter : print_options)
                 iter.second.format(s, level_ * 2 + 2);
@@ -160,7 +163,8 @@ namespace broken_options
         std::map<std::string, broken_options::option&> get_all_options()
         {
             std::map<std::string, broken_options::option&> tmp;
-            tmp.insert(options_.begin(), options_.end());
+            for (auto& it : options_)
+                tmp.insert(it->first, it->second);
 
             for (auto& sg : sub_groups_)
             {
@@ -173,7 +177,8 @@ namespace broken_options
         std::map<std::string, broken_options::multi_option&> get_all_multi_options()
         {
             std::map<std::string, broken_options::multi_option&> tmp;
-            tmp.insert(multi_options_.begin(), multi_options_.end());
+            for (auto& it : multi_options_)
+                tmp.insert(it->first, it->second);
 
             for (auto& sg : sub_groups_)
             {
@@ -186,7 +191,8 @@ namespace broken_options
         std::map<std::string, broken_options::toggle&> get_all_toggles()
         {
             std::map<std::string, broken_options::toggle&> tmp;
-            tmp.insert(toggles_.begin(), toggles_.end());
+            for (auto& it : toggles_)
+                tmp.insert(it->first, it->second);
 
             for (auto& sg : sub_groups_)
             {
