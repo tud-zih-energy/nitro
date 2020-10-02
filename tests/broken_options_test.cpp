@@ -550,10 +550,15 @@ test arguments:
 
         std::stringstream s;
 
-        auto grp1 = parser.group("group1");
-        auto grp2 = parser.group("group1");
+        auto& grp1 = parser.group("group1");
+        auto& grp2 = parser.group("group1");
 
         REQUIRE(grp1 == grp2);
+
+        auto& opt1 = grp1.option("opt");
+        auto& opt2 = grp2.option("opt");
+
+        REQUIRE(&opt1 == &opt2);
     }
 }
 
