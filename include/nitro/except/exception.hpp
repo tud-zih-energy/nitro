@@ -76,7 +76,8 @@ namespace except
     {
     public:
         template <typename... Args>
-        explicit exception(Args... args) : std::runtime_error(detail::make_string(args...))
+        explicit exception(Args&&... args)
+        : std::runtime_error(detail::make_string(std::forward<Args>(args)...))
         {
         }
     };
