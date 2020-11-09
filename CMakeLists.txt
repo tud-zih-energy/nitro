@@ -87,6 +87,7 @@ if (NOT NITRO_LOG_LEVEL)
 endif()
 
 option(NITRO_POSITION_INDEPENDENT_CODE "Whether to build Nitro libraries with position independent code" OFF)
+option(NITRO_BUILD_TESTING  "Whether to build Nitro tests" ON)
 
 add_library(nitro-core INTERFACE)
 target_compile_features(nitro-core
@@ -256,8 +257,10 @@ if(CMAKE_CURRENT_SOURCE_DIR STREQUAL CMAKE_SOURCE_DIR)
         DESTINATION lib/cmake/Nitro
     )
 
-    include(CTest)
-    add_subdirectory(tests)
+    if (NITRO_BUILD_TESTING)
+        include(CTest)
+        add_subdirectory(tests)
+    endif()
 else()
     target_include_directories(nitro-core SYSTEM INTERFACE
         $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
