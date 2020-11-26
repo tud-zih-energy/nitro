@@ -247,18 +247,6 @@ arguments:
 
         CHECK(actual.size() == expected.size());
 
-        std::size_t tmp = 0;
-        for (unsigned long i = 0; i < actual.size(); ++i)
-        {
-            if (actual[i] != expected[i])
-            {
-                std::cout << i << " " << actual[i] << " " << expected[i] << std::endl;
-                ++tmp;
-                if (tmp > 100)
-                    break;
-            }
-        }
-
         REQUIRE(actual == expected);
     }
 }
@@ -352,18 +340,6 @@ group2:
 )EXPECTED";
 
         CHECK(actual.size() == expected.size());
-
-        std::size_t tmp = 0;
-        for (unsigned long i = 0; i < actual.size(); ++i)
-        {
-            if (actual[i] != expected[i])
-            {
-                std::cout << i << " " << actual[i] << " " << expected[i] << std::endl;
-                ++tmp;
-                if (tmp > 100)
-                    break;
-            }
-        }
 
         REQUIRE(actual == expected);
     }
