@@ -39,68 +39,80 @@ namespace nitro
 {
 namespace broken_options
 {
+    std::map<std::string, broken_options::option&> parser::get_all_options()
+    {
+        std::map<std::string, broken_options::option&> tmp;
+        for (auto& sg : groups_)
+        {
+            auto add = sg.get_all_options();
+            tmp.insert(add.begin(), add.end());
+        }
+        return tmp;
+    }
+
+    std::map<std::string, broken_options::multi_option&> parser::get_all_multi_options()
+    {
+        std::map<std::string, broken_options::multi_option&> tmp;
+        for (auto& sg : groups_)
+        {
+            auto add = sg.get_all_multi_options();
+            tmp.insert(add.begin(), add.end());
+        }
+        return tmp;
+    }
+
+    std::map<std::string, broken_options::toggle&> parser::get_all_toggles()
+    {
+        std::map<std::string, broken_options::toggle&> tmp;
+        for (auto& sg : groups_)
+        {
+            auto add = sg.get_all_toggles();
+            tmp.insert(add.begin(), add.end());
+        }
+        return tmp;
+    }
+
+    nitro::broken_options::group& parser::group(const std::string& name,
+                                                const std::string& description)
+    {
+        for (nitro::broken_options::group& grp : groups_)
+        {
+            if (grp.name == name)
+            {
+                if (!description.empty())
+                    grp.description = description;
+                return grp;
+            }
+        }
+
+        groups_.emplace_back(broken_options::group(all_argument_names_, 0, name, description));
+        return groups_.back();
+    }
+    nitro::broken_options::group& parser::default_group(const std::string& name,
+                                                        const std::string& description)
+    {
+        if (!name.empty())
+            default_group_.name = name;
+        if (!description.empty())
+            default_group_.description = description;
+
+        return default_group_;
+    }
+
     broken_options::option& parser::option(const std::string& name, const std::string& description)
     {
-        if (multi_options_.count(name) > 0)
-        {
-            raise<parser_error>("Trying to redefine multi_option as option. Name: ", name);
-        }
-
-        if (toggles_.count(name) > 0)
-        {
-            raise<parser_error>("Trying to redefine toggle as multi_option. Name: ", name);
-        }
-
-        if (options_.count(name) == 0)
-        {
-            auto res = options_.emplace(std::piecewise_construct, std::forward_as_tuple(name),
-                                        std::forward_as_tuple(name, description));
-            arguments_.add(res.first->second);
-        }
-        return options_.at(name);
+        return default_group_.option(name, description);
     }
 
     broken_options::multi_option& parser::multi_option(const std::string& name,
                                                        const std::string& description)
     {
-        if (options_.count(name) > 0)
-        {
-            raise<parser_error>("Trying to redefine option as multi_option. Name: ", name);
-        }
-
-        if (toggles_.count(name) > 0)
-        {
-            raise<parser_error>("Trying to redefine toggle as multi_option. Name: ", name);
-        }
-
-        if (multi_options_.count(name) == 0)
-        {
-            auto res = multi_options_.emplace(std::piecewise_construct, std::forward_as_tuple(name),
-                                              std::forward_as_tuple(name, description));
-            arguments_.add(res.first->second);
-        }
-        return multi_options_.at(name);
+        return default_group_.multi_option(name, description);
     }
 
     broken_options::toggle& parser::toggle(const std::string& name, const std::string& description)
     {
-        if (options_.count(name) > 0)
-        {
-            raise<parser_error>("Trying to redefine option as multi_option. Name: ", name);
-        }
-
-        if (multi_options_.count(name) > 0)
-        {
-            raise<parser_error>("Trying to redefine multi_option as option. Name: ", name);
-        }
-
-        if (toggles_.count(name) == 0)
-        {
-            auto res = toggles_.emplace(std::piecewise_construct, std::forward_as_tuple(name),
-                                        std::forward_as_tuple(name, description));
-            arguments_.add(res.first->second);
-        }
-        return toggles_.at(name);
+        return default_group_.toggle(name, description);
     }
 
     void parser::accept_positionals(std::size_t amount)
@@ -145,12 +157,8 @@ namespace broken_options
                 continue;
             }
 
-            if (parse_options(it, args.end()) || parse_multi_options(it, args.end()))
-            {
-                continue;
-            }
-
-            if (parse_toggles(it, args.end()))
+            if (parse_options(it, args.end()) || parse_multi_options(it, args.end()) ||
+                parse_toggles(it, args.end()))
             {
                 continue;
             }
@@ -166,7 +174,7 @@ namespace broken_options
 
         validate();
 
-        return options(options_, multi_options_, toggles_, positionals);
+        return options(get_all_options(), get_all_multi_options(), get_all_toggles(), positionals);
     }
 
     std::ostream& parser::usage(std::ostream& s, bool print_default_group)
@@ -174,7 +182,7 @@ namespace broken_options
         std::string short_list;
         std::string option_list;
 
-        for (auto& toggle : toggles_)
+        for (auto& toggle : get_all_toggles())
         {
             if (toggle.second.has_short_name())
             {
@@ -190,7 +198,7 @@ namespace broken_options
             s << " [-" << short_list << "]";
         }
 
-        for (auto& opt : options_)
+        for (auto& opt : get_all_options())
         {
             if (opt.second.has_default())
             {
@@ -202,7 +210,7 @@ namespace broken_options
             }
         }
 
-        for (auto& mopt : multi_options_)
+        for (auto& mopt : get_all_multi_options())
         {
             if (mopt.second.has_default())
             {
@@ -226,18 +234,22 @@ namespace broken_options
             s << about_ << std::endl << std::endl;
         }
 
-        if (print_default_group)
+        bool first = true;
+        for (const auto& grp : groups_)
         {
-            arguments_.usage(s);
-        }
+            if (print_default_group || !first)
+                grp.usage(s);
 
+            if (first)
+                first = false;
+        }
         return s;
     }
 
     template <typename Iter>
     bool parser::parse_options(Iter& it, Iter end)
     {
-        for (auto& option : options_)
+        for (auto& option : get_all_options())
         {
 
             if (it->has_value())
@@ -275,7 +287,7 @@ namespace broken_options
     template <typename Iter>
     bool parser::parse_multi_options(Iter& it, Iter end)
     {
-        for (auto& option : multi_options_)
+        for (auto& option : get_all_multi_options())
         {
             if (it->has_value())
             {
@@ -315,7 +327,7 @@ namespace broken_options
 
         bool match_found = false;
 
-        for (auto& option : toggles_)
+        for (auto& option : get_all_toggles())
         {
             if (option.second.matches(*it))
             {
@@ -359,21 +371,20 @@ namespace broken_options
     template <typename F>
     void parser::for_each_option(F f)
     {
-        for (auto& option : options_)
+        for (auto& option : get_all_options())
         {
             f(option.second);
         }
 
-        for (auto& option : multi_options_)
+        for (auto& option : get_all_multi_options())
         {
             f(option.second);
         }
 
-        for (auto& option : toggles_)
+        for (auto& option : get_all_toggles())
         {
             f(option.second);
         }
     }
-
 } // namespace broken_options
 } // namespace nitro

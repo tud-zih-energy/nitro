@@ -208,11 +208,13 @@ TEST_CASE("Usage descriptions work")
 
         parser.usage(s);
 
-        REQUIRE(
-            s.str() ==
+        auto actual = s.str();
+
+        std::string expected =
             R"EXPECTED(usage: app_name [-tu] --env-opt --env-opt-2 --opt --opt_long [--opt_nos] --opt_nosd [--opt_with_d] [--some_long_named_option] --mopt [command line ...]
 
 about
+
 
 arguments:
   --env-opt arg                           This is an option to set cool stuff.
@@ -241,7 +243,141 @@ arguments:
                                           description
   -t [ --tog ]                            some toggle
   -u [ --togg ]                           some other toggle
+)EXPECTED";
+
+        CHECK(actual.size() == expected.size());
+
+        REQUIRE(actual == expected);
+    }
+}
+
+TEST_CASE("Groups")
+{
+    SECTION("Usage output with groups is correct")
+    {
+        nitro::broken_options::parser parser("app_name", "about");
+
+        std::stringstream s;
+
+        parser.accept_positionals(3);
+        parser.positional_name("command line");
+
+        auto& grp1 = parser.group("group1", "some text");
+        auto& grp2 = parser.group("group2");
+
+        grp1.toggle("tog", "some toggle").short_name("t");
+        grp1.toggle("togg", "some other toggle").short_name("u");
+
+        grp1.option("opt", "some opt").short_name("o");
+        grp1.option("opt_with_d", "some opt with a default")
+            .short_name("d")
+            .default_value("default value");
+
+        grp1.option("opt_nos", "some opt without a short, but a default")
+            .default_value("default value");
+        parser.group("group1").option("opt_nosd", "some opt without short and default");
+
+        parser.group("group1").option(
+            "opt_long", "an option with an very very very very very very very very very "
+                        "very very very very very very very very very very very very very "
+                        "very very very very very very very very long description");
+
+        grp2.option("some_long_named_option",
+                    "an option with an very very very very very very very very very "
+                    "very very very very very very very very very very very very very "
+                    "very very very very very very very very long description")
+            .short_name("x")
+            .default_value("some very long default parameter for this fucking thing");
+
+        grp2.multi_option("mopt", "some multi opt").short_name("m");
+
+        parser.group("group2")
+            .option("env-opt", "This is an option to set cool stuff.")
+            .env("ENV_OPT");
+        parser.group("group2").option("env-opt-2").env("ENV_OPT2");
+
+        parser.usage(s, false);
+
+        auto actual = s.str();
+        std::string expected =
+            R"EXPECTED(usage: app_name [-tu] --env-opt --env-opt-2 --opt --opt_long [--opt_nos] --opt_nosd [--opt_with_d] [--some_long_named_option] --mopt [command line ...]
+
+about
+
+
+group1:
+
+some text
+
+  -o [ --opt ] arg                        some opt
+  --opt_long arg                          an option with an very very very very
+                                          very very very very very very very
+                                          very very very very very very very
+                                          very very very very very very very
+                                          very very very very very long
+                                          description
+  --opt_nos [=default value]              some opt without a short, but a
+                                          default
+  --opt_nosd arg                          some opt without short and default
+  -d [ --opt_with_d ] [=default value]    some opt with a default
+  -t [ --tog ]                            some toggle
+  -u [ --togg ]                           some other toggle
+
+group2:
+  --env-opt arg                           This is an option to set cool stuff.
+                                          Can be set using the environment
+                                          variable 'ENV_OPT'.
+  --env-opt-2 arg                         Can be set using the environment
+                                          variable 'ENV_OPT2'.
+  -m [ --mopt ] arg                       some multi opt
+  -x [ --some_long_named_option ] [=some very long default parameter for this fucking thing]
+                                          an option with an very very very very
+                                          very very very very very very very
+                                          very very very very very very very
+                                          very very very very very very very
+                                          very very very very very long
+                                          description
+)EXPECTED";
+
+        CHECK(actual.size() == expected.size());
+
+        REQUIRE(actual == expected);
+    }
+
+    SECTION("Change name of default group should work")
+    {
+        nitro::broken_options::parser parser("app_name", "");
+
+        std::stringstream s;
+
+        parser.default_group("test arguments");
+        parser.toggle("tog", "some toggle").short_name("t");
+        parser.usage(s);
+
+        REQUIRE(s.str() ==
+                R"EXPECTED(usage: app_name [-t]
+
+
+test arguments:
+  -t [ --tog ]                            some toggle
 )EXPECTED");
+    }
+
+    SECTION("Getting group with same name")
+    {
+        nitro::broken_options::parser parser("app_name", "about");
+
+        std::stringstream s;
+
+        auto& grp1 = parser.group("group1");
+        auto& grp2 = parser.group("group1");
+
+        REQUIRE(grp1 == grp2);
+
+        auto& opt1 = grp1.option("opt");
+        auto& opt2 = grp2.option("opt");
+
+        REQUIRE(&opt1 == &opt2);
     }
 }
 
@@ -977,6 +1113,7 @@ TEST_CASE("Usage metavar work")
 
 about
 
+
 arguments:
   --opt_nosd test                         some opt without short and default
 )EXPECTED");
@@ -996,6 +1133,7 @@ arguments:
                 R"EXPECTED(usage: app_name --mopt
 
 about
+
 
 arguments:
   --mopt test                             some multi opt
