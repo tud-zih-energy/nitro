@@ -34,7 +34,7 @@ namespace better_options
 {
     class parser;
     class arguments;
-    
+
     class group;
 
     struct parser_error;

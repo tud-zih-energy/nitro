@@ -33,8 +33,8 @@
 #include <nitro/better_options/fwd.hpp>
 #include <nitro/better_options/option/base.hpp>
 
-#include <nitro/lang/optional.hpp>
 #include <nitro/env/get.hpp>
+#include <nitro/lang/optional.hpp>
 
 #include <ios>
 #include <memory>
