@@ -119,6 +119,8 @@ namespace better_options
     private:
         void update_value(const user_input& arg) override
         {
+            dirty_ = true;
+
             value_.push_back(arg.value());
         }
 
@@ -151,10 +153,7 @@ namespace better_options
 
                 if (default_.size())
                 {
-                    for (auto& item : default_)
-                    {
-                        update_value(item);
-                    }
+                    value_ = default_;
 
                     return;
                 }
