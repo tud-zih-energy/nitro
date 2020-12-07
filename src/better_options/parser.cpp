@@ -289,8 +289,8 @@ namespace better_options
         {
             if (user_provided_.count(it->second) > 0)
             {
-                raise<parsing_error>("provided argument for both mutually exclusive options: '", name,
-                                     "' and '", it->second, "'");
+                raise<parsing_error>("provided argument for both mutually exclusive options: '",
+                                     name, "' and '", it->second, "'");
             }
         }
 

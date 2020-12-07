@@ -99,7 +99,6 @@ namespace better_options
         void prepare();
         void validate();
 
-
         template <typename F>
         void for_each_option(F f)
         {
