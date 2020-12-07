@@ -28,9 +28,9 @@
 
 #pragma once
 
-#include <nitro/broken_options/exception.hpp>
-#include <nitro/broken_options/fwd.hpp>
-#include <nitro/broken_options/option/base.hpp>
+#include <nitro/better_options/exception.hpp>
+#include <nitro/better_options/fwd.hpp>
+#include <nitro/better_options/option/base.hpp>
 
 #include <nitro/lang/optional.hpp>
 
@@ -41,13 +41,13 @@
 
 namespace nitro
 {
-namespace broken_options
+namespace better_options
 {
     class option : public crtp_base<option>
     {
     public:
         option(const std::string& name, const std::string& description)
-        : crtp_base(name, description), data_(nullptr)
+        : crtp_base(name, description)
         {
         }
 
@@ -64,23 +64,16 @@ namespace broken_options
             return static_cast<bool>(default_);
         }
 
-        const std::string& default_value() const
+        const std::string& get_default() const
         {
             return *default_;
-        }
-
-        option& ref(std::string& target)
-        {
-            data_ = &target;
-
-            return *this;
         }
 
         virtual void format_value(std::ostream& s) const override
         {
             if (has_default())
             {
-                s << " [=" << default_value() << "]";
+                s << " [=" << get_default() << "]";
             }
             else
             {
@@ -116,16 +109,11 @@ namespace broken_options
         }
 
     private:
-        void update_value(const argument& arg) override
+        void update_value(const user_input& arg) override
         {
             if (value_)
             {
                 raise<parsing_error>("option was already given: ", name());
-            }
-
-            if (data_)
-            {
-                *data_ = arg.value();
             }
 
             value_ = arg.value();
@@ -166,9 +154,7 @@ namespace broken_options
 
     private:
         nitro::lang::optional<std::string> default_;
-        nitro::lang::optional<std::string> short_;
         nitro::lang::optional<std::string> value_;
-        std::string* data_;
     };
-} // namespace broken_options
+} // namespace better_options
 } // namespace nitro

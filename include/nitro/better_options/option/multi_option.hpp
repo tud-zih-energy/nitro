@@ -26,16 +26,16 @@
  * WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef INCLUDE_NITRO_BROKEN_OPTIONS_MULTI_OPTION_HPP
-#define INCLUDE_NITRO_BROKEN_OPTIONS_MULTI_OPTION_HPP
+#pragma once
 
-#include <nitro/broken_options/exception.hpp>
-#include <nitro/broken_options/fwd.hpp>
-#include <nitro/broken_options/option/base.hpp>
+#include <nitro/better_options/exception.hpp>
+#include <nitro/better_options/fwd.hpp>
+#include <nitro/better_options/option/base.hpp>
 
 #include <nitro/env/get.hpp>
 #include <nitro/except/raise.hpp>
 #include <nitro/lang/optional.hpp>
+#include <nitro/lang/string.hpp>
 
 #include <memory>
 #include <sstream>
@@ -44,13 +44,13 @@
 
 namespace nitro
 {
-namespace broken_options
+namespace better_options
 {
     class multi_option : public crtp_base<multi_option>
     {
     public:
         multi_option(const std::string& name, const std::string& description)
-        : crtp_base(name, description), ref_(nullptr)
+        : crtp_base(name, description)
         {
         }
 
@@ -67,16 +67,9 @@ namespace broken_options
             return !default_.empty();
         }
 
-        const std::vector<std::string>& default_value() const
+        const std::vector<std::string>& get_default() const
         {
             return default_;
-        }
-
-        multi_option& ref(std::vector<std::string>& target)
-        {
-            ref_ = &target;
-
-            return *this;
         }
 
     public:
@@ -84,21 +77,8 @@ namespace broken_options
         {
             if (has_default())
             {
-                s << " [=";
-
-                bool first = true;
-
-                for (auto& value : default_value())
-                {
-                    if (!first)
-                    {
-                        s << ", ";
-                    }
-                    s << value;
-                    first = false;
-                }
-
-                s << "]";
+                s << " [=" << nitro::lang::join(get_default().begin(), get_default().end(), ", ")
+                  << "]";
             }
             else
             {
@@ -122,7 +102,7 @@ namespace broken_options
             std::stringstream str;
             str << value_[i];
 
-            T result;
+            T result{};
 
             str >> result;
 
@@ -137,13 +117,8 @@ namespace broken_options
         }
 
     private:
-        void update_value(const argument& arg) override
+        void update_value(const user_input& arg) override
         {
-            if (ref_)
-            {
-                ref_->push_back(arg.value());
-            }
-
             value_.push_back(arg.value());
         }
 
@@ -193,9 +168,6 @@ namespace broken_options
     private:
         std::vector<std::string> default_;
         std::vector<std::string> value_;
-        std::vector<std::string>* ref_;
     };
-} // namespace broken_options
+} // namespace better_options
 } // namespace nitro
-
-#endif // INCLUDE_NITRO_BROKEN_OPTIONS_MULTI_OPTION_HPP

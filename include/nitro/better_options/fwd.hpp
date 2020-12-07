@@ -26,23 +26,23 @@
  * WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef INCLUDE_NITRO_BROKEN_OPTIONS_FWD_HPP
-#define INCLUDE_NITRO_BROKEN_OPTIONS_FWD_HPP
+#pragma once
 
 namespace nitro
 {
-namespace broken_options
+namespace better_options
 {
     class parser;
-    class options;
+    class arguments;
+    
+    class group;
 
     struct parser_error;
+    struct parsing_error;
 
     class option;
     class multi_option;
     class toggle;
 
-} // namespace broken_options
+} // namespace better_options
 } // namespace nitro
-
-#endif // INCLUDE_NITRO_BROKEN_OPTIONS_OPTION_HPP

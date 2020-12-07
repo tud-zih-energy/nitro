@@ -1,106 +1,107 @@
 #define CATCH_CONFIG_MAIN
 #include <catch2/catch.hpp>
 
-#include <nitro/broken_options/parser.hpp>
+#include <nitro/better_options/parser.hpp>
+#include <nitro/better_options/user_input.hpp>
 
-TEST_CASE("argument class works as intended")
+TEST_CASE("user_input class works as intended", "[better_options]")
 {
     SECTION("double dash gets parsed correctly")
     {
-        nitro::broken_options::argument arg("--");
+        nitro::better_options::user_input arg("--");
 
         REQUIRE(arg.is_double_dash());
     }
 
     SECTION("double dash does not get confised with a named argument")
     {
-        nitro::broken_options::argument arg("--not-a-double-dash");
+        nitro::better_options::user_input arg("--not-a-double-dash");
 
         REQUIRE(!arg.is_double_dash());
     }
 
     SECTION("double dash does not get confised with a short")
     {
-        nitro::broken_options::argument arg("-v");
+        nitro::better_options::user_input arg("-v");
 
         REQUIRE(!arg.is_double_dash());
     }
 
     SECTION("Values get parsed as such")
     {
-        nitro::broken_options::argument arg("some_value");
+        nitro::better_options::user_input arg("some_value");
         REQUIRE(arg.is_value());
         REQUIRE(arg.value() == "some_value");
-        REQUIRE_THROWS_AS(arg.name(), nitro::broken_options::parser_error);
+        REQUIRE_THROWS_AS(arg.name(), nitro::better_options::parser_error);
     }
 
     SECTION("Values get not confused with named arguments")
     {
-        nitro::broken_options::argument arg("--some-arg");
+        nitro::better_options::user_input arg("--some-arg");
         REQUIRE(!arg.is_value());
     }
 
     SECTION("Values get not confused with short list")
     {
-        nitro::broken_options::argument arg("-abcd");
+        nitro::better_options::user_input arg("-abcd");
         REQUIRE(!arg.is_value());
     }
 
     SECTION("short arguments get recognized properly")
     {
-        REQUIRE(nitro::broken_options::argument("-a").is_short());
-        REQUIRE(nitro::broken_options::argument("-ab").is_short());
-        REQUIRE(!nitro::broken_options::argument("--ab").is_short());
-        REQUIRE(!nitro::broken_options::argument("ab").is_short());
-        REQUIRE(!nitro::broken_options::argument("--").is_short());
+        REQUIRE(nitro::better_options::user_input("-a").is_short());
+        REQUIRE(nitro::better_options::user_input("-ab").is_short());
+        REQUIRE(!nitro::better_options::user_input("--ab").is_short());
+        REQUIRE(!nitro::better_options::user_input("ab").is_short());
+        REQUIRE(!nitro::better_options::user_input("--").is_short());
     }
 
     SECTION("named arguments get recognized properly")
     {
-        REQUIRE(!nitro::broken_options::argument("-a").is_named());
-        REQUIRE(!nitro::broken_options::argument("-ab").is_named());
-        REQUIRE(nitro::broken_options::argument("--ab").is_named());
-        REQUIRE(!nitro::broken_options::argument("ab").is_named());
-        REQUIRE(!nitro::broken_options::argument("--").is_named());
+        REQUIRE(!nitro::better_options::user_input("-a").is_named());
+        REQUIRE(!nitro::better_options::user_input("-ab").is_named());
+        REQUIRE(nitro::better_options::user_input("--ab").is_named());
+        REQUIRE(!nitro::better_options::user_input("ab").is_named());
+        REQUIRE(!nitro::better_options::user_input("--").is_named());
     }
 
     SECTION("arguments get recognized properly")
     {
-        REQUIRE(nitro::broken_options::argument("-a").is_argument());
-        REQUIRE(nitro::broken_options::argument("-ab").is_argument());
-        REQUIRE(nitro::broken_options::argument("--ab").is_argument());
-        REQUIRE(!nitro::broken_options::argument("ab").is_argument());
-        REQUIRE(!nitro::broken_options::argument("--").is_argument());
+        REQUIRE(nitro::better_options::user_input("-a").is_argument());
+        REQUIRE(nitro::better_options::user_input("-ab").is_argument());
+        REQUIRE(nitro::better_options::user_input("--ab").is_argument());
+        REQUIRE(!nitro::better_options::user_input("ab").is_argument());
+        REQUIRE(!nitro::better_options::user_input("--").is_argument());
     }
 
     SECTION("arguments get properly parsed")
     {
-        nitro::broken_options::argument short_arg("-a");
+        nitro::better_options::user_input short_arg("-a");
         REQUIRE(short_arg.is_argument());
         REQUIRE(short_arg.is_short());
         REQUIRE(!short_arg.is_named());
         REQUIRE(!short_arg.has_value());
         REQUIRE(short_arg.name() == "-a");
-        REQUIRE_THROWS_AS(short_arg.as_named(), nitro::broken_options::parser_error);
+        REQUIRE_THROWS_AS(short_arg.as_named(), nitro::better_options::parser_error);
         REQUIRE(short_arg.as_short_list().size() == 1);
         REQUIRE(short_arg.as_short_list().count("a") == 1);
 
-        nitro::broken_options::argument named_arg("--ab");
+        nitro::better_options::user_input named_arg("--ab");
         REQUIRE(named_arg.is_argument());
         REQUIRE(!named_arg.is_short());
         REQUIRE(named_arg.is_named());
         REQUIRE(!named_arg.has_value());
         REQUIRE(named_arg.name() == "--ab");
         REQUIRE(named_arg.as_named() == "ab");
-        REQUIRE_THROWS_AS(named_arg.as_short_list(), nitro::broken_options::parser_error);
+        REQUIRE_THROWS_AS(named_arg.as_short_list(), nitro::better_options::parser_error);
 
-        nitro::broken_options::argument short_list("-ab");
+        nitro::better_options::user_input short_list("-ab");
         REQUIRE(short_list.is_argument());
         REQUIRE(short_list.is_short());
         REQUIRE(!short_list.is_named());
         REQUIRE(!short_list.has_value());
         REQUIRE(short_list.name() == "-ab");
-        REQUIRE_THROWS_AS(short_list.as_named(), nitro::broken_options::parser_error);
+        REQUIRE_THROWS_AS(short_list.as_named(), nitro::better_options::parser_error);
         REQUIRE(short_list.as_short_list().size() == 2);
         REQUIRE(short_list.as_short_list().count("a") == 1);
         REQUIRE(short_list.as_short_list().count("b") == 1);
@@ -108,7 +109,7 @@ TEST_CASE("argument class works as intended")
 
     SECTION("arguments with values get properly parsed")
     {
-        nitro::broken_options::argument short_arg("-a=5");
+        nitro::better_options::user_input short_arg("-a=5");
         REQUIRE(short_arg.is_argument());
         REQUIRE(short_arg.is_short());
         REQUIRE(!short_arg.is_named());
@@ -117,7 +118,7 @@ TEST_CASE("argument class works as intended")
         REQUIRE(short_arg.name() == "-a");
         REQUIRE(short_arg.data() == "-a=5");
 
-        nitro::broken_options::argument named_arg("--ab=5");
+        nitro::better_options::user_input named_arg("--ab=5");
         REQUIRE(named_arg.is_argument());
         REQUIRE(!named_arg.is_short());
         REQUIRE(named_arg.is_named());
@@ -129,49 +130,47 @@ TEST_CASE("argument class works as intended")
 
     SECTION("Trying to break with edge cases")
     {
-        nitro::broken_options::argument without_value("--ab=");
+        nitro::better_options::user_input without_value("--ab=");
 
         REQUIRE(without_value.has_value());
         REQUIRE(without_value.value() == "");
         REQUIRE(without_value.as_named() == "ab");
 
-        REQUIRE_THROWS_AS(nitro::broken_options::argument("-="),
-                          nitro::broken_options::parsing_error);
-        REQUIRE_THROWS_AS(nitro::broken_options::argument("--="),
-                          nitro::broken_options::parsing_error);
-        REQUIRE_THROWS_AS(nitro::broken_options::argument("---="),
-                          nitro::broken_options::parsing_error);
-        REQUIRE_THROWS_AS(nitro::broken_options::argument("---ab="),
-                          nitro::broken_options::parsing_error);
-        REQUIRE_THROWS_AS(nitro::broken_options::argument("---a=b"),
-                          nitro::broken_options::parsing_error);
-        REQUIRE_THROWS_AS(nitro::broken_options::argument("---=ab"),
-                          nitro::broken_options::parsing_error);
-        REQUIRE_THROWS_AS(nitro::broken_options::argument("--=ab"),
-                          nitro::broken_options::parsing_error);
-        REQUIRE_THROWS_AS(nitro::broken_options::argument("-=ab"),
-                          nitro::broken_options::parsing_error);
+        REQUIRE_THROWS_AS(nitro::better_options::user_input("-="),
+                          nitro::better_options::parsing_error);
+        REQUIRE_THROWS_AS(nitro::better_options::user_input("--="),
+                          nitro::better_options::parsing_error);
+        REQUIRE_THROWS_AS(nitro::better_options::user_input("---="),
+                          nitro::better_options::parsing_error);
+        REQUIRE_THROWS_AS(nitro::better_options::user_input("---ab="),
+                          nitro::better_options::parsing_error);
+        REQUIRE_THROWS_AS(nitro::better_options::user_input("---a=b"),
+                          nitro::better_options::parsing_error);
+        REQUIRE_THROWS_AS(nitro::better_options::user_input("---=ab"),
+                          nitro::better_options::parsing_error);
+        REQUIRE_THROWS_AS(nitro::better_options::user_input("--=ab"),
+                          nitro::better_options::parsing_error);
+        REQUIRE_THROWS_AS(nitro::better_options::user_input("-=ab"),
+                          nitro::better_options::parsing_error);
     }
 }
 
-TEST_CASE("Using argc, argv from main does compile")
+TEST_CASE("Using argc, argv from main does compile", "[better_options]")
 {
-    int argc;
+    int argc = 0;
     char** argv = nullptr;
 
-    nitro::broken_options::parser parser;
+    nitro::better_options::parser parser;
 
-    decltype(parser.parse(argc, argv))* foo;
+    decltype(parser.parse(argc, argv))* foo = nullptr;
     (void)foo;
 }
 
-TEST_CASE("Usage descriptions work")
+TEST_CASE("Usage descriptions work", "[better_options]")
 {
-    SECTION("Description for options work")
+    SECTION("Description for arguments work")
     {
-        nitro::broken_options::parser parser("app_name", "about");
-
-        std::stringstream s;
+        nitro::better_options::parser parser("app_name", "about");
 
         parser.accept_positionals(3);
         parser.positional_name("command line");
@@ -191,13 +190,13 @@ TEST_CASE("Usage descriptions work")
         parser.option("opt_long",
                       "an option with an very very very very very very very very very "
                       "very very very very very very very very very very very very very "
-                      "very very very very very very very very long description");
+                      "very very very very very very very very long description_");
 
         parser
             .option("some_long_named_option",
                     "an option with an very very very very very very very very very "
                     "very very very very very very very very very very very very very "
-                    "very very very very very very very very long description")
+                    "very very very very very very very very long description_")
             .short_name("x")
             .default_value("some very long default parameter for this fucking thing");
 
@@ -205,10 +204,6 @@ TEST_CASE("Usage descriptions work")
 
         parser.option("env-opt", "This is an option to set cool stuff.").env("ENV_OPT");
         parser.option("env-opt-2").env("ENV_OPT2");
-
-        parser.usage(s);
-
-        auto actual = s.str();
 
         std::string expected =
             R"EXPECTED(usage: app_name [-tu] --env-opt --env-opt-2 --opt --opt_long [--opt_nos] --opt_nosd [--opt_with_d] [--some_long_named_option] --mopt [command line ...]
@@ -229,7 +224,7 @@ arguments:
                                           very very very very very very very
                                           very very very very very very very
                                           very very very very very long
-                                          description
+                                          description_
   --opt_nos [=default value]              some opt without a short, but a
                                           default
   --opt_nosd arg                          some opt without short and default
@@ -240,10 +235,14 @@ arguments:
                                           very very very very very very very
                                           very very very very very very very
                                           very very very very very long
-                                          description
+                                          description_
   -t [ --tog ]                            some toggle
   -u [ --togg ]                           some other toggle
 )EXPECTED";
+
+        std::stringstream s;
+        parser.usage(s);
+        auto actual = s.str();
 
         CHECK(actual.size() == expected.size());
 
@@ -251,11 +250,11 @@ arguments:
     }
 }
 
-TEST_CASE("Groups")
+TEST_CASE("Groups", "[better_options]")
 {
     SECTION("Usage output with groups is correct")
     {
-        nitro::broken_options::parser parser("app_name", "about");
+        nitro::better_options::parser parser("app_name", "about");
 
         std::stringstream s;
 
@@ -280,12 +279,12 @@ TEST_CASE("Groups")
         parser.group("group1").option(
             "opt_long", "an option with an very very very very very very very very very "
                         "very very very very very very very very very very very very very "
-                        "very very very very very very very very long description");
+                        "very very very very very very very very long description_");
 
         grp2.option("some_long_named_option",
                     "an option with an very very very very very very very very very "
                     "very very very very very very very very very very very very very "
-                    "very very very very very very very very long description")
+                    "very very very very very very very very long description_")
             .short_name("x")
             .default_value("some very long default parameter for this fucking thing");
 
@@ -315,7 +314,7 @@ some text
                                           very very very very very very very
                                           very very very very very very very
                                           very very very very very long
-                                          description
+                                          description_
   --opt_nos [=default value]              some opt without a short, but a
                                           default
   --opt_nosd arg                          some opt without short and default
@@ -336,7 +335,7 @@ group2:
                                           very very very very very very very
                                           very very very very very very very
                                           very very very very very long
-                                          description
+                                          description_
 )EXPECTED";
 
         CHECK(actual.size() == expected.size());
@@ -344,13 +343,12 @@ group2:
         REQUIRE(actual == expected);
     }
 
-    SECTION("Change name of default group should work")
+    SECTION("Change name_ of default group should work")
     {
-        nitro::broken_options::parser parser("app_name", "");
+        nitro::better_options::parser parser("app_name", "", "test arguments");
 
         std::stringstream s;
 
-        parser.default_group("test arguments");
         parser.toggle("tog", "some toggle").short_name("t");
         parser.usage(s);
 
@@ -365,14 +363,14 @@ test arguments:
 
     SECTION("Getting group with same name")
     {
-        nitro::broken_options::parser parser("app_name", "about");
+        nitro::better_options::parser parser("app_name", "about");
 
         std::stringstream s;
 
         auto& grp1 = parser.group("group1");
         auto& grp2 = parser.group("group1");
 
-        REQUIRE(grp1 == grp2);
+        REQUIRE(&grp1 == &grp2);
 
         auto& opt1 = grp1.option("opt");
         auto& opt2 = grp2.option("opt");
@@ -381,25 +379,25 @@ test arguments:
     }
 }
 
-TEST_CASE("Check if short option names are unique")
+TEST_CASE("Check if short option names are unique", "[better_options]")
 {
-    nitro::broken_options::parser parser;
+    nitro::better_options::parser parser;
 
     parser.option("opt1").short_name("o");
     parser.option("opt2").short_name("o");
-    REQUIRE_THROWS_AS(parser.parse(0, nullptr), nitro::broken_options::parser_error);
+    REQUIRE_THROWS_AS(parser.parse(0, nullptr), nitro::better_options::parser_error);
 }
 
-TEST_CASE("Simple named arguments can get parsed from command line", "[broken_options]")
+TEST_CASE("Simple named arguments can get parsed from command line", "[better_options]")
 {
     SECTION("Trying to parse unknown arguments will throw")
     {
         int argc = 5;
         const char* argv[] = { "", "--opt1", "12", "--opt2", "abc" };
 
-        nitro::broken_options::parser parser;
+        nitro::better_options::parser parser;
 
-        REQUIRE_THROWS_AS(parser.parse(argc, argv), nitro::broken_options::parsing_error);
+        REQUIRE_THROWS_AS(parser.parse(argc, argv), nitro::better_options::parsing_error);
     }
 
     SECTION("Simple string values work")
@@ -407,7 +405,7 @@ TEST_CASE("Simple named arguments can get parsed from command line", "[broken_op
         int argc = 3;
         const char* argv[] = { "", "--opt2", "abc" };
 
-        nitro::broken_options::parser parser;
+        nitro::better_options::parser parser;
 
         parser.option("opt2");
 
@@ -421,7 +419,7 @@ TEST_CASE("Simple named arguments can get parsed from command line", "[broken_op
         int argc = 3;
         const char* argv[] = { "", "--opt1", "12" };
 
-        nitro::broken_options::parser parser;
+        nitro::better_options::parser parser;
 
         parser.option("opt1");
 
@@ -435,7 +433,7 @@ TEST_CASE("Simple named arguments can get parsed from command line", "[broken_op
         int argc = 1;
         const char* argv[] = { "" };
 
-        nitro::broken_options::parser parser;
+        nitro::better_options::parser parser;
 
         parser.option("opt3").default_value("hello");
 
@@ -449,7 +447,7 @@ TEST_CASE("Simple named arguments can get parsed from command line", "[broken_op
         int argc = 1;
         const char* argv[] = { "" };
 
-        nitro::broken_options::parser parser;
+        nitro::better_options::parser parser;
 
         parser.option("opt3");
 
@@ -461,7 +459,7 @@ TEST_CASE("Simple named arguments can get parsed from command line", "[broken_op
         int argc = 2;
         const char* argv[] = { "", "--opt3" };
 
-        nitro::broken_options::parser parser;
+        nitro::better_options::parser parser;
 
         parser.option("opt3");
 
@@ -473,7 +471,7 @@ TEST_CASE("Simple named arguments can get parsed from command line", "[broken_op
         int argc = 6;
         const char* argv[] = { "", "--opt1", "value1", "--opt2", "--opt3", "value3" };
 
-        nitro::broken_options::parser parser;
+        nitro::better_options::parser parser;
 
         parser.option("opt1");
         parser.option("opt2");
@@ -483,14 +481,14 @@ TEST_CASE("Simple named arguments can get parsed from command line", "[broken_op
     }
 }
 
-TEST_CASE("Short-cut arguments can get parsed from command line", "[broken_options]")
+TEST_CASE("Short-cut arguments can get parsed from command line", "[better_options]")
 {
     SECTION("Simple string short named values work")
     {
         int argc = 3;
         const char* argv[] = { "", "-a", "abc" };
 
-        nitro::broken_options::parser parser;
+        nitro::better_options::parser parser;
 
         parser.option("opt2").short_name("a");
 
@@ -504,7 +502,7 @@ TEST_CASE("Short-cut arguments can get parsed from command line", "[broken_optio
         int argc = 3;
         const char* argv[] = { "", "-o", "12" };
 
-        nitro::broken_options::parser parser;
+        nitro::better_options::parser parser;
 
         parser.option("opt1").short_name("o");
 
@@ -518,7 +516,7 @@ TEST_CASE("Short-cut arguments can get parsed from command line", "[broken_optio
         int argc = 1;
         const char* argv[] = { "" };
 
-        nitro::broken_options::parser parser;
+        nitro::better_options::parser parser;
 
         parser.option("opt3").short_name("o").default_value("hello");
 
@@ -528,18 +526,18 @@ TEST_CASE("Short-cut arguments can get parsed from command line", "[broken_optio
     }
 }
 
-TEST_CASE("Multiple arguments should work", "[broken_options]")
+TEST_CASE("Multiple arguments should work", "[better_options]")
 {
     SECTION("Giving an option unexcepted twice should throw")
     {
         int argc = 5;
         const char* argv[] = { "", "--opt3", "12", "--opt3", "13" };
 
-        nitro::broken_options::parser parser;
+        nitro::better_options::parser parser;
 
         parser.option("opt3");
 
-        REQUIRE_THROWS_AS(parser.parse(argc, argv), nitro::broken_options::parsing_error);
+        REQUIRE_THROWS_AS(parser.parse(argc, argv), nitro::better_options::parsing_error);
     }
 
     SECTION("Giving an option mixed with short unexcepted twice should throw")
@@ -547,11 +545,11 @@ TEST_CASE("Multiple arguments should work", "[broken_options]")
         int argc = 5;
         const char* argv[] = { "", "--opt3", "12", "-o", "13" };
 
-        nitro::broken_options::parser parser;
+        nitro::better_options::parser parser;
 
         parser.option("opt3").short_name("o");
 
-        REQUIRE_THROWS_AS(parser.parse(argc, argv), nitro::broken_options::parsing_error);
+        REQUIRE_THROWS_AS(parser.parse(argc, argv), nitro::better_options::parsing_error);
     }
 
     SECTION("Giving an identical option twice should throw")
@@ -559,11 +557,11 @@ TEST_CASE("Multiple arguments should work", "[broken_options]")
         int argc = 5;
         const char* argv[] = { "", "--opt3", "12", "--opt3", "12" };
 
-        nitro::broken_options::parser parser;
+        nitro::better_options::parser parser;
 
         parser.option("opt3");
 
-        REQUIRE_THROWS_AS(parser.parse(argc, argv), nitro::broken_options::parsing_error);
+        REQUIRE_THROWS_AS(parser.parse(argc, argv), nitro::better_options::parsing_error);
     }
 
     SECTION("Giving two different values for for a multi_option should work")
@@ -571,7 +569,7 @@ TEST_CASE("Multiple arguments should work", "[broken_options]")
         int argc = 5;
         const char* argv[] = { "", "--opt3", "12", "--opt3", "13" };
 
-        nitro::broken_options::parser parser;
+        nitro::better_options::parser parser;
 
         parser.multi_option("opt3");
 
@@ -588,7 +586,7 @@ TEST_CASE("Multiple arguments should work", "[broken_options]")
         int argc = 5;
         const char* argv[] = { "", "--opt3", "12", "--opt3", "12" };
 
-        nitro::broken_options::parser parser;
+        nitro::better_options::parser parser;
 
         parser.multi_option("opt3");
 
@@ -600,12 +598,12 @@ TEST_CASE("Multiple arguments should work", "[broken_options]")
         REQUIRE(options.get("opt3", 1) == "12");
     }
 
-    SECTION("Mutli options get_all should work as well")
+    SECTION("Mutli arguments get_all should work as well")
     {
         int argc = 5;
         const char* argv[] = { "", "--opt3", "12", "--opt3", "12" };
 
-        nitro::broken_options::parser parser;
+        nitro::better_options::parser parser;
 
         parser.multi_option("opt3");
 
@@ -621,22 +619,22 @@ TEST_CASE("Multiple arguments should work", "[broken_options]")
 
     SECTION("Defining an option also as a multi_option should throw")
     {
-        nitro::broken_options::parser parser;
+        nitro::better_options::parser parser;
 
         parser.option("opt3");
 
-        REQUIRE_THROWS_AS(parser.multi_option("opt3"), nitro::broken_options::parser_error);
+        REQUIRE_THROWS_AS(parser.multi_option("opt3"), nitro::better_options::parser_error);
     }
 }
 
-TEST_CASE("positional arguments should work", "[broken_options]")
+TEST_CASE("positional arguments should work", "[better_options]")
 {
     SECTION("-- should trigger everything to be positional")
     {
         int argc = 6;
         const char* argv[] = { "", "--", "--opt1", "12", "--opt2", "13" };
 
-        nitro::broken_options::parser parser;
+        nitro::better_options::parser parser;
         parser.accept_positionals(4);
 
         auto options = parser.parse(argc, argv);
@@ -654,7 +652,7 @@ TEST_CASE("positional arguments should work", "[broken_options]")
         int argc = 6;
         const char* argv[] = { "", "--", "--opt1", "12", "--opt2", "13" };
 
-        nitro::broken_options::parser parser;
+        nitro::better_options::parser parser;
         parser.accept_positionals(4);
 
         auto options = parser.parse(argc, argv);
@@ -667,15 +665,15 @@ TEST_CASE("positional arguments should work", "[broken_options]")
         REQUIRE(options.get(-1) == "13");
     }
 
-    SECTION("Given accept_positionals(), unknown options should still throw")
+    SECTION("Given accept_positionals(), unknown arguments should still throw")
     {
         int argc = 8;
         const char* argv[] = { "", "--unknown", "value", "--", "--opt1", "12", "--opt2", "13" };
 
-        nitro::broken_options::parser parser;
+        nitro::better_options::parser parser;
         parser.accept_positionals();
 
-        REQUIRE_THROWS_AS(parser.parse(argc, argv), nitro::broken_options::parsing_error);
+        REQUIRE_THROWS_AS(parser.parse(argc, argv), nitro::better_options::parsing_error);
     }
 
     SECTION("Given positionals when non were accepted should throw")
@@ -683,9 +681,9 @@ TEST_CASE("positional arguments should work", "[broken_options]")
         int argc = 8;
         const char* argv[] = { "", "--unknown", "value", "--", "--opt1", "12", "--opt2", "13" };
 
-        nitro::broken_options::parser parser;
+        nitro::better_options::parser parser;
 
-        REQUIRE_THROWS_AS(parser.parse(argc, argv), nitro::broken_options::parsing_error);
+        REQUIRE_THROWS_AS(parser.parse(argc, argv), nitro::better_options::parsing_error);
     }
 
     SECTION("Given more positionals than accepted should throw")
@@ -693,10 +691,10 @@ TEST_CASE("positional arguments should work", "[broken_options]")
         int argc = 8;
         const char* argv[] = { "", "--unknown", "value", "--", "--opt1", "12", "--opt2", "13" };
 
-        nitro::broken_options::parser parser;
+        nitro::better_options::parser parser;
         parser.accept_positionals(3);
 
-        REQUIRE_THROWS_AS(parser.parse(argc, argv), nitro::broken_options::parsing_error);
+        REQUIRE_THROWS_AS(parser.parse(argc, argv), nitro::better_options::parsing_error);
     }
 
     SECTION("positionals should be allowed between arguments")
@@ -704,7 +702,7 @@ TEST_CASE("positional arguments should work", "[broken_options]")
         const char* argv[] = { "",       "--opt1",      "value1", "positional0", "--opt2",
                                "value2", "positional1", "--",     "positional2" };
 
-        nitro::broken_options::parser parser;
+        nitro::better_options::parser parser;
         parser.option("opt1");
         parser.option("opt2");
         parser.accept_positionals(3);
@@ -726,7 +724,7 @@ TEST_CASE("positional arguments should work", "[broken_options]")
         int argc = 3;
         const char* argv[] = { "", "--", "--" };
 
-        nitro::broken_options::parser parser;
+        nitro::better_options::parser parser;
         parser.accept_positionals(1);
 
         auto options = parser.parse(argc, argv);
@@ -740,12 +738,12 @@ TEST_CASE("positional arguments should work", "[broken_options]")
 TEST_CASE("Giving values with an '=' should work ")
 {
 
-    SECTION("for named options")
+    SECTION("for named arguments")
     {
         int argc = 2;
         const char* argv[] = { "", "--opt1=12" };
 
-        nitro::broken_options::parser parser;
+        nitro::better_options::parser parser;
 
         parser.option("opt1");
 
@@ -754,12 +752,12 @@ TEST_CASE("Giving values with an '=' should work ")
         REQUIRE(options.as<int>("opt1") == 12);
     }
 
-    SECTION("for short options")
+    SECTION("for short arguments")
     {
         int argc = 2;
         const char* argv[] = { "", "-o=12" };
 
-        nitro::broken_options::parser parser;
+        nitro::better_options::parser parser;
 
         parser.option("opt1").short_name("o");
 
@@ -773,19 +771,19 @@ TEST_CASE("Giving values with an '=' should work ")
         int argc = 2;
         const char* argv[] = { "", "-o=12" };
 
-        nitro::broken_options::parser parser;
+        nitro::better_options::parser parser;
 
         parser.toggle("opt1").short_name("o");
 
-        REQUIRE_THROWS_AS(parser.parse(argc, argv), nitro::broken_options::parsing_error);
+        REQUIRE_THROWS_AS(parser.parse(argc, argv), nitro::better_options::parsing_error);
     }
 }
 
 TEST_CASE("Defining an option twice should return the same object twice")
 {
-    SECTION("for options")
+    SECTION("for arguments")
     {
-        nitro::broken_options::parser parser;
+        nitro::better_options::parser parser;
 
         auto obj1 = &parser.option("opt1");
         auto obj2 = &parser.option("opt1");
@@ -795,7 +793,7 @@ TEST_CASE("Defining an option twice should return the same object twice")
 
     SECTION("for multi_options")
     {
-        nitro::broken_options::parser parser;
+        nitro::better_options::parser parser;
 
         auto obj1 = &parser.multi_option("opt1");
         auto obj2 = &parser.multi_option("opt1");
@@ -805,7 +803,7 @@ TEST_CASE("Defining an option twice should return the same object twice")
 
     SECTION("for toggles")
     {
-        nitro::broken_options::parser parser;
+        nitro::better_options::parser parser;
 
         auto obj1 = &parser.toggle("opt1");
         auto obj2 = &parser.toggle("opt1");
@@ -816,57 +814,57 @@ TEST_CASE("Defining an option twice should return the same object twice")
 
 TEST_CASE("Trying to redefine short_name")
 {
-    SECTION("for options should throw")
+    SECTION("for arguments should throw")
     {
-        nitro::broken_options::parser parser;
+        nitro::better_options::parser parser;
 
         parser.option("opt1").short_name("o");
 
         REQUIRE_THROWS_AS(parser.option("opt1").short_name("p"),
-                          nitro::broken_options::parser_error);
+                          nitro::better_options::parser_error);
     }
 
     SECTION("for multi_options should throw")
     {
-        nitro::broken_options::parser parser;
+        nitro::better_options::parser parser;
 
         parser.multi_option("opt1").short_name("o");
 
         REQUIRE_THROWS_AS(parser.multi_option("opt1").short_name("p"),
-                          nitro::broken_options::parser_error);
+                          nitro::better_options::parser_error);
     }
 
     SECTION("for toggle should throw")
     {
-        nitro::broken_options::parser parser;
+        nitro::better_options::parser parser;
 
         parser.toggle("opt1").short_name("o");
 
         REQUIRE_THROWS_AS(parser.toggle("opt1").short_name("p"),
-                          nitro::broken_options::parser_error);
+                          nitro::better_options::parser_error);
     }
 
-    SECTION("for options with same short name should NOT throw")
+    SECTION("for arguments with same short name_ should NOT throw")
     {
-        nitro::broken_options::parser parser;
+        nitro::better_options::parser parser;
 
         parser.option("opt1").short_name("o");
 
         REQUIRE_NOTHROW(parser.option("opt1").short_name("o"));
     }
 
-    SECTION("for multi_options with same short name should NOT throw")
+    SECTION("for multi_options with same short name_ should NOT throw")
     {
-        nitro::broken_options::parser parser;
+        nitro::better_options::parser parser;
 
         parser.multi_option("opt1").short_name("o");
 
         REQUIRE_NOTHROW(parser.multi_option("opt1").short_name("o"));
     }
 
-    SECTION("for toggle with same short name should NOT throw")
+    SECTION("for toggle with same short name_ should NOT throw")
     {
-        nitro::broken_options::parser parser;
+        nitro::better_options::parser parser;
 
         parser.toggle("opt1").short_name("o");
 
@@ -874,14 +872,14 @@ TEST_CASE("Trying to redefine short_name")
     }
 }
 
-TEST_CASE("Toggles should work", "[broken_options]")
+TEST_CASE("Toggles should work", "[better_options]")
 {
-    SECTION("for named options")
+    SECTION("for named arguments")
     {
         int argc = 2;
         const char* argv[] = { "", "--opt1" };
 
-        nitro::broken_options::parser parser;
+        nitro::better_options::parser parser;
 
         parser.toggle("opt1");
 
@@ -890,12 +888,12 @@ TEST_CASE("Toggles should work", "[broken_options]")
         REQUIRE(options.given("opt1"));
     }
 
-    SECTION("for short options")
+    SECTION("for short arguments")
     {
         int argc = 2;
         const char* argv[] = { "", "-o" };
 
-        nitro::broken_options::parser parser;
+        nitro::better_options::parser parser;
 
         parser.toggle("opt2").short_name("o");
 
@@ -909,7 +907,7 @@ TEST_CASE("Toggles should work", "[broken_options]")
         int argc = 4;
         const char* argv[] = { "", "-o", "-o", "-o" };
 
-        nitro::broken_options::parser parser;
+        nitro::better_options::parser parser;
 
         parser.toggle("opt2").short_name("o");
 
@@ -923,7 +921,7 @@ TEST_CASE("Toggles should work", "[broken_options]")
         int argc = 1;
         const char* argv[] = { "" };
 
-        nitro::broken_options::parser parser;
+        nitro::better_options::parser parser;
 
         parser.toggle("opt2").short_name("o");
 
@@ -937,10 +935,10 @@ TEST_CASE("Toggles should work", "[broken_options]")
         int argc = 3;
         const char* argv[] = { "", "-o", "value" };
 
-        nitro::broken_options::parser parser;
+        nitro::better_options::parser parser;
         parser.toggle("opt2").short_name("o");
 
-        REQUIRE_THROWS_AS(parser.parse(argc, argv), nitro::broken_options::parsing_error);
+        REQUIRE_THROWS_AS(parser.parse(argc, argv), nitro::better_options::parsing_error);
     }
 
     SECTION("for multiple toggles in one arg")
@@ -948,7 +946,7 @@ TEST_CASE("Toggles should work", "[broken_options]")
         int argc = 2;
         const char* argv[] = { "", "-ab" };
 
-        nitro::broken_options::parser parser;
+        nitro::better_options::parser parser;
 
         parser.toggle("opt_a").short_name("a");
         parser.toggle("opt_b").short_name("b");
@@ -962,14 +960,14 @@ TEST_CASE("Toggles should work", "[broken_options]")
     }
 }
 
-TEST_CASE("Reading the value from the ENV variables", "[broken_options]")
+TEST_CASE("Reading the value from the ENV variables", "[better_options]")
 {
-    SECTION("for options when not given a value")
+    SECTION("for arguments when not given a value")
     {
         int argc = 1;
         const char* argv[] = { "" };
 
-        nitro::broken_options::parser parser;
+        nitro::better_options::parser parser;
 
         parser.option("opt1").env("OPT1");
 
@@ -978,12 +976,12 @@ TEST_CASE("Reading the value from the ENV variables", "[broken_options]")
         REQUIRE(options.get("opt1") == "OPT1_VALUE");
     }
 
-    SECTION("for options with a default when not given a value")
+    SECTION("for arguments with a default when not given a value")
     {
         int argc = 1;
         const char* argv[] = { "" };
 
-        nitro::broken_options::parser parser;
+        nitro::better_options::parser parser;
 
         parser.option("opt1").env("OPT1").default_value("DEFAULT");
 
@@ -992,12 +990,12 @@ TEST_CASE("Reading the value from the ENV variables", "[broken_options]")
         REQUIRE(options.get("opt1") == "OPT1_VALUE");
     }
 
-    SECTION("for options with a default when given a value")
+    SECTION("for arguments with a default when given a value")
     {
         int argc = 3;
         const char* argv[] = { "", "--opt1", "foo" };
 
-        nitro::broken_options::parser parser;
+        nitro::better_options::parser parser;
 
         parser.option("opt1").env("OPT1").default_value("DEFAULT");
 
@@ -1011,7 +1009,7 @@ TEST_CASE("Reading the value from the ENV variables", "[broken_options]")
         int argc = 1;
         const char* argv[] = { "" };
 
-        nitro::broken_options::parser parser;
+        nitro::better_options::parser parser;
 
         parser.toggle("opt2").env("OPT2");
 
@@ -1025,7 +1023,7 @@ TEST_CASE("Reading the value from the ENV variables", "[broken_options]")
         int argc = 1;
         const char* argv[] = { "" };
 
-        nitro::broken_options::parser parser;
+        nitro::better_options::parser parser;
 
         parser.toggle("opt3").env("OPT3");
 
@@ -1039,7 +1037,7 @@ TEST_CASE("Reading the value from the ENV variables", "[broken_options]")
         int argc = 2;
         const char* argv[] = { "", "--opt3" };
 
-        nitro::broken_options::parser parser;
+        nitro::better_options::parser parser;
 
         parser.toggle("opt3").env("OPT3");
 
@@ -1048,12 +1046,12 @@ TEST_CASE("Reading the value from the ENV variables", "[broken_options]")
         REQUIRE(options.given("opt3"));
     }
 
-    SECTION("for multi options when not given a value")
+    SECTION("for multi arguments when not given a value")
     {
         int argc = 1;
         const char* argv[] = { "" };
 
-        nitro::broken_options::parser parser;
+        nitro::better_options::parser parser;
 
         parser.multi_option("opt4").env("OPT4");
 
@@ -1064,12 +1062,12 @@ TEST_CASE("Reading the value from the ENV variables", "[broken_options]")
         CHECK(options.get("opt4", 1) == "OPT4_VALUE1");
     }
 
-    SECTION("for multi options with a default when not given a value")
+    SECTION("for multi arguments with a default when not given a value")
     {
         int argc = 1;
         const char* argv[] = { "" };
 
-        nitro::broken_options::parser parser;
+        nitro::better_options::parser parser;
 
         parser.multi_option("opt4").env("OPT4").default_value({ "DEFAULT" });
 
@@ -1080,12 +1078,12 @@ TEST_CASE("Reading the value from the ENV variables", "[broken_options]")
         CHECK(options.get("opt4", 1) == "OPT4_VALUE1");
     }
 
-    SECTION("for multi options with a default when given a value")
+    SECTION("for multi arguments with a default when given a value")
     {
         int argc = 3;
         const char* argv[] = { "", "--opt4", "foo" };
 
-        nitro::broken_options::parser parser;
+        nitro::better_options::parser parser;
 
         parser.multi_option("opt4").env("OPT4").default_value({ "foo" });
 
@@ -1098,9 +1096,9 @@ TEST_CASE("Reading the value from the ENV variables", "[broken_options]")
 
 TEST_CASE("Usage metavar work")
 {
-    SECTION("metavar for options work")
+    SECTION("metavar for arguments work")
     {
-        nitro::broken_options::parser parser("app_name", "about");
+        nitro::better_options::parser parser("app_name", "about");
 
         std::stringstream s;
 
@@ -1119,9 +1117,9 @@ arguments:
 )EXPECTED");
     }
 
-    SECTION("metavar for multi options work")
+    SECTION("metavar for multi arguments work")
     {
-        nitro::broken_options::parser parser("app_name", "about");
+        nitro::better_options::parser parser("app_name", "about");
 
         std::stringstream s;
 
@@ -1143,26 +1141,26 @@ arguments:
 
 TEST_CASE("parsing toggles with prefix and default value")
 {
-    SECTION("test argument with --no- is parsed right")
+    SECTION("test user_input with --no- is parsed right")
     {
-        nitro::broken_options::argument arg("--no-arg");
+        nitro::better_options::user_input arg("--no-arg");
         REQUIRE(arg.has_prefix());
         REQUIRE(arg.name_without_prefix() == "arg");
     }
 
-    SECTION("argument without prefix work")
+    SECTION("user_input without prefix work")
     {
-        nitro::broken_options::argument arg("--arg");
+        nitro::better_options::user_input arg("--arg");
         REQUIRE(!arg.has_prefix());
-        REQUIRE_THROWS_AS(arg.name_without_prefix(), nitro::broken_options::parser_error);
+        REQUIRE_THROWS_AS(arg.name_without_prefix(), nitro::better_options::parser_error);
     }
 
-    SECTION("parsing an argument with prefix and testing check() function")
+    SECTION("parsing an user_input with prefix and testing check() function")
     {
         int argc = 2;
         const char* argv[] = { "", "--no-arg" };
 
-        nitro::broken_options::parser parser;
+        nitro::better_options::parser parser;
 
         parser.toggle("arg");
 
@@ -1176,7 +1174,7 @@ TEST_CASE("parsing toggles with prefix and default value")
         int argc = 1;
         const char* argv[] = { "" };
 
-        nitro::broken_options::parser parser;
+        nitro::better_options::parser parser;
 
         parser.toggle("arg").default_value(true);
 
@@ -1190,7 +1188,7 @@ TEST_CASE("parsing toggles with prefix and default value")
         int argc = 1;
         const char* argv[] = { "" };
 
-        nitro::broken_options::parser parser;
+        nitro::better_options::parser parser;
 
         parser.toggle("arg").default_value(false);
 
@@ -1204,7 +1202,7 @@ TEST_CASE("parsing toggles with prefix and default value")
         int argc = 1;
         const char* argv[] = { "" };
 
-        nitro::broken_options::parser parser;
+        nitro::better_options::parser parser;
 
         parser.toggle("arg").env("OPT3");
 
@@ -1215,7 +1213,7 @@ TEST_CASE("parsing toggles with prefix and default value")
 
     SECTION("test parse_env_value() function with positiv env_value")
     {
-        using namespace nitro::broken_options;
+        using namespace nitro::better_options;
 
         REQUIRE(toggle::parse_env_value("TRUE"));
         REQUIRE(toggle::parse_env_value("True"));
@@ -1235,7 +1233,7 @@ TEST_CASE("parsing toggles with prefix and default value")
 
     SECTION("test parse_env_value() function with negativ env_value")
     {
-        using namespace nitro::broken_options;
+        using namespace nitro::better_options;
 
         REQUIRE(!toggle::parse_env_value("False"));
         REQUIRE(!toggle::parse_env_value("FALSE"));
@@ -1255,16 +1253,16 @@ TEST_CASE("parsing toggles with prefix and default value")
 
     SECTION("test parse_env_value() function with error env_value")
     {
-        using namespace nitro::broken_options;
+        using namespace nitro::better_options;
 
-        REQUIRE_THROWS_AS(toggle::parse_env_value("fddgh"), nitro::broken_options::parsing_error);
+        REQUIRE_THROWS_AS(toggle::parse_env_value("fddgh"), nitro::better_options::parsing_error);
         REQUIRE_THROWS_AS(toggle::parse_env_value("fdd-gdegh"),
-                          nitro::broken_options::parsing_error);
+                          nitro::better_options::parsing_error);
     }
 
     SECTION("arguments with prefix get properly parsed")
     {
-        nitro::broken_options::argument named_arg("--no-ab=5");
+        nitro::better_options::user_input named_arg("--no-ab=5");
         REQUIRE(named_arg.is_argument());
         REQUIRE(!named_arg.is_short());
         REQUIRE(named_arg.is_named());
@@ -1274,5 +1272,83 @@ TEST_CASE("parsing toggles with prefix and default value")
         REQUIRE(named_arg.name() == "--no-ab");
         REQUIRE(named_arg.name_without_prefix() == "ab");
         REQUIRE(named_arg.data() == "--no-ab=5");
+    }
+}
+
+TEST_CASE("Defining conflicts between options")
+{
+    SECTION("An option can conflict with another option")
+    {
+        const char* argv[] = { "", "--a=1", "--b", "hello" };
+        int argc = 4;
+
+        nitro::better_options::parser parser;
+
+        auto& a = parser.option("a");
+        auto& b = parser.option("b");
+
+        parser.mutually_exclusive(a, b);
+
+        REQUIRE_THROWS_AS(parser.parse(argc, argv), nitro::better_options::parsing_error);
+    }
+
+    SECTION("An option can conflict with a toggle")
+    {
+        const char* argv[] = { "", "--a=1", "--b" };
+        int argc = 3;
+
+        nitro::better_options::parser parser;
+
+        auto& a = parser.option("a");
+        auto& b = parser.toggle("b");
+
+        parser.mutually_exclusive(a, b);
+
+        REQUIRE_THROWS_AS(parser.parse(argc, argv), nitro::better_options::parsing_error);
+    }
+
+    SECTION("conflicting isn't trasitive by default")
+    {
+        const char* argv[] = { "", "--a=1", "--b", "hello" };
+        int argc = 4;
+
+        nitro::better_options::parser parser;
+
+        auto& a = parser.option("a");
+        auto& b = parser.option("b");
+        auto& c = parser.toggle("c");
+
+        parser.mutually_exclusive(a, c);
+        parser.mutually_exclusive(c, b);
+
+        REQUIRE_NOTHROW(parser.parse(argc, argv));
+    }
+
+    SECTION("An option shall not conflict with itself")
+    {
+        nitro::better_options::parser parser;
+
+        auto& a = parser.option("a");
+        auto& b = parser.multi_option("b");
+        auto& c = parser.toggle("c");
+
+        REQUIRE_THROWS_AS(parser.mutually_exclusive(a, a), nitro::better_options::parser_error);
+        REQUIRE_THROWS_AS(parser.mutually_exclusive(b, b), nitro::better_options::parser_error);
+        REQUIRE_THROWS_AS(parser.mutually_exclusive(c, c), nitro::better_options::parser_error);
+    }
+
+    SECTION("An option can conflict with a multi_option")
+    {
+        const char* argv[] = { "", "--a=1", "--a", "hello" };
+        int argc = 4;
+
+        nitro::better_options::parser parser;
+
+        auto& a = parser.multi_option("a");
+        auto& b = parser.toggle("b");
+
+        parser.mutually_exclusive(a, b);
+
+        REQUIRE_NOTHROW(parser.parse(argc, argv));
     }
 }

@@ -28,8 +28,9 @@
 
 #pragma once
 
-#include <nitro/broken_options/exception.hpp>
-#include <nitro/broken_options/fwd.hpp>
+#include <nitro/better_options/exception.hpp>
+#include <nitro/better_options/fwd.hpp>
+#include <nitro/better_options/user_input.hpp>
 
 #include <nitro/lang/optional.hpp>
 
@@ -38,10 +39,11 @@
 #include <sstream>
 #include <string>
 #include <type_traits>
+#include <vector>
 
 namespace nitro
 {
-namespace broken_options
+namespace better_options
 {
 
     class base
@@ -52,14 +54,17 @@ namespace broken_options
         {
         }
 
+        base(const base&) = delete;
+        base& operator=(const base&) = delete;
+
         bool has_short_name() const
         {
-            return static_cast<bool>(short_);
+            return !short_.empty();
         }
 
         const std::string& short_name() const
         {
-            return *short_;
+            return short_;
         }
 
         const std::string& name() const
@@ -69,22 +74,22 @@ namespace broken_options
 
         bool has_env() const
         {
-            return static_cast<bool>(env_);
+            return !env_.empty();
         }
 
         const std::string& env() const
         {
-            return *env_;
+            return env_;
         }
 
         const std::string& metavar() const
         {
-            return arg_name_;
+            return metavar_;
         }
 
         virtual void format_value(std::ostream& s) const = 0;
 
-        std::ostream& format(std::ostream& s, int left_padding = 2) const
+        std::ostream& format(std::ostream& s, std::streamsize left_padding = 2) const
         {
             for (int i = 0; i < left_padding; ++i)
                 s << ' ';
@@ -109,12 +114,10 @@ namespace broken_options
 
             if (fmt.size() > 38)
             {
-                s << std::endl << std::setw(40) << ' ' << " ";
+                s << std::endl << std::setw(40) << ' ';
             }
-            else
-            {
-                s << " ";
-            }
+
+            s << " ";
 
             auto space = 38;
 
@@ -127,7 +130,7 @@ namespace broken_options
                 {
                     dstr << ' ';
                 }
-                dstr << "Can be set using the environment variable '" << *env_ << "'.";
+                dstr << "Can be set using the environment variable '" << env_ << "'.";
             }
 
             std::string word;
@@ -144,13 +147,13 @@ namespace broken_options
                     space = 38;
                 }
 
-                space -= word.size() + 1;
+                space -= static_cast<int>(word.size()) + 1;
             }
 
             return s << std::endl;
         }
 
-        virtual bool matches(const argument& arg) const
+        virtual bool matches(const user_input& arg) const
         {
             if (!arg.is_argument())
             {
@@ -177,7 +180,7 @@ namespace broken_options
         }
 
     private:
-        virtual void update_value(const argument& data) = 0;
+        virtual void update_value(const user_input& data) = 0;
         virtual void prepare() = 0;
         virtual void check() = 0;
 
@@ -188,9 +191,9 @@ namespace broken_options
         std::string description_;
 
     protected:
-        nitro::lang::optional<std::string> short_;
-        nitro::lang::optional<std::string> env_;
-        std::string arg_name_ = "arg";
+        std::string short_ = "";
+        std::string env_ = "";
+        std::string metavar_ = "arg";
     };
 
     template <typename Option>
@@ -202,23 +205,23 @@ namespace broken_options
         using base::metavar;
         using base::short_name;
 
-        Option& metavar(const std::string& arg_name)
+        Option& metavar(const std::string& metavar)
         {
-            if (arg_name.empty())
+            if (metavar.empty())
             {
                 raise<parser_error>("Trying to assign empty string to metavar");
             }
 
-            arg_name_ = arg_name;
+            metavar_ = metavar;
 
             return *static_cast<Option*>(this);
         }
 
         Option& short_name(const std::string& short_name)
         {
-            if (short_ && *short_ != short_name)
+            if (!short_.empty() && short_ != short_name)
             {
-                raise<parser_error>("Trying to redefine short name");
+                raise<parser_error>("Trying to redefine short name_");
             }
 
             short_ = short_name;
@@ -238,5 +241,5 @@ namespace broken_options
             return *static_cast<Option*>(this);
         }
     };
-} // namespace broken_options
+} // namespace better_options
 } // namespace nitro

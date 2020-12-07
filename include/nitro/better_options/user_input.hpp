@@ -26,11 +26,10 @@
  * WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef INCLUDE_NITRO_BROKEN_OPTIONS_ARGUMENT_HPP
-#define INCLUDE_NITRO_BROKEN_OPTIONS_ARGUMENT_HPP
+#pragma once
 
-#include <nitro/broken_options/exception.hpp>
-#include <nitro/broken_options/fwd.hpp>
+#include <nitro/better_options/exception.hpp>
+#include <nitro/better_options/fwd.hpp>
 
 #include <nitro/except/raise.hpp>
 #include <nitro/lang/optional.hpp>
@@ -42,12 +41,12 @@
 
 namespace nitro
 {
-namespace broken_options
+namespace better_options
 {
-    class argument
+    class user_input
     {
     public:
-        argument(const std::string& arg) : arg_(arg)
+        user_input(const std::string& arg) : arg_(arg)
         {
             auto sep = arg_.find("=");
             if (sep != std::string::npos)
@@ -64,7 +63,7 @@ namespace broken_options
             {
                 if (!std::regex_match(arg, std::regex("-{1,2}[^-=]+[^=]*=?.*")))
                 {
-                    raise<parsing_error>("The argument couldn't be parsed.");
+                    raise<parsing_error>("The user input couldn't be parsed. (", arg, ")");
                 }
             }
         }
@@ -116,7 +115,7 @@ namespace broken_options
             if (!has_prefix())
             {
                 raise<parser_error>(
-                    "Trying to get the name without prefix but prefix is not given.");
+                    "Trying to get the name_ without prefix but prefix is not given.");
             }
             return name().substr(5);
         }
@@ -125,7 +124,7 @@ namespace broken_options
         {
             if (is_value())
             {
-                raise<parser_error>("Trying to get the name of a pure value argument.");
+                raise<parser_error>("Trying to get the name_ of a pure value argument.");
             }
 
             return name_;
@@ -152,7 +151,7 @@ namespace broken_options
             if (!is_short())
             {
                 raise<parser_error>(
-                    "Trying to interpret argument as short options list, but it ain't.");
+                    "Trying to interpret argument as short arguments list, but it ain't.");
             }
 
             std::multiset<std::string> result;
@@ -180,7 +179,5 @@ namespace broken_options
         std::string name_;
         lang::optional<std::string> value_;
     };
-} // namespace broken_options
+} // namespace better_options
 } // namespace nitro
-
-#endif // INCLUDE_NITRO_BROKEN_OPTIONS_ARGUMENT_HPP
