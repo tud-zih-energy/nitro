@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015-2019, Technische Universität Dresden, Germany
+ * Copyright (c) 2015-2018, Technische Universität Dresden, Germany
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without modification, are permitted
@@ -28,41 +28,29 @@
 
 #pragma once
 
-#include <nitro/broken_options/argument.hpp>
+#include <nitro/except/exception.hpp>
 
 namespace nitro
 {
-namespace broken_options
+namespace better_options
 {
-    class argument_parser
+    /**
+     * This exception will be thrown, if the parser is build wrongly.
+     * This exceptions might as well be assertions only triggering during development.
+     */
+    struct parser_error : nitro::except::exception
     {
-    public:
-        argument_parser(int argc, const char* const argv[])
-        {
-            for (int i = 1; i < argc; i++)
-            {
-                arguments_.emplace_back(argv[i]);
-            }
-        }
-
-        auto begin() const
-        {
-            return arguments_.begin();
-        }
-
-        auto end() const
-        {
-            return arguments_.end();
-        }
-
-        auto size() const
-        {
-            return arguments_.size();
-        }
-
-    private:
-        std::vector<argument> arguments_;
+        using base = nitro::except::exception;
+        using base::base;
     };
 
-} // namespace broken_options
+    /**
+     * This exception is thrown, if the user input is not valid according to the built parser
+     */
+    struct parsing_error : nitro::except::exception
+    {
+        using base = nitro::except::exception;
+        using base::base;
+    };
+} // namespace better_options
 } // namespace nitro

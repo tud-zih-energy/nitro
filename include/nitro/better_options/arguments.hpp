@@ -26,12 +26,11 @@
  * WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef INCLUDE_NITRO_BROKEN_OPTIONS_OPTIONS_HPP
-#define INCLUDE_NITRO_BROKEN_OPTIONS_OPTIONS_HPP
+#pragma once
 
-#include <nitro/broken_options/option/multi_option.hpp>
-#include <nitro/broken_options/option/option.hpp>
-#include <nitro/broken_options/option/toggle.hpp>
+#include <nitro/better_options/option/multi_option.hpp>
+#include <nitro/better_options/option/option.hpp>
+#include <nitro/better_options/option/toggle.hpp>
 
 #include <map>
 #include <sstream>
@@ -40,15 +39,15 @@
 
 namespace nitro
 {
-namespace broken_options
+namespace better_options
 {
-    class options
+    class arguments
     {
     public:
-        options(const std::map<std::string, option&>& option_map,
-                const std::map<std::string, multi_option&>& multi_option_map,
-                const std::map<std::string, toggle&>& toggle_map,
-                const std::vector<std::string>& positionals)
+        arguments(const std::map<std::string, option*>& option_map,
+                  const std::map<std::string, multi_option*>& multi_option_map,
+                  const std::map<std::string, toggle*>& toggle_map,
+                  const std::vector<std::string>& positionals)
         : options_(option_map), multi_options_(multi_option_map), toggles_(toggle_map),
           positionals_(positionals)
         {
@@ -57,40 +56,40 @@ namespace broken_options
     public:
         const std::string& get(const std::string& name) const
         {
-            return options_.at(name).get();
+            return options_.at(name)->get();
         }
 
         template <typename T>
         T as(const std::string& name) const
         {
-            return options_.at(name).as<T>();
+            return options_.at(name)->as<T>();
         }
 
     public:
         int given(const std::string& name) const
         {
-            return toggles_.at(name).given();
+            return toggles_.at(name)->given();
         }
 
         std::size_t count(const std::string& name) const
         {
-            return multi_options_.at(name).count();
+            return multi_options_.at(name)->count();
         }
 
         const std::string& get(const std::string& name, std::size_t i) const
         {
-            return multi_options_.at(name).get(i);
+            return multi_options_.at(name)->get(i);
         }
 
         const std::vector<std::string>& get_all(const std::string& name) const
         {
-            return multi_options_.at(name).get_all();
+            return multi_options_.at(name)->get_all();
         }
 
         template <typename T>
         T as(const std::string& name, std::size_t i) const
         {
-            return multi_options_.at(name).as<T>(i);
+            return multi_options_.at(name)->as<T>(i);
         }
 
     public:
@@ -115,12 +114,10 @@ namespace broken_options
         }
 
     private:
-        std::map<std::string, option&> options_;
-        std::map<std::string, multi_option&> multi_options_;
-        std::map<std::string, toggle&> toggles_;
+        std::map<std::string, option*> options_;
+        std::map<std::string, multi_option*> multi_options_;
+        std::map<std::string, toggle*> toggles_;
         std::vector<std::string> positionals_;
     };
-} // namespace broken_options
+} // namespace better_options
 } // namespace nitro
-
-#endif // INCLUDE_NITRO_BROKEN_OPTIONS_OPTIONS_HPP

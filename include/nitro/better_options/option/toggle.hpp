@@ -26,14 +26,15 @@
  * WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef INCLUDE_NITRO_BROKEN_OPTIONS_TOGGLE_HPP
-#define INCLUDE_NITRO_BROKEN_OPTIONS_TOGGLE_HPP
+#ifndef INCLUDE_NITRO_better_options_TOGGLE_HPP
+#define INCLUDE_NITRO_better_options_TOGGLE_HPP
 
-#include <nitro/broken_options/exception.hpp>
-#include <nitro/broken_options/fwd.hpp>
-#include <nitro/broken_options/option/base.hpp>
+#include <nitro/better_options/exception.hpp>
+#include <nitro/better_options/fwd.hpp>
+#include <nitro/better_options/option/base.hpp>
 
 #include <nitro/lang/optional.hpp>
+#include <nitro/env/get.hpp>
 
 #include <ios>
 #include <memory>
@@ -42,22 +43,14 @@
 
 namespace nitro
 {
-namespace broken_options
+namespace better_options
 {
     class toggle : public crtp_base<toggle>
     {
     public:
         toggle(const std::string& name, const std::string& description)
-        : crtp_base(name, description), ref_(nullptr), given_(0)
+        : crtp_base(name, description), given_(0)
         {
-        }
-
-    public:
-        toggle& ref(int& target)
-        {
-            ref_ = &target;
-
-            return *this;
         }
 
     public:
@@ -66,16 +59,14 @@ namespace broken_options
             return given_;
         }
 
-        int default_value(bool def)
+        void default_value(bool def)
         {
-            if (def)
-            {
-                return given_ = 1;
-            }
-            else
-            {
-                return given_ = 0;
-            }
+            given_ = def ? 1 : 0;
+        }
+
+        void default_value(int def)
+        {
+            given_ = def;
         }
 
     public:
@@ -93,6 +84,7 @@ namespace broken_options
             {
                 return true;
             }
+
             if (env_value == "false" || env_value == "FALSE" || env_value == "without" ||
                 env_value == "0" || env_value == "NO" || env_value == "no" ||
                 env_value == "Without" || env_value == "n" || env_value == "off" ||
@@ -105,16 +97,11 @@ namespace broken_options
         }
 
     private:
-        virtual void update_value(const argument& arg) override
+        virtual void update_value(const user_input& arg) override
         {
             if (arg.has_value())
             {
                 raise<parsing_error>("a toggle cannot be given a value: ", name());
-            }
-
-            if (ref_ != nullptr)
-            {
-                *ref_ = true;
             }
 
             if (arg.has_prefix())
@@ -158,18 +145,11 @@ namespace broken_options
             }
         }
 
-        bool matches(const argument& arg) const override
+        bool matches(const user_input& arg) const override
         {
-            if (arg.is_named())
+            if (arg.has_prefix() && arg.name_without_prefix() == name())
             {
-                if (arg.has_prefix())
-                {
-                    return arg.name_without_prefix() == name();
-                }
-                else
-                {
-                    return arg.as_named() == name();
-                }
+                return true;
             }
 
             return base::matches(arg);
@@ -180,11 +160,9 @@ namespace broken_options
     private:
         std::string name_;
         std::string description_;
-        nitro::lang::optional<std::string> short_;
-        int* ref_;
         int given_;
     };
-} // namespace broken_options
+} // namespace better_options
 } // namespace nitro
 
-#endif // INCLUDE_NITRO_BROKEN_OPTIONS_TOGGLE_HPP
+#endif // INCLUDE_NITRO_better_options_TOGGLE_HPP
