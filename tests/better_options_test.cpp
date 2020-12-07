@@ -524,6 +524,22 @@ TEST_CASE("Short-cut arguments can get parsed from command line", "[better_optio
 
         REQUIRE(options.get("opt3") == "hello");
     }
+
+    SECTION("When given by the user, should say so")
+    {
+        int argc = 3;
+        const char* argv[] = { "", "--a", "test" };
+
+        nitro::better_options::parser parser;
+
+        auto& a = parser.option("a");
+        auto& b = parser.option("b").default_value("");
+
+        auto options = parser.parse(argc, argv);
+
+        REQUIRE(a.has_non_default());
+        REQUIRE(!b.has_non_default());
+    }
 }
 
 TEST_CASE("Multiple arguments should work", "[better_options]")
@@ -624,6 +640,22 @@ TEST_CASE("Multiple arguments should work", "[better_options]")
         parser.option("opt3");
 
         REQUIRE_THROWS_AS(parser.multi_option("opt3"), nitro::better_options::parser_error);
+    }
+
+    SECTION("When given by the user, should say so")
+    {
+        int argc = 3;
+        const char* argv[] = { "", "--a", "test" };
+
+        nitro::better_options::parser parser;
+
+        auto& a = parser.multi_option("a");
+        auto& b = parser.multi_option("b").default_value({""});
+
+        auto options = parser.parse(argc, argv);
+
+        REQUIRE(a.has_non_default());
+        REQUIRE(!b.has_non_default());
     }
 }
 
@@ -958,6 +990,22 @@ TEST_CASE("Toggles should work", "[better_options]")
         REQUIRE(options.given("opt_b"));
         REQUIRE(!options.given("opt_c"));
     }
+
+    SECTION("When given by the user, should say so")
+    {
+        int argc = 2;
+        const char* argv[] = { "", "--a" };
+
+        nitro::better_options::parser parser;
+
+        auto& a = parser.toggle("a");
+        auto& b = parser.toggle("b");
+
+        auto options = parser.parse(argc, argv);
+
+        REQUIRE(a.has_non_default());
+        REQUIRE(!b.has_non_default());
+    }
 }
 
 TEST_CASE("Reading the value from the ENV variables", "[better_options]")
@@ -1153,6 +1201,30 @@ TEST_CASE("parsing toggles with prefix and default value")
         nitro::better_options::user_input arg("--arg");
         REQUIRE(!arg.has_prefix());
         REQUIRE_THROWS_AS(arg.name_without_prefix(), nitro::better_options::parser_error);
+    }
+
+    SECTION("cannot provide --arg and --no-arg at the same time")
+    {
+        int argc = 3;
+        const char* argv[] = { "", "--arg", "--no-arg" };
+
+        nitro::better_options::parser parser;
+
+        parser.toggle("arg");
+
+        REQUIRE_THROWS_AS(parser.parse(argc, argv), nitro::better_options::parsing_error);
+    }
+
+    SECTION("cannot provide --no-arg and --arg at the same time")
+    {
+        int argc = 3;
+        const char* argv[] = { "", "--no-arg", "--arg" };
+
+        nitro::better_options::parser parser;
+
+        parser.toggle("arg");
+
+        REQUIRE_THROWS_AS(parser.parse(argc, argv), nitro::better_options::parsing_error);
     }
 
     SECTION("parsing an user_input with prefix and testing check() function")

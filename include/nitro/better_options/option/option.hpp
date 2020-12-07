@@ -116,6 +116,7 @@ namespace better_options
                 raise<parsing_error>("option was already given: ", name());
             }
 
+            dirty_ = true;
             value_ = arg.value();
         }
 
@@ -141,7 +142,7 @@ namespace better_options
 
                 if (default_)
                 {
-                    update_value(*default_);
+                    value_ = *default_;
                 }
                 else
                 {

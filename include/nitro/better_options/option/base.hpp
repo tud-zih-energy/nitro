@@ -179,6 +179,11 @@ namespace better_options
             return false;
         }
 
+        bool has_non_default() const
+        {
+            return dirty_;
+        }
+
     private:
         virtual void update_value(const user_input& data) = 0;
         virtual void prepare() = 0;
@@ -194,6 +199,8 @@ namespace better_options
         std::string short_ = "";
         std::string env_ = "";
         std::string metavar_ = "arg";
+
+        bool dirty_ = false;
     };
 
     template <typename Option>

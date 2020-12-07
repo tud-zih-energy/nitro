@@ -106,13 +106,25 @@ namespace better_options
 
             if (arg.has_prefix())
             {
+                if (dirty_ && given())
+                {
+                    raise<parsing_error>("Cannot provide --", name(), " and --no-", name(), " at the same time.");
+                }
+
                 given_ = 0;
             }
-
             else
             {
+                if (dirty_ && !given())
+                {
+                    raise<parsing_error>("Cannot provide --", name(), " and --no-", name(),
+                                         " at the same time.");
+                }
+
                 ++given_;
             }
+
+            dirty_ = true;
         }
 
         virtual void prepare() override
