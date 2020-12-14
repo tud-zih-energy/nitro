@@ -55,6 +55,10 @@ jobs:
       # The CMake binaries on the Github Actions machines are (as of this writing) 3.12
       run: cmake $GITHUB_WORKSPACE -DCMAKE_BUILD_TYPE=$BUILD_TYPE
 
+    - uses: ammaraskar/msvc-problem-matcher@master
+      if: ${{ startsWith( matrix.os, 'windows' ) }}
+    - uses: ammaraskar/gcc-problem-matcher@master
+      if: ${{ startsWith( matrix.compiler, 'g++') }}
     - name: Build
       working-directory: ${{runner.workspace}}/build
       shell: bash
