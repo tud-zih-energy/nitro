@@ -4,7 +4,7 @@ on: [push, pull_request]
 
 env:
   # Customize the CMake build type here (Release, Debug, RelWithDebInfo, etc.)
-  BUILD_TYPE: Release
+  BUILD_TYPE: Debug
 
 jobs:
   build:
@@ -22,8 +22,8 @@ jobs:
             compiler: clang++-6.0
           - os: macos-latest
             xcode: default
-          - os: windows-latest
-            vs: default
+          - os: windows-2019
+          - os: windows-2016
 
     # The CMake configure and build commands are platform agnostic and should work equally
     # well on Windows or Mac.  You can convert this to a matrix build if you need
@@ -56,6 +56,8 @@ jobs:
     - name: Build
       working-directory: ${{runner.workspace}}/build
       shell: bash
+      env:
+        CXX: ${{ matrix.compiler }}
       # Execute the build.  You can specify a specific target with "--target <NAME>"
       run: cmake --build . --config $BUILD_TYPE
 
