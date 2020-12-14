@@ -28,8 +28,16 @@ jobs:
             compiler: clang++-6.0
           - os: macos-latest
             xcode: default
-          - os: windows-2019
+          - os: macos-latest
+            xcode: 11.7
+          - os: macos-latest
+            xcode: 10.3
+          - os: macos-latest
+            compiler: g++-8
+          - os: macos-latest
+            compiler: g++-9
           - os: windows-2016
+          - os: windows-2019
 
     # The CMake configure and build commands are platform agnostic and should work equally
     # well on Windows or Mac.  You can convert this to a matrix build if you need
@@ -42,7 +50,7 @@ jobs:
 
     - name: Select XCode
       run: sudo xcode-select -s /Applications/Xcode_${{ matrix.xcode }}.app/Contents/Developer
-      if: matrix.os == 'macos-latest' && matrix.xcode != 'default'
+      if: startsWith( matrix.os, 'macos') && matrix.xcode && matrix.xcode != 'default'
 
     - name: Create Build Environment
       # Some projects don't allow in-source building, so create a separate build directory
