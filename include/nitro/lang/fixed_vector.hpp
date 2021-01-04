@@ -54,7 +54,7 @@ namespace lang
         }
 
         fixed_vector(const std::initializer_list<T>& list)
-        : capacity_(list.size()), data_(std::make_unique<T[]>(capacity))
+        : capacity_(list.size()), data_(std::make_unique<T[]>(list.size()))
         {
             insert(this->begin(), list.begin(), list.end());
         }
