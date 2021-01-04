@@ -53,6 +53,12 @@ namespace lang
             insert(this->begin(), array.begin(), array.end());
         }
 
+        fixed_vector(const std::initializer_list<T>& list)
+        : capacity_(list.size()), data_(std::make_unique<T[]>(capacity))
+        {
+            insert(this->begin(), list.begin(), list.end());
+        }
+
         fixed_vector(const fixed_vector<T>& v) : fixed_vector(v.capacity_, v)
         {
         }
@@ -60,6 +66,22 @@ namespace lang
         fixed_vector(fixed_vector<T>&& v) : capacity_(v.capacity_), data_(std::move(v.data_))
         {
         }
+
+        fixed_vector operator=(const fixed_vector& v)
+        {
+            return fixed_vector(v);
+        }
+
+        fixed_vector operator=(fixed_vector&& v)
+        {
+            return fixed_vector(std::move(v));
+        }
+
+        fixed_vector operator=(const std::initializer_list<T>& l)
+        {
+            return fixed_vector(l.size(), l);
+        }
+
 
         ~fixed_vector() = default;
 
@@ -196,6 +218,11 @@ namespace lang
                 ++key;
                 ++start;
             }
+        }
+
+        void insert(T* const pos, std::initializer_list<T>& list)
+        {
+            insert(pos, list.begin(), list.end());
         }
 
         std::size_t push_back(const T& value)

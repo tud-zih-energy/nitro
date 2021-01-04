@@ -20,6 +20,7 @@ TEST_CASE("fixed vector read and write", "[lang]")
 
     REQUIRE(v.size() == 2);
     REQUIRE(v[0] == 5);
+    REQUIRE(v.front() == 5);
     REQUIRE(v.at(1) == 7);
     REQUIRE(v.back() == 7);
 }
