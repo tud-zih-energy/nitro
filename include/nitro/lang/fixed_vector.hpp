@@ -82,7 +82,6 @@ namespace lang
             return fixed_vector(l.size(), l);
         }
 
-
         ~fixed_vector() = default;
 
         bool empty() const
