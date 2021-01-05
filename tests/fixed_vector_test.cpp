@@ -5,7 +5,7 @@
 
 TEST_CASE("fixed vector init", "[lang]")
 {
-    nitro::lang::fixed_vector<std::int64_t> v(10);
+    constexpr nitro::lang::fixed_vector<std::int64_t> v(10);
 
     REQUIRE(v.size() == 0);
     REQUIRE(v.capacity() == 10);
@@ -40,7 +40,7 @@ TEST_CASE("fixed vector erase", "[lang]")
 
 TEST_CASE("fixed vector array assignment", "[lang]")
 {
-    std::array<std::int64_t, 10> a = { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9 };
+    constexpr std::array<std::int64_t, 10> a = { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9 };
 
     nitro::lang::fixed_vector<std::int64_t> v(10, a);
 
@@ -51,7 +51,7 @@ TEST_CASE("fixed vector array assignment", "[lang]")
 
 TEST_CASE("fixed vector array assignment with less elements", "[lang]")
 {
-    std::array<std::int64_t, 6> a = { 0, 1, 2, 3, 4, 5 };
+    constexpr std::array<std::int64_t, 6> a = { 0, 1, 2, 3, 4, 5 };
 
     nitro::lang::fixed_vector<std::int64_t> v(10, a);
 
@@ -63,7 +63,7 @@ TEST_CASE("fixed vector array assignment with less elements", "[lang]")
 
 TEST_CASE("fixed vector std::get access", "[lang]")
 {
-    std::array<std::int64_t, 6> a = { 0, 1, 2, 3, 4, 5 };
+    constexpr std::array<std::int64_t, 6> a = { 0, 1, 2, 3, 4, 5 };
 
     nitro::lang::fixed_vector<std::int64_t> v(6, a);
 
@@ -73,7 +73,7 @@ TEST_CASE("fixed vector std::get access", "[lang]")
 
 TEST_CASE("fixed vector bracket access", "[lang]")
 {
-    std::array<std::int64_t, 6> a = { 0, 1, 2, 3, 4, 5 };
+    constexpr std::array<std::int64_t, 6> a = { 0, 1, 2, 3, 4, 5 };
 
     nitro::lang::fixed_vector<std::int64_t> v(6, a);
 
@@ -85,7 +85,7 @@ TEST_CASE("fixed vector bracket access", "[lang]")
 
 TEST_CASE("fixed vector at() access", "[lang]")
 {
-    std::array<std::int64_t, 6> a = { 0, 1, 2, 3, 4, 5 };
+    constexpr std::array<std::int64_t, 6> a = { 0, 1, 2, 3, 4, 5 };
 
     nitro::lang::fixed_vector<std::int64_t> v(6, a);
 
