@@ -41,70 +41,70 @@ namespace lang
     class fixed_vector
     {
     public:
-        fixed_vector(std::size_t capacity)
+        constexpr fixed_vector(std::size_t capacity)
         : capacity_(capacity), data_(std::make_unique<T[]>(capacity))
         {
         }
 
         template <typename Iterabel>
-        fixed_vector(std::size_t capacity, const Iterabel& array)
+        constexpr fixed_vector(std::size_t capacity, const Iterabel& array)
         : capacity_(capacity), data_(std::make_unique<T[]>(capacity))
         {
             insert(this->begin(), array.begin(), array.end());
         }
 
-        fixed_vector(const std::initializer_list<T>& list)
+        constexpr fixed_vector(const std::initializer_list<T>& list)
         : capacity_(list.size()), data_(std::make_unique<T[]>(list.size()))
         {
             insert(this->begin(), list.begin(), list.end());
         }
 
-        fixed_vector(const fixed_vector<T>& v) : fixed_vector(v.capacity_, v)
+        constexpr fixed_vector(const fixed_vector<T>& v) : fixed_vector(v.capacity_, v)
         {
         }
 
-        fixed_vector(fixed_vector<T>&& v) : capacity_(v.capacity_), data_(std::move(v.data_))
+        constexpr fixed_vector(fixed_vector<T>&& v) : capacity_(v.capacity_), data_(std::move(v.data_))
         {
         }
 
-        fixed_vector operator=(const fixed_vector& v)
+        constexpr fixed_vector operator=(const fixed_vector& v)
         {
             return fixed_vector(v);
         }
 
-        fixed_vector operator=(fixed_vector&& v)
+        constexpr fixed_vector operator=(fixed_vector&& v)
         {
             return fixed_vector(std::move(v));
         }
 
-        fixed_vector operator=(const std::initializer_list<T>& l)
+        constexpr fixed_vector operator=(const std::initializer_list<T>& l)
         {
             return fixed_vector(l.size(), l);
         }
 
         ~fixed_vector() = default;
 
-        bool empty() const
+        constexpr bool empty() const
         {
             return size_ == 0;
         }
 
-        std::size_t size() const
+        constexpr std::size_t size() const
         {
             return size_;
         }
 
-        std::size_t capacity() const
+        constexpr std::size_t capacity() const
         {
             return capacity_;
         }
 
-        T& operator[](const std::size_t& key)
+        constexpr T& operator[](const std::size_t& key)
         {
             return data_[key];
         }
 
-        T& at(const std::size_t& key)
+        constexpr T& at(const std::size_t& key)
         {
             if (key >= capacity_)
                 raise("Key is larger than capacity");
@@ -115,12 +115,12 @@ namespace lang
             return data_[key];
         }
 
-        const T& operator[](const std::size_t& key) const
+        constexpr const T& operator[](const std::size_t& key) const
         {
             return data_[key];
         }
 
-        const T& at(const std::size_t& key) const
+        constexpr const T& at(const std::size_t& key) const
         {
             if (key >= capacity_)
                 raise("Key is larger than capacity!");
@@ -131,28 +131,28 @@ namespace lang
             return data_[key];
         }
 
-        T& front() noexcept
+        constexpr T& front() noexcept
         {
             return data_[0];
         }
 
-        const T& front() const noexcept
+        constexpr const T& front() const noexcept
         {
             return data_[0];
         }
 
-        T& back() noexcept
+        constexpr T& back() noexcept
         {
             return data_[size_ - 1];
         }
 
-        const T& back() const noexcept
+        constexpr const T& back() const noexcept
         {
             return data_[size_ - 1];
         }
 
         template <class... Args>
-        void emplace(T* const pos, Args&&... args)
+        constexpr void emplace(T* const pos, Args&&... args)
         {
             auto key = std::distance(begin(), pos);
 
@@ -164,7 +164,7 @@ namespace lang
         }
 
         template <class... Args>
-        std::size_t emplace_back(Args&&... args)
+        constexpr std::size_t emplace_back(Args&&... args)
         {
             if (size_ >= capacity_)
                 raise("No capacity left!");
@@ -175,7 +175,7 @@ namespace lang
             return size_ - 1;
         }
 
-        std::size_t insert(const T& value)
+        constexpr std::size_t insert(const T& value)
         {
             if (size_ >= capacity_)
                 raise("No capacity left!");
@@ -186,7 +186,7 @@ namespace lang
             return size_ - 1;
         }
 
-        std::size_t insert(T&& value)
+        constexpr std::size_t insert(T&& value)
         {
             if (size_ >= capacity_)
                 raise("No capacity left!");
@@ -198,7 +198,7 @@ namespace lang
         }
 
         template <typename Iter>
-        void insert(T* const pos, Iter start, Iter end)
+        constexpr void insert(T* const pos, Iter start, Iter end)
         {
             std::size_t key = std::distance(begin(), pos);
             if (key > size_)
@@ -219,12 +219,12 @@ namespace lang
             }
         }
 
-        void insert(T* const pos, std::initializer_list<T>& list)
+        constexpr void insert(T* const pos, std::initializer_list<T>& list)
         {
             insert(pos, list.begin(), list.end());
         }
 
-        std::size_t push_back(const T& value)
+        constexpr std::size_t push_back(const T& value)
         {
             if (size_ >= capacity_)
                 raise("No capacity left!");
@@ -236,12 +236,12 @@ namespace lang
         }
 
         template <typename Iter>
-        void push_back(Iter start, Iter end)
+        constexpr void push_back(Iter start, Iter end)
         {
             insert(this->end(), start, end);
         }
 
-        void pop_back()
+        constexpr void pop_back()
         {
             if (size_ == 0)
                 raise("Container is empty!");
@@ -249,67 +249,67 @@ namespace lang
             --size_;
         }
 
-        T* begin() noexcept
+        constexpr T* begin() noexcept
         {
             return &data_[0];
         }
 
-        T* rbegin() noexcept
+        constexpr T* rbegin() noexcept
         {
             return &data_[size_ - 1];
         }
 
-        T* end() noexcept
+        constexpr T* end() noexcept
         {
             return &data_[size_];
         }
 
-        T* rend() noexcept
+        constexpr T* rend() noexcept
         {
             return &data_[-1];
         }
 
-        const T* begin() const noexcept
+        constexpr const T* begin() const noexcept
         {
             return &data_[0];
         }
 
-        const T* rbegin() const noexcept
+        constexpr const T* rbegin() const noexcept
         {
             return &data_[size_ - 1];
         }
 
-        const T* end() const noexcept
+        constexpr const T* end() const noexcept
         {
             return &data_[size_];
         }
 
-        const T* rend() const noexcept
+        constexpr const T* rend() const noexcept
         {
             return &data_[-1];
         }
 
-        const T* cbegin() const noexcept
+        constexpr const T* cbegin() const noexcept
         {
             return &data_[0];
         }
 
-        const T* crbegin() const noexcept
+        constexpr const T* crbegin() const noexcept
         {
             return &data_[size_ - 1];
         }
 
-        const T* cend() const noexcept
+        constexpr const T* cend() const noexcept
         {
             return &data_[size_];
         }
 
-        const T* crend() const noexcept
+        constexpr const T* crend() const noexcept
         {
             return &data_[-1];
         }
 
-        void erase(T* pos)
+        constexpr void erase(T* pos)
         {
             std::size_t key = std::distance(begin(), pos);
 
@@ -324,12 +324,12 @@ namespace lang
             --size_;
         }
 
-        T* data() noexcept
+        constexpr T* data() noexcept
         {
             return data_.get();
         }
 
-        const T* data() const noexcept
+        constexpr const T* data() const noexcept
         {
             return data_.get();
         }
@@ -341,13 +341,13 @@ namespace lang
         std::unique_ptr<T[]> data_;
 
         template <typename A>
-        std::enable_if_t<std::is_move_assignable<A>::value> replace(A& a, A&& b)
+        constexpr std::enable_if_t<std::is_move_assignable<A>::value> replace(A& a, A&& b)
         {
             a = std::move(b);
         }
 
         template <typename A>
-        std::enable_if_t<!std::is_move_assignable<A>::value> replace(A& a, const A& b)
+        constexpr std::enable_if_t<!std::is_move_assignable<A>::value> replace(A& a, const A& b)
         {
             a = b;
         }
