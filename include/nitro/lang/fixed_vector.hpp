@@ -63,7 +63,8 @@ namespace lang
         {
         }
 
-        constexpr fixed_vector(fixed_vector<T>&& v) : capacity_(v.capacity_), data_(std::move(v.data_))
+        constexpr fixed_vector(fixed_vector<T>&& v)
+        : capacity_(v.capacity_), data_(std::move(v.data_))
         {
         }
 
