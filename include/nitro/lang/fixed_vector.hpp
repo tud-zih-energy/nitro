@@ -41,16 +41,15 @@ namespace lang
     class fixed_vector
     {
     public:
-        using value_type             = T;
-        using pointer                = T*;
-        using const_pointer          = const T*;
-        using reference              = value_type&;
-        using const_reference        = const value_type&;
-        using size_type              = std::size_t;
-        // using difference_type        = /* implementation-defined */;
-        using iterator               = T*;
-        using const_iterator         = const T*;
-        using reverse_iterator       = std::reverse_iterator<iterator>;
+        using value_type = T;
+        using pointer = T*;
+        using const_pointer = const T*;
+        using reference = value_type&;
+        using const_reference = const value_type&;
+        using size_type = std::size_t;
+        using iterator = T*;
+        using const_iterator = const T*;
+        using reverse_iterator = std::reverse_iterator<iterator>;
         using const_reverse_iterator = std::reverse_iterator<const_iterator>;
 
         constexpr fixed_vector(std::size_t capacity)
