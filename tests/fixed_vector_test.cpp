@@ -5,7 +5,7 @@
 
 TEST_CASE("fixed vector init", "[lang]")
 {
-    constexpr nitro::lang::fixed_vector<std::int64_t> v(10);
+    nitro::lang::fixed_vector<std::int64_t> v(10);
 
     REQUIRE(v.size() == 0);
     REQUIRE(v.capacity() == 10);
@@ -101,7 +101,7 @@ TEST_CASE("fixed vector merge two vectors #1", "[lang]")
     constexpr std::array<std::int64_t, 6> b = { 6, 7, 8, 9, 10, 11 };
 
     nitro::lang::fixed_vector<std::int64_t> v(12, a);
-    constexpr nitro::lang::fixed_vector<std::int64_t> w(6, b);
+    nitro::lang::fixed_vector<std::int64_t> w(6, b);
 
     v.push_back(w.begin(), w.end());
 
