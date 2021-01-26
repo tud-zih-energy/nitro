@@ -108,6 +108,13 @@ TEST_CASE("fixed vector merge two vectors #1", "[lang]")
     REQUIRE(v.size() == 12);
 }
 
+TEST_CASE("fixed vector init with init list", "[lang]")
+{
+    nitro::lang::fixed_vector<std::int64_t> v = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12};
+
+    REQUIRE(v.size() == 12);
+}
+
 TEST_CASE("fixed vector with unique ptr", "[lang]")
 {
     nitro::lang::fixed_vector<std::unique_ptr<std::int64_t>> v(2);
