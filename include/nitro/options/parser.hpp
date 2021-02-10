@@ -28,14 +28,14 @@
 
 #pragma once
 
-#include <nitro/better_options/fwd.hpp>
+#include <nitro/options/fwd.hpp>
 
-#include <nitro/better_options/option/group.hpp>
-#include <nitro/better_options/option/multi_option.hpp>
-#include <nitro/better_options/option/option.hpp>
-#include <nitro/better_options/option/toggle.hpp>
+#include <nitro/options/option/group.hpp>
+#include <nitro/options/option/multi_option.hpp>
+#include <nitro/options/option/option.hpp>
+#include <nitro/options/option/toggle.hpp>
 
-#include <nitro/better_options/arguments.hpp>
+#include <nitro/options/arguments.hpp>
 
 #include <deque>
 #include <iostream>
@@ -45,7 +45,7 @@
 
 namespace nitro
 {
-namespace better_options
+namespace options
 {
 
     class parser
@@ -56,48 +56,40 @@ namespace better_options
                const std::string& group = std::string("arguments"));
 
         auto parse(int argc, const char* const argv[]) -> arguments;
-        auto parse(const std::vector<better_options::user_input>& args) -> arguments;
+        auto parse(const std::vector<options::user_input>& args) -> arguments;
 
     public:
-        nitro::better_options::group& group(const std::string& name,
-                                            const std::string& description = std::string(""));
+        nitro::options::group& group(const std::string& name,
+                                     const std::string& description = std::string(""));
 
-        nitro::better_options::group& group();
+        nitro::options::group& group();
 
         auto option(const std::string& name, const std::string& description = std::string(""))
-            -> better_options::option&;
+            -> options::option&;
         auto multi_option(const std::string& name, const std::string& description = std::string(""))
-            -> better_options::multi_option&;
+            -> options::multi_option&;
         auto toggle(const std::string& name, const std::string& description = std::string(""))
-            -> better_options::toggle&;
+            -> options::toggle&;
 
         void accept_positionals(std::size_t amount = std::numeric_limits<std::size_t>::max());
-        void positional_name(const std::string& name);
-
-        void mutually_exclusive(const better_options::base& a, const better_options::base& b);
+        void positional_metavar(const std::string& name);
 
     public:
-        std::ostream& usage(std::ostream& s = std::cout, bool print_default_group = true);
+        std::ostream& usage(std::ostream& s = std::cout);
 
     private:
-        void check_consistency();
-        void handle_match(const std::string& name);
+        void check_parser_consistency();
 
-        std::map<std::string, nitro::better_options::option*> get_all_options() const;
-        std::map<std::string, nitro::better_options::multi_option*> get_all_multi_options() const;
-        std::map<std::string, nitro::better_options::toggle*> get_all_toggles() const;
+        std::map<std::string, nitro::options::option*> get_all_options() const;
+        std::map<std::string, nitro::options::multi_option*> get_all_multi_options() const;
+        std::map<std::string, nitro::options::toggle*> get_all_toggles() const;
 
-        template <typename Iter>
-        bool parse_options(Iter& it, Iter end);
+        template <typename Options, typename Iter>
+        bool try_parse_as_option(Options&& options, Iter& it, Iter end);
+        bool try_parse_as_toggle(const user_input&);
 
-        template <typename Iter>
-        bool parse_multi_options(Iter& it, Iter end);
-
-        template <typename Iter>
-        bool parse_toggles(Iter& it);
-
-        void prepare();
-        void validate();
+        void prepare_options();
+        void validate_options();
 
         template <typename F>
         void for_each_option(F f)
@@ -120,18 +112,16 @@ namespace better_options
 
         bool has_option_with_name(const std::string& name) const;
 
-        friend class better_options::group;
+        friend class options::group;
 
     private:
         std::string app_name_;
         std::string about_;
 
-        std::map<std::string, nitro::better_options::group> groups_;
-        std::multimap<std::string, std::string> exclusions_;
-        std::set<std::string> user_provided_;
+        std::map<std::string, nitro::options::group> groups_;
 
         std::size_t allowed_positionals_ = 0;
         std::string positional_name_ = "args";
     };
-} // namespace better_options
+} // namespace options
 } // namespace nitro
