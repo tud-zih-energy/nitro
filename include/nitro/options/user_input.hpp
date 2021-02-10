@@ -28,8 +28,8 @@
 
 #pragma once
 
-#include <nitro/better_options/exception.hpp>
-#include <nitro/better_options/fwd.hpp>
+#include <nitro/options/exception.hpp>
+#include <nitro/options/fwd.hpp>
 
 #include <nitro/except/raise.hpp>
 #include <nitro/lang/optional.hpp>
@@ -41,7 +41,7 @@
 
 namespace nitro
 {
-namespace better_options
+namespace options
 {
     class user_input
     {
@@ -179,5 +179,5 @@ namespace better_options
         std::string name_;
         lang::optional<std::string> value_;
     };
-} // namespace better_options
+} // namespace options
 } // namespace nitro

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015-2016, Technische Universität Dresden, Germany
+ * Copyright (c) 2015-2018, Technische Universität Dresden, Germany
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without modification, are permitted
@@ -28,34 +28,31 @@
 
 #pragma once
 
-#include <nitro/better_options/exception.hpp>
-#include <nitro/better_options/fwd.hpp>
-#include <nitro/better_options/option/base.hpp>
+#include <nitro/options/exception.hpp>
+#include <nitro/options/fwd.hpp>
+#include <nitro/options/option/base.hpp>
 
-#include <nitro/env/get.hpp>
-#include <nitro/except/raise.hpp>
 #include <nitro/lang/optional.hpp>
-#include <nitro/lang/string.hpp>
 
 #include <memory>
 #include <sstream>
 #include <string>
-#include <vector>
+#include <type_traits>
 
 namespace nitro
 {
-namespace better_options
+namespace options
 {
-    class multi_option : public crtp_base<multi_option>
+    class option : public crtp_base<option>
     {
     public:
-        multi_option(const std::string& name, const std::string& description)
+        option(const std::string& name, const std::string& description)
         : crtp_base(name, description)
         {
         }
 
     public:
-        multi_option& default_value(const std::vector<std::string>& new_default)
+        option& default_value(const std::string& new_default)
         {
             default_ = new_default;
 
@@ -64,21 +61,19 @@ namespace better_options
 
         bool has_default() const
         {
-            return !default_.empty();
+            return static_cast<bool>(default_);
         }
 
-        const std::vector<std::string>& get_default() const
+        const std::string& get_default() const
         {
-            return default_;
+            return *default_;
         }
 
-    public:
         virtual void format_value(std::ostream& s) const override
         {
             if (has_default())
             {
-                s << " [=" << nitro::lang::join(get_default().begin(), get_default().end(), ", ")
-                  << "]";
+                s << " [=" << get_default() << "]";
             }
             else
             {
@@ -86,23 +81,19 @@ namespace better_options
             }
         }
 
-        const std::string& get(std::size_t i) const
+    public:
+        const std::string& get() const
         {
-            return value_[i];
-        }
-
-        const std::vector<std::string>& get_all() const
-        {
-            return value_;
+            return *value_;
         }
 
         template <typename T>
-        T as(std::size_t i) const
+        std::enable_if_t<!std::is_constructible<T, std::string>::value, T> as() const
         {
             std::stringstream str;
-            str << value_[i];
+            str << *value_;
 
-            T result{};
+            T result;
 
             str >> result;
 
@@ -111,17 +102,22 @@ namespace better_options
             return result;
         }
 
-        std::size_t count() const
+        template <typename T>
+        std::enable_if_t<std::is_constructible<T, std::string>::value, T> as() const
         {
-            return value_.size();
+            return T(*value_);
         }
 
     private:
         void update_value(const user_input& arg) override
         {
-            dirty_ = true;
+            if (value_)
+            {
+                raise<parsing_error>("option was already given: ", name());
+            }
 
-            value_.push_back(arg.value());
+            dirty_ = true;
+            value_ = arg.value();
         }
 
         void prepare() override
@@ -130,7 +126,7 @@ namespace better_options
 
         void check() override
         {
-            if (value_.empty())
+            if (!value_)
             {
                 if (has_env())
                 {
@@ -138,35 +134,28 @@ namespace better_options
 
                     if (!env_value.empty())
                     {
-                        std::string element;
-                        std::stringstream str;
-                        str << env_value;
-
-                        while (std::getline(str, element, ';'))
-                        {
-                            update_value(element);
-                        }
+                        update_value(env_value);
 
                         return;
                     }
                 }
 
-                if (default_.size())
+                if (default_)
                 {
-                    value_ = default_;
-
-                    return;
+                    value_ = *default_;
                 }
-
-                raise<parsing_error>("missing value for required option: ", name());
+                else
+                {
+                    raise<parsing_error>("missing value for required option: ", name());
+                }
             }
         }
 
         friend class parser;
 
     private:
-        std::vector<std::string> default_;
-        std::vector<std::string> value_;
+        nitro::lang::optional<std::string> default_;
+        nitro::lang::optional<std::string> value_;
     };
-} // namespace better_options
+} // namespace options
 } // namespace nitro

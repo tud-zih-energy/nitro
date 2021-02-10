@@ -32,9 +32,9 @@ NitroTest(env_get_test.cpp)
 target_link_libraries(Nitro.env_get_test Nitro::env)
 set_tests_properties(Nitro.env_get_test PROPERTIES ENVIRONMENT "TEST_1=THIS_WAS_SET")
 
-NitroTest(better_options_test.cpp)
-target_link_libraries(Nitro.better_options_test Nitro::better-options)
-set_tests_properties(Nitro.better_options_test PROPERTIES ENVIRONMENT "OPT1=OPT1_VALUE;OPT2=TRUE;OPT3=FALSE;OPT4=OPT4_VALUE0\;OPT4_VALUE1")
+NitroTest(options_test.cpp)
+target_link_libraries(Nitro.options_test Nitro::options)
+set_tests_properties(Nitro.options_test PROPERTIES ENVIRONMENT "OPT1=OPT1_VALUE;OPT2=TRUE;OPT3=FALSE;OPT4=OPT4_VALUE0\;OPT4_VALUE1")
 
 NitroTest(tuple_operators_test.cpp)
 

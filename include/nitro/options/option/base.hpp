@@ -28,9 +28,9 @@
 
 #pragma once
 
-#include <nitro/better_options/exception.hpp>
-#include <nitro/better_options/fwd.hpp>
-#include <nitro/better_options/user_input.hpp>
+#include <nitro/options/exception.hpp>
+#include <nitro/options/fwd.hpp>
+#include <nitro/options/user_input.hpp>
 
 #include <nitro/lang/optional.hpp>
 
@@ -43,7 +43,7 @@
 
 namespace nitro
 {
-namespace better_options
+namespace options
 {
 
     class base
@@ -87,6 +87,16 @@ namespace better_options
             return metavar_;
         }
 
+        virtual std::string format_name() const
+        {
+            return "--" + name();
+        }
+
+        virtual bool is_optional() const
+        {
+            return true;
+        }
+
         virtual void format_value(std::ostream& s) const = 0;
 
         std::ostream& format(std::ostream& s, std::streamsize left_padding = 2) const
@@ -99,11 +109,11 @@ namespace better_options
 
             if (has_short_name())
             {
-                str << "-" << short_name() << " [ --" << name() << " ]";
+                str << "-" << short_name() << " [ " << format_name() << " ]";
             }
             else
             {
-                str << "--" << name();
+                str << format_name();
             }
 
             format_value(str);
@@ -228,7 +238,13 @@ namespace better_options
         {
             if (!short_.empty() && short_ != short_name)
             {
-                raise<parser_error>("Trying to redefine short name_");
+                raise<parser_error>("Trying to redefine short_name for ", name());
+            }
+
+            if (short_name.size() != 1)
+            {
+                raise<parser_error>("Trying to define short_name for ", name(),
+                                    " that isn't one character.");
             }
 
             short_ = short_name;
@@ -248,5 +264,5 @@ namespace better_options
             return *static_cast<Option*>(this);
         }
     };
-} // namespace better_options
+} // namespace options
 } // namespace nitro

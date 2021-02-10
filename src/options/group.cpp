@@ -26,12 +26,12 @@
  * WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include <nitro/better_options/option/group.hpp>
+#include <nitro/options/option/group.hpp>
 
-#include <nitro/better_options/option/multi_option.hpp>
-#include <nitro/better_options/option/option.hpp>
-#include <nitro/better_options/option/toggle.hpp>
-#include <nitro/better_options/parser.hpp>
+#include <nitro/options/option/multi_option.hpp>
+#include <nitro/options/option/option.hpp>
+#include <nitro/options/option/toggle.hpp>
+#include <nitro/options/parser.hpp>
 
 #include <functional>
 #include <iostream>
@@ -39,9 +39,9 @@
 
 namespace nitro
 {
-namespace better_options
+namespace options
 {
-    group::group(const better_options::parser& parser, const std::string& name,
+    group::group(const options::parser& parser, const std::string& name,
                  const std::string& description)
     : parser_(parser), name_(name), description_(description)
     {
@@ -76,7 +76,7 @@ namespace better_options
             s << std::endl << description_ << std::endl << std::endl;
         }
 
-        std::map<std::string, const nitro::better_options::base&> print_options;
+        std::map<std::string, const nitro::options::base&> print_options;
         for (auto& it : options_)
             print_options.emplace(it.first, it.second);
         for (auto& it : multi_options_)
@@ -88,7 +88,7 @@ namespace better_options
             iter.second.format(s);
     }
 
-    better_options::option& group::option(const std::string& name, const std::string& description)
+    options::option& group::option(const std::string& name, const std::string& description)
     {
         if (parser_.has_option_with_name(name) && options_.count(name) == 0)
         {
@@ -101,8 +101,8 @@ namespace better_options
             .first->second;
     }
 
-    better_options::multi_option& group::multi_option(const std::string& name,
-                                                      const std::string& description)
+    options::multi_option& group::multi_option(const std::string& name,
+                                               const std::string& description)
     {
         if (parser_.has_option_with_name(name) && multi_options_.count(name) == 0)
         {
@@ -115,7 +115,7 @@ namespace better_options
             .first->second;
     }
 
-    better_options::toggle& group::toggle(const std::string& name, const std::string& description)
+    options::toggle& group::toggle(const std::string& name, const std::string& description)
     {
         if (parser_.has_option_with_name(name) && toggles_.count(name) == 0)
         {
@@ -128,20 +128,20 @@ namespace better_options
             .first->second;
     }
 
-    const std::map<std::string, better_options::option>& group::get_options() const
+    const std::map<std::string, options::option>& group::get_options() const
     {
         return options_;
     }
 
-    const std::map<std::string, better_options::multi_option>& group::get_multi_options() const
+    const std::map<std::string, options::multi_option>& group::get_multi_options() const
     {
         return multi_options_;
     }
 
-    const std::map<std::string, better_options::toggle>& group::get_toggles() const
+    const std::map<std::string, options::toggle>& group::get_toggles() const
     {
         return toggles_;
     }
 
-} // namespace better_options
+} // namespace options
 } // namespace nitro

@@ -28,9 +28,9 @@
 
 #pragma once
 
-#include <nitro/better_options/option/multi_option.hpp>
-#include <nitro/better_options/option/option.hpp>
-#include <nitro/better_options/option/toggle.hpp>
+#include <nitro/options/option/multi_option.hpp>
+#include <nitro/options/option/option.hpp>
+#include <nitro/options/option/toggle.hpp>
 
 #include <map>
 #include <sstream>
@@ -39,11 +39,14 @@
 
 namespace nitro
 {
-namespace better_options
+namespace options
 {
     class arguments
     {
     public:
+        arguments() = default;
+
+
         arguments(const std::map<std::string, option*>& option_map,
                   const std::map<std::string, multi_option*>& multi_option_map,
                   const std::map<std::string, toggle*>& toggle_map,
@@ -119,5 +122,5 @@ namespace better_options
         std::map<std::string, toggle*> toggles_;
         std::vector<std::string> positionals_;
     };
-} // namespace better_options
+} // namespace options
 } // namespace nitro

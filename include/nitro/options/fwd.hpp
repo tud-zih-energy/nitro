@@ -30,7 +30,7 @@
 
 namespace nitro
 {
-namespace better_options
+namespace options
 {
     class parser;
     class arguments;
@@ -44,5 +44,5 @@ namespace better_options
     class multi_option;
     class toggle;
 
-} // namespace better_options
+} // namespace options
 } // namespace nitro

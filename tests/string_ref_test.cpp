@@ -30,15 +30,15 @@ TEST_CASE("String ref works", "[lang]")
 
     SECTION("can be nullptr")
     {
-        nitro::lang::string_ref sr(nullptr);
+        nitro::lang::string_ref sr2(nullptr);
 
-        REQUIRE(sr.empty() == true);
+        REQUIRE(sr2.empty() == true);
     }
 
     SECTION("can be used with string literals")
     {
-        nitro::lang::string_ref sr("literally a string literal");
+        nitro::lang::string_ref sr2("literally a string literal");
 
-        REQUIRE(std::string("literally a string literal") == sr);
+        REQUIRE(std::string("literally a string literal") == sr2);
     }
 }

@@ -26,12 +26,11 @@
  * WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef INCLUDE_NITRO_better_options_TOGGLE_HPP
-#define INCLUDE_NITRO_better_options_TOGGLE_HPP
+#pragma once
 
-#include <nitro/better_options/exception.hpp>
-#include <nitro/better_options/fwd.hpp>
-#include <nitro/better_options/option/base.hpp>
+#include <nitro/options/exception.hpp>
+#include <nitro/options/fwd.hpp>
+#include <nitro/options/option/base.hpp>
 
 #include <nitro/env/get.hpp>
 #include <nitro/lang/optional.hpp>
@@ -43,7 +42,7 @@
 
 namespace nitro
 {
-namespace better_options
+namespace options
 {
     class toggle : public crtp_base<toggle>
     {
@@ -59,14 +58,37 @@ namespace better_options
             return given_;
         }
 
-        void default_value(bool def)
+        toggle& default_value(bool def)
         {
             given_ = def ? 1 : 0;
+
+            return *this;
         }
 
-        void default_value(int def)
+        toggle& default_value(int def)
         {
             given_ = def;
+
+            return *this;
+        }
+
+        toggle& allow_reverse()
+        {
+            reversable_ = true;
+
+            return *this;
+        }
+
+        std::string format_name() const override
+        {
+            if (reversable_)
+            {
+                return "--[no-]" + name();
+            }
+            else
+            {
+                return "--" + name();
+            }
         }
 
     public:
@@ -106,9 +128,15 @@ namespace better_options
 
             if (arg.has_prefix())
             {
+                if (!reversable_)
+                {
+                    raise<parsing_error>("The option --no-", name(), " isn't allowed.");
+                }
+
                 if (dirty_ && given())
                 {
-                    raise<parsing_error>("Cannot provide --", name(), " and --no-", name(), " at the same time.");
+                    raise<parsing_error>("Cannot provide --", name(), " and --no-", name(),
+                                         " at the same time.");
                 }
 
                 given_ = 0;
@@ -133,24 +161,14 @@ namespace better_options
 
         virtual void check() override
         {
-            if (has_env() && !given())
+            if (has_env() && !has_non_default())
             {
                 auto env_value = nitro::env::get(env());
 
                 if (!env_value.empty())
                 {
-                    // Python code would look like this:
-                    // if bool(env_value):
-                    // FeelsBadMan
-                    if (parse_env_value(env_value))
-                    {
-                        update_value({ "--" + name() });
-                    }
-
-                    else
-                    {
-                        update_value({ "--no-" + name() });
-                    }
+                    given_ = parse_env_value(env_value);
+                    dirty_ = true;
 
                     return;
                 }
@@ -173,8 +191,7 @@ namespace better_options
         std::string name_;
         std::string description_;
         int given_;
+        bool reversable_ = false;
     };
-} // namespace better_options
+} // namespace options
 } // namespace nitro
-
-#endif // INCLUDE_NITRO_better_options_TOGGLE_HPP

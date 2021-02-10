@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2015-2019, Technische Universität Dresden, Germany
- * All rights reserved.
+ * All rights reserved.options
  *
  * Redistribution and use in source and binary forms, with or without modification, are permitted
  * provided that the following conditions are met:
@@ -26,15 +26,15 @@
  * WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include <nitro/better_options/parser.hpp>
+#include <nitro/options/parser.hpp>
 
-#include <nitro/better_options/arguments.hpp>
-#include <nitro/better_options/exception.hpp>
-#include <nitro/better_options/option/group.hpp>
-#include <nitro/better_options/option/multi_option.hpp>
-#include <nitro/better_options/option/option.hpp>
-#include <nitro/better_options/option/toggle.hpp>
-#include <nitro/better_options/user_input.hpp>
+#include <nitro/options/arguments.hpp>
+#include <nitro/options/exception.hpp>
+#include <nitro/options/option/group.hpp>
+#include <nitro/options/option/multi_option.hpp>
+#include <nitro/options/option/option.hpp>
+#include <nitro/options/option/toggle.hpp>
+#include <nitro/options/user_input.hpp>
 
 #include <nitro/except/raise.hpp>
 #include <nitro/format/format.hpp>
@@ -44,7 +44,7 @@
 
 namespace nitro
 {
-namespace better_options
+namespace options
 {
     parser::parser(const std::string& app_name, const std::string& about, const std::string& group)
     : app_name_(app_name), about_(about)
@@ -53,7 +53,7 @@ namespace better_options
                         std::forward_as_tuple(*this, group));
     }
 
-    nitro::better_options::group& parser::group()
+    nitro::options::group& parser::group()
     {
         return groups_.at("__default");
     }
@@ -64,51 +64,50 @@ namespace better_options
                get_all_toggles().count(name);
     }
 
-    std::map<std::string, better_options::option*> parser::get_all_options() const
+    std::map<std::string, options::option*> parser::get_all_options() const
     {
-        std::map<std::string, better_options::option*> tmp;
+        std::map<std::string, options::option*> tmp;
         for (auto& sg : groups_)
         {
             auto& options = sg.second.get_options();
             for (auto& option : options)
             {
-                tmp.emplace(option.first, const_cast<better_options::option*>(&option.second));
+                tmp.emplace(option.first, const_cast<options::option*>(&option.second));
             }
         }
         return tmp;
     }
 
-    std::map<std::string, better_options::multi_option*> parser::get_all_multi_options() const
+    std::map<std::string, options::multi_option*> parser::get_all_multi_options() const
     {
-        std::map<std::string, better_options::multi_option*> tmp;
+        std::map<std::string, options::multi_option*> tmp;
         for (auto& sg : groups_)
         {
             auto& multi_options = sg.second.get_multi_options();
             for (auto& multi_option : multi_options)
             {
                 tmp.emplace(multi_option.first,
-                            const_cast<better_options::multi_option*>(&multi_option.second));
+                            const_cast<options::multi_option*>(&multi_option.second));
             }
         }
         return tmp;
     }
 
-    std::map<std::string, better_options::toggle*> parser::get_all_toggles() const
+    std::map<std::string, options::toggle*> parser::get_all_toggles() const
     {
-        std::map<std::string, better_options::toggle*> tmp;
+        std::map<std::string, options::toggle*> tmp;
         for (auto& group : groups_)
         {
             auto& toggles = group.second.get_toggles();
             for (auto& toggle : toggles)
             {
-                tmp.emplace(toggle.first, const_cast<better_options::toggle*>(&toggle.second));
+                tmp.emplace(toggle.first, const_cast<options::toggle*>(&toggle.second));
             }
         }
         return tmp;
     }
 
-    nitro::better_options::group& parser::group(const std::string& name,
-                                                const std::string& description)
+    nitro::options::group& parser::group(const std::string& name, const std::string& description)
     {
         auto res = groups_.emplace(std::piecewise_construct, std::forward_as_tuple(name),
                                    std::forward_as_tuple(*this, name, description));
@@ -116,18 +115,18 @@ namespace better_options
         return res.first->second;
     }
 
-    better_options::option& parser::option(const std::string& name, const std::string& description)
+    options::option& parser::option(const std::string& name, const std::string& description)
     {
         return group().option(name, description);
     }
 
-    better_options::multi_option& parser::multi_option(const std::string& name,
-                                                       const std::string& description)
+    options::multi_option& parser::multi_option(const std::string& name,
+                                                const std::string& description)
     {
         return group().multi_option(name, description);
     }
 
-    better_options::toggle& parser::toggle(const std::string& name, const std::string& description)
+    options::toggle& parser::toggle(const std::string& name, const std::string& description)
     {
         return group().toggle(name, description);
     }
@@ -137,25 +136,14 @@ namespace better_options
         allowed_positionals_ = amount;
     }
 
-    void parser::positional_name(const std::string& name)
+    void parser::positional_metavar(const std::string& name)
     {
         positional_name_ = name;
     }
 
-    void parser::mutually_exclusive(const better_options::base& a, const better_options::base& b)
-    {
-        if (a.name() == b.name())
-        {
-            raise<parser_error>("An option cannot conflict with itself.");
-        }
-
-        exclusions_.insert(std::make_pair(a.name(), b.name()));
-        exclusions_.insert(std::make_pair(b.name(), a.name()));
-    }
-
     arguments parser::parse(int argc, const char* const argv[])
     {
-        std::vector<better_options::user_input> args;
+        std::vector<options::user_input> args;
 
         for (int i = 1; i < argc; i++)
         {
@@ -165,18 +153,18 @@ namespace better_options
         return parse(args);
     }
 
-    arguments parser::parse(const std::vector<better_options::user_input>& args)
+    arguments parser::parse(const std::vector<options::user_input>& args)
     {
-        check_consistency();
+        check_parser_consistency();
 
-        prepare();
+        prepare_options();
 
-        bool only_positionals = false;
+        bool only_positionals_mode = false;
         std::vector<std::string> positionals;
 
         for (auto it = args.begin(); it != args.end(); ++it)
         {
-            if (only_positionals || it->is_value())
+            if (only_positionals_mode || it->is_value())
             {
                 if (allowed_positionals_ == positionals.size())
                 {
@@ -191,32 +179,33 @@ namespace better_options
 
             if (it->is_double_dash())
             {
-                only_positionals = true;
+                only_positionals_mode = true;
                 continue;
             }
 
-            if (parse_options(it, args.end()) || parse_multi_options(it, args.end()) ||
-                parse_toggles(it))
+            if (try_parse_as_option(get_all_options(), it, args.end()) ||
+                try_parse_as_option(get_all_multi_options(), it, args.end()) ||
+                try_parse_as_toggle(*it))
             {
                 continue;
             }
 
             if (allowed_positionals_ < positionals.size() && it->is_value())
             {
-                positionals.push_back(it->name());
+                positionals.push_back(it->data());
                 continue;
             }
 
             raise<parsing_error>("Argument '", it->data(), "' could not be parsed.");
         }
 
-        validate();
+        validate_options();
 
         return arguments(get_all_options(), get_all_multi_options(), get_all_toggles(),
                          positionals);
     }
 
-    std::ostream& parser::usage(std::ostream& s, bool print_default_group)
+    std::ostream& parser::usage(std::ostream& s)
     {
         std::string short_list;
         std::string option_list;
@@ -281,31 +270,13 @@ namespace better_options
         return s;
     }
 
-    void parser::handle_match(const std::string& name)
+    template <typename Options, typename Iter>
+    bool parser::try_parse_as_option(Options&& options, Iter& it, Iter end)
     {
-        auto range = exclusions_.equal_range(name);
-
-        for (auto it = range.first; it != range.second; ++it)
-        {
-            if (user_provided_.count(it->second) > 0)
-            {
-                raise<parsing_error>("provided argument for both mutually exclusive options: '",
-                                     name, "' and '", it->second, "'");
-            }
-        }
-
-        user_provided_.emplace(name);
-    }
-
-    template <typename Iter>
-    bool parser::parse_options(Iter& it, Iter end)
-    {
-        for (auto& option : get_all_options())
+        for (auto& option : options)
         {
             if (option.second->matches(*it))
             {
-                handle_match(option.first);
-
                 if (it->has_value())
                 {
                     option.second->update_value(*it);
@@ -334,55 +305,17 @@ namespace better_options
         return false;
     }
 
-    template <typename Iter>
-    bool parser::parse_multi_options(Iter& it, Iter end)
+    bool parser::try_parse_as_toggle(const user_input& in)
     {
-        for (auto& option : get_all_multi_options())
-        {
-            if (option.second->matches(*it))
-            {
-                handle_match(option.first);
-
-                if (it->has_value())
-                {
-                    option.second->update_value(*it);
-                }
-                else
-                {
-                    auto next = it + 1;
-
-                    if (next != end && next->is_value())
-                    {
-                        option.second->update_value(*next);
-                    }
-                    else
-                    {
-                        raise<parsing_error>("missing value for required option: ",
-                                             option.second->name());
-                    }
-
-                    ++it;
-                }
-
-                return true;
-            }
-        }
-
-        return false;
-    }
-
-    template <typename Iter>
-    bool parser::parse_toggles(Iter& it)
-    {
+        // a given user_input might match more than one toggle, e.g., -ab matches a and b.
+        // Therefore, we need to keep checking all toggles, even after one match.
         auto match_found = false;
 
         for (auto& option : get_all_toggles())
         {
-            if (option.second->matches(*it))
+            if (option.second->matches(in))
             {
-                handle_match(option.first);
-
-                option.second->update_value(*it);
+                option.second->update_value(in);
                 match_found = true;
             }
         }
@@ -390,17 +323,17 @@ namespace better_options
         return match_found;
     }
 
-    void parser::prepare()
+    void parser::prepare_options()
     {
         for_each_option([](auto& arg) { arg.prepare(); });
     }
 
-    void parser::validate()
+    void parser::validate_options()
     {
         for_each_option([](auto& arg) { arg.check(); });
     }
 
-    void parser::check_consistency()
+    void parser::check_parser_consistency()
     {
         std::set<std::string> short_names;
 
@@ -419,5 +352,5 @@ namespace better_options
         });
     }
 
-} // namespace better_options
+} // namespace options
 } // namespace nitro

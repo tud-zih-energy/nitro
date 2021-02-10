@@ -173,14 +173,14 @@ set_target_properties(nitro-env-static PROPERTIES
     OUTPUT_NAME nitro-env
 )
 
-set(NITRO_BO_SRCS
-    src/better_options/parser.cpp
-    src/better_options/group.cpp
+set(NITRO_OPTIONS_SRCS
+    src/options/parser.cpp
+    src/options/group.cpp
 )
 
 if(NOT WIN32)
-    add_library(nitro-better-options SHARED ${NITRO_BO_SRCS})
-    target_link_libraries(nitro-better-options
+    add_library(nitro-options SHARED ${NITRO_OPTIONS_SRCS})
+    target_link_libraries(nitro-options
         PUBLIC
             Nitro::core
             nitro-env
@@ -188,16 +188,16 @@ if(NOT WIN32)
     )
 endif()
 
-add_library(nitro-better-options-static STATIC ${NITRO_BO_SRCS})
-target_link_libraries(nitro-better-options-static
+add_library(nitro-options-static STATIC ${NITRO_OPTIONS_SRCS})
+target_link_libraries(nitro-options-static
     PUBLIC
         Nitro::core
         Nitro::env
         $<$<CXX_COMPILER_ID:MSVC>:ws2_32>
 )
-set_target_properties(nitro-better-options-static PROPERTIES
+set_target_properties(nitro-options-static PROPERTIES
     POSITION_INDEPENDENT_CODE ${NITRO_POSITION_INDEPENDENT_CODE}
-    OUTPUT_NAME nitro-better-options
+    OUTPUT_NAME nitro-options
 )
 
 
@@ -215,10 +215,10 @@ set_target_properties(nitro-dl PROPERTIES EXPORT_NAME dl)
 set_target_properties(nitro-log PROPERTIES EXPORT_NAME log)
 if(WIN32)
     set_target_properties(nitro-env-static PROPERTIES EXPORT_NAME env)
-    set_target_properties(nitro-better-options-static PROPERTIES EXPORT_NAME better-options)
+    set_target_properties(nitro-options-static PROPERTIES EXPORT_NAME options)
 else()
     set_target_properties(nitro-env PROPERTIES EXPORT_NAME env)
-    set_target_properties(nitro-better-options PROPERTIES EXPORT_NAME better-options)
+    set_target_properties(nitro-options PROPERTIES EXPORT_NAME options)
 endif()
 
 add_library(Nitro::nitro ALIAS nitro)
@@ -226,7 +226,7 @@ add_library(Nitro::core ALIAS nitro-core)
 add_library(Nitro::dl ALIAS nitro-dl)
 add_library(Nitro::log ALIAS nitro-log)
 add_library(Nitro::env ALIAS nitro-env-static)
-add_library(Nitro::better-options ALIAS nitro-better-options-static)
+add_library(Nitro::options ALIAS nitro-options-static)
 
 if(CMAKE_CURRENT_SOURCE_DIR STREQUAL CMAKE_SOURCE_DIR)
     # build Debug with all warnings
@@ -253,7 +253,7 @@ if(CMAKE_CURRENT_SOURCE_DIR STREQUAL CMAKE_SOURCE_DIR)
                 nitro-dl
                 nitro-log
                 nitro-env-static
-                nitro-better-options-static
+                nitro-options-static
             EXPORT NitroTargets
             LIBRARY DESTINATION lib
             ARCHIVE DESTINATION lib
@@ -268,8 +268,8 @@ if(CMAKE_CURRENT_SOURCE_DIR STREQUAL CMAKE_SOURCE_DIR)
                 nitro-log
                 nitro-env
                 nitro-env-static
-                nitro-better-options
-                nitro-better-options-static
+                nitro-options
+                nitro-options-static
             EXPORT NitroTargets
             LIBRARY DESTINATION lib
             ARCHIVE DESTINATION lib
@@ -304,7 +304,7 @@ else()
     if(WIN32)
         set_target_properties(
                 nitro-env-static
-                nitro-better-options-static
+                nitro-options-static
             PROPERTIES
                 EXCLUDE_FROM_ALL TRUE
         )
@@ -312,8 +312,8 @@ else()
         set_target_properties(
                 nitro-env
                 nitro-env-static
-                nitro-better-options
-                nitro-better-options-static
+                nitro-options
+                nitro-options-static
             PROPERTIES
                 EXCLUDE_FROM_ALL TRUE
         )
