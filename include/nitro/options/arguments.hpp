@@ -33,6 +33,7 @@
 #include <nitro/options/option/toggle.hpp>
 
 #include <map>
+#include <set>
 #include <sstream>
 #include <string>
 #include <vector>
@@ -46,13 +47,13 @@ namespace options
     public:
         arguments() = default;
 
-
         arguments(const std::map<std::string, option*>& option_map,
                   const std::map<std::string, multi_option*>& multi_option_map,
                   const std::map<std::string, toggle*>& toggle_map,
-                  const std::vector<std::string>& positionals)
+                  const std::vector<std::string>& positionals,
+                  const std::set<std::string>& provided)
         : options_(option_map), multi_options_(multi_option_map), toggles_(toggle_map),
-          positionals_(positionals)
+          positionals_(positionals), provided_(provided)
         {
         }
 
@@ -116,11 +117,17 @@ namespace options
             return positionals_;
         }
 
+        bool provided(const std::string& name) const
+        {
+            return provided_.count(name);
+        }
+
     private:
         std::map<std::string, option*> options_;
         std::map<std::string, multi_option*> multi_options_;
         std::map<std::string, toggle*> toggles_;
         std::vector<std::string> positionals_;
+        std::set<std::string> provided_;
     };
 } // namespace options
 } // namespace nitro

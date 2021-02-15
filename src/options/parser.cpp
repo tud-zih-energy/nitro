@@ -201,8 +201,17 @@ namespace options
 
         validate_options();
 
-        return arguments(get_all_options(), get_all_multi_options(), get_all_toggles(),
-                         positionals);
+        std::set<std::string> provided;
+
+        for_each_option([&provided](auto& option) {
+            if (option.has_non_default())
+            {
+                provided.insert(option.name());
+            }
+        });
+
+        return arguments(get_all_options(), get_all_multi_options(), get_all_toggles(), positionals,
+                         provided);
     }
 
     std::ostream& parser::usage(std::ostream& s)
