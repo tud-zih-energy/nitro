@@ -57,19 +57,19 @@ namespace options
     public:
         multi_option& default_value(const std::vector<std::string>& new_default)
         {
-            default_ = new_default;
+            default_ = std::make_unique<std::vector<std::string>>(new_default);
 
             return *this;
         }
 
         bool has_default() const
         {
-            return !default_.empty();
+            return static_cast<bool>(default_);
         }
 
         const std::vector<std::string>& get_default() const
         {
-            return default_;
+            return *default_;
         }
 
     public:
@@ -151,9 +151,9 @@ namespace options
                     }
                 }
 
-                if (default_.size())
+                if (default_)
                 {
-                    value_ = default_;
+                    value_ = *default_;
 
                     return;
                 }
@@ -165,7 +165,7 @@ namespace options
         friend class parser;
 
     private:
-        std::vector<std::string> default_;
+        std::unique_ptr<std::vector<std::string>> default_;
         std::vector<std::string> value_;
     };
 } // namespace options
