@@ -473,6 +473,18 @@ TEST_CASE("Simple named arguments can get parsed from command line", "[options]"
         REQUIRE_THROWS_WITH(parser.parse(argc, argv), "missing value for required option: opt3");
     }
 
+    SECTION("Missing values for passed multi option without default throws")
+    {
+        int argc = 2;
+        const char* argv[] = { "", "--opt3" };
+
+        nitro::options::parser parser;
+
+        parser.multi_option("opt3");
+
+        REQUIRE_THROWS_WITH(parser.parse(argc, argv), "missing value for required option: opt3");
+    }
+
     SECTION("Missing values for passed option without default throws if left out in between")
     {
         int argc = 6;
@@ -1381,5 +1393,150 @@ TEST_CASE("parsing toggles with prefix and default value")
         REQUIRE(named_arg.name() == "--no-ab");
         REQUIRE(named_arg.name_without_prefix() == "ab");
         REQUIRE(named_arg.data() == "--no-ab=5");
+    }
+}
+
+SCENARIO("a multi_option is usable")
+{
+    GIVEN("A parser with a multi_option with an empty list as default value")
+    {
+        nitro::options::parser parser;
+
+        auto& mopt = parser.multi_option("mopt").default_value({});
+
+        WHEN("No arguments are given")
+        {
+            int argc = 1;
+            const char* argv[] = { "" };
+
+            nitro::options::arguments arguments;
+
+            THEN("the parsing is successful and the parsed argument is an empty list")
+            {
+                REQUIRE_NOTHROW(arguments = parser.parse(argc, argv));
+                REQUIRE(arguments.count("mopt") == 0);
+            }
+        }
+
+        WHEN("Arguments are given")
+        {
+            int argc = 3;
+            const char* argv[] = { "", "--mopt", "value1" };
+
+            nitro::options::arguments arguments;
+
+            THEN("the parsing is successful and the parsed argument is not an empty list")
+            {
+                REQUIRE_NOTHROW(arguments = parser.parse(argc, argv));
+                REQUIRE(arguments.count("mopt") == 1);
+                REQUIRE(arguments.get("mopt", 0) == "value1");
+            }
+        }
+
+        WHEN("Arguments are given as ENV")
+        {
+            int argc = 1;
+            const char* argv[] = { "" };
+
+            mopt.env("OPT4");
+
+            nitro::options::arguments arguments;
+
+            THEN("the parsing is successful and the parsed argument is not an empty list")
+            {
+                REQUIRE_NOTHROW(arguments = parser.parse(argc, argv));
+                REQUIRE(arguments.count("mopt") == 2);
+                REQUIRE(arguments.get("mopt", 0) == "OPT4_VALUE0");
+                REQUIRE(arguments.get("mopt", 1) == "OPT4_VALUE1");
+            }
+        }
+    }
+}
+
+SCENARIO("provided arguments are different from default arguments", "[options]")
+{
+    GIVEN("A parser with some options")
+    {
+        nitro::options::parser parser;
+
+        auto& opt = parser.option("opt").default_value("value");
+        auto& tog = parser.toggle("tog");
+        auto& mopt = parser.multi_option("mopt").default_value({});
+
+        WHEN("no arguments are given")
+        {
+            int argc = 1;
+            const char* argv[] = { "" };
+
+            auto arguments = parser.parse(argc, argv);
+
+            THEN("all options should be marked as not provided")
+            {
+                REQUIRE(!opt.has_non_default());
+                REQUIRE(!tog.has_non_default());
+                REQUIRE(!mopt.has_non_default());
+
+                REQUIRE(!arguments.provided("opt"));
+                REQUIRE(!arguments.provided("tog"));
+                REQUIRE(!arguments.provided("mopt"));
+            }
+        }
+
+        WHEN("the option argument is given")
+        {
+            int argc = 3;
+            const char* argv[] = { "", "--opt", "foo" };
+
+            auto arguments = parser.parse(argc, argv);
+
+            THEN("only the option should be marked as provided")
+            {
+                REQUIRE(opt.has_non_default());
+                REQUIRE(!tog.has_non_default());
+                REQUIRE(!mopt.has_non_default());
+
+                REQUIRE(arguments.provided("opt"));
+                REQUIRE(!arguments.provided("tog"));
+                REQUIRE(!arguments.provided("mopt"));
+            }
+        }
+
+        WHEN("the multi option argument is given")
+        {
+            int argc = 3;
+            const char* argv[] = { "", "--mopt", "foo" };
+
+            auto arguments = parser.parse(argc, argv);
+
+            THEN("only the multi option should be marked as provided")
+            {
+                REQUIRE(!opt.has_non_default());
+                REQUIRE(!tog.has_non_default());
+                REQUIRE(mopt.has_non_default());
+
+                REQUIRE(!arguments.provided("opt"));
+                REQUIRE(!arguments.provided("tog"));
+                REQUIRE(arguments.provided("mopt"));
+            }
+        }
+
+        WHEN("the toggle argument is given")
+        {
+            int argc = 2;
+            const char* argv[] = { "", "--tog" };
+
+            auto arguments = parser.parse(argc, argv);
+
+            THEN("only the toggle should be marked as provided")
+            {
+                REQUIRE(!opt.has_non_default());
+                REQUIRE(tog.has_non_default());
+                REQUIRE(!mopt.has_non_default());
+
+                REQUIRE(!arguments.provided("opt"));
+                REQUIRE(arguments.provided("tog"));
+                REQUIRE(!arguments.provided("mopt"));
+            }
+        }
     }
 }
