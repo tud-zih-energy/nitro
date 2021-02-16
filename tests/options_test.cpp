@@ -1481,6 +1481,16 @@ SCENARIO("options and multi_options can be optional, but without default values"
 
                 REQUIRE(!arguments.provided("opt"));
             }
+
+            THEN("the access will raise an exception")
+            {
+                int argc = 3;
+                const char* argv[] = { "", "--mopt", "foo" };
+
+                auto arguments = parser.parse(argc, argv);
+
+                REQUIRE_THROWS(arguments.get_all("opt"));
+            }
         }
 
         WHEN("An optional multi_option isn't provided")
@@ -1503,6 +1513,18 @@ SCENARIO("options and multi_options can be optional, but without default values"
                 auto arguments = parser.parse(argc, argv);
 
                 REQUIRE(!arguments.provided("mopt"));
+            }
+
+            THEN("the access will return an empty vector")
+            {
+                int argc = 3;
+                const char* argv[] = { "", "--opt", "foo" };
+
+                auto arguments = parser.parse(argc, argv);
+
+                auto v = arguments.get_all("mopt");
+
+                REQUIRE(v.size() == 0);
             }
         }
     }
