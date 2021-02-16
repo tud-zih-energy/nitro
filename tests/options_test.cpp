@@ -386,6 +386,61 @@ test arguments:
     }
 }
 
+SCENARIO("The help message is useful")
+{
+    GIVEN("A parser with a reversable toggle")
+    {
+        nitro::options::parser parser;
+        auto& tog = parser.toggle("tog", "some toggle").allow_reverse();
+
+        WHEN("the default is false")
+        {
+            THEN("the usage should hint that the default is false")
+            {
+                std::stringstream str;
+
+                parser.usage(str);
+
+                std::string usage = str.str();
+
+                std::string expected =
+                    R"EXPECTED(usage: main
+
+
+arguments:
+  --[no-]tog [=no]                        some toggle
+)EXPECTED";
+
+                REQUIRE(usage == expected);
+            }
+        }
+
+        WHEN("the default is true")
+        {
+            tog.default_value(true);
+
+            THEN("the usage should hint that the default is true")
+            {
+                std::stringstream str;
+
+                parser.usage(str);
+
+                std::string usage = str.str();
+
+                std::string expected =
+                    R"EXPECTED(usage: main
+
+
+arguments:
+  --[no-]tog [=yes]                       some toggle
+)EXPECTED";
+
+                REQUIRE(usage == expected);
+            }
+        }
+    }
+}
+
 TEST_CASE("Check if short option names are unique", "[options]")
 {
     nitro::options::parser parser;
@@ -1039,7 +1094,7 @@ TEST_CASE("Toggles should work", "[options]")
 
 
 arguments:
-  -t [ --[no-]tog ]                       some toggle
+  -t [ --[no-]tog ] [=no]                 some toggle
 )EXPECTED";
 
         REQUIRE(actual == expected);
