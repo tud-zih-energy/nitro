@@ -60,14 +60,14 @@ namespace options
 
         toggle& default_value(bool def)
         {
-            given_ = def ? 1 : 0;
+            default_ = def ? 1 : 0;
 
             return *this;
         }
 
         toggle& default_value(int def)
         {
-            given_ = def;
+            default_ = def;
 
             return *this;
         }
@@ -92,8 +92,28 @@ namespace options
         }
 
     public:
-        virtual void format_value(std::ostream&) const override
+        virtual void format_value(std::ostream& s) const override
         {
+            if (!reversable_)
+            {
+                return;
+            }
+
+            s << " [=";
+
+            switch (default_)
+            {
+            case 0:
+                s << "no";
+                break;
+            case 1:
+                s << "yes";
+                break;
+            default:
+                s << default_;
+            }
+
+            s << "]";
         }
 
         static bool parse_env_value(const std::string& env_value)
@@ -173,6 +193,11 @@ namespace options
                     return;
                 }
             }
+
+            if (!has_non_default())
+            {
+                given_ = default_;
+            }
         }
 
         bool matches(const user_input& arg) const override
@@ -191,6 +216,7 @@ namespace options
         std::string name_;
         std::string description_;
         int given_;
+        int default_ = 0;
         bool reversable_ = false;
     };
 } // namespace options
