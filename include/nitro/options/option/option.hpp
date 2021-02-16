@@ -69,6 +69,13 @@ namespace options
             return *default_;
         }
 
+        option& optional()
+        {
+            is_optional_ = true;
+
+            return *this;
+        }
+
         virtual void format_value(std::ostream& s) const override
         {
             if (has_default())
@@ -144,7 +151,7 @@ namespace options
                 {
                     value_ = *default_;
                 }
-                else
+                else if (!is_optional_)
                 {
                     raise<parsing_error>("missing value for required option: ", name());
                 }
@@ -156,6 +163,8 @@ namespace options
     private:
         nitro::lang::optional<std::string> default_;
         nitro::lang::optional<std::string> value_;
+
+        bool is_optional_ = false;
     };
 } // namespace options
 } // namespace nitro
