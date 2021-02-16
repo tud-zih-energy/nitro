@@ -72,6 +72,13 @@ namespace options
             return *default_;
         }
 
+        multi_option& optional()
+        {
+            is_optional_ = true;
+
+            return *this;
+        }
+
     public:
         virtual void format_value(std::ostream& s) const override
         {
@@ -158,7 +165,10 @@ namespace options
                     return;
                 }
 
-                raise<parsing_error>("missing value for required option: ", name());
+                if (!is_optional_)
+                {
+                    raise<parsing_error>("missing value for required option: ", name());
+                }
             }
         }
 
@@ -167,6 +177,8 @@ namespace options
     private:
         std::unique_ptr<std::vector<std::string>> default_;
         std::vector<std::string> value_;
+
+        bool is_optional_ = false;
     };
 } // namespace options
 } // namespace nitro

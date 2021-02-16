@@ -1451,6 +1451,63 @@ TEST_CASE("parsing toggles with prefix and default value")
     }
 }
 
+SCENARIO("options and multi_options can be optional, but without default values")
+{
+    GIVEN("A parser with an option and a multi_option")
+    {
+        nitro::options::parser parser;
+
+        auto& opt = parser.option("opt");
+        auto& mopt = parser.multi_option("mopt");
+
+        WHEN("An optional option isn't provided")
+        {
+            opt.optional();
+
+            THEN("it should not raise an exception")
+            {
+                int argc = 3;
+                const char* argv[] = { "", "--mopt", "foo" };
+
+                REQUIRE_NOTHROW(parser.parse(argc, argv));
+            }
+
+            THEN("it should not be provided")
+            {
+                int argc = 3;
+                const char* argv[] = { "", "--mopt", "foo" };
+
+                auto arguments = parser.parse(argc, argv);
+
+                REQUIRE(!arguments.provided("opt"));
+            }
+        }
+
+        WHEN("An optional multi_option isn't provided")
+        {
+            mopt.optional();
+
+            THEN("it should not raise an exception")
+            {
+                int argc = 3;
+                const char* argv[] = { "", "--opt", "foo" };
+
+                REQUIRE_NOTHROW(parser.parse(argc, argv));
+            }
+
+            THEN("it should not be provided")
+            {
+                int argc = 3;
+                const char* argv[] = { "", "--opt", "foo" };
+
+                auto arguments = parser.parse(argc, argv);
+
+                REQUIRE(!arguments.provided("mopt"));
+            }
+        }
+    }
+}
+
 SCENARIO("a multi_option is usable")
 {
     GIVEN("A parser with a multi_option with an empty list as default value")
