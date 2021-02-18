@@ -76,6 +76,11 @@ namespace options
             return *this;
         }
 
+        bool is_optional() const
+        {
+            return is_optional_;
+        }
+
         virtual void format_value(std::ostream& s) const override
         {
             s << " " << metavar();

@@ -1588,6 +1588,11 @@ SCENARIO("options and multi_options can be optional, but without default values"
 
                 REQUIRE_THROWS(arguments.get_all("opt"));
             }
+
+            THEN("is_optional() should return true")
+            {
+                REQUIRE(opt.is_optional() == true);
+            }
         }
 
         WHEN("An optional multi_option isn't provided")
@@ -1622,6 +1627,11 @@ SCENARIO("options and multi_options can be optional, but without default values"
                 auto v = arguments.get_all("mopt");
 
                 REQUIRE(v.size() == 0);
+            }
+
+            THEN("is_optional() should return true")
+            {
+                REQUIRE(mopt.is_optional() == true);
             }
         }
     }

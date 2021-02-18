@@ -244,7 +244,7 @@ namespace options
 
         for (auto& opt : get_all_options())
         {
-            if (opt.second->has_default())
+            if (opt.second->has_default() || opt.second->is_optional())
             {
                 option_list += " [--" + opt.second->name() + "]";
             }
@@ -256,7 +256,7 @@ namespace options
 
         for (auto& mopt : get_all_multi_options())
         {
-            if (mopt.second->has_default())
+            if (mopt.second->has_default() || mopt.second->is_optional())
             {
                 option_list += " [--" + mopt.second->name() + "]";
             }
