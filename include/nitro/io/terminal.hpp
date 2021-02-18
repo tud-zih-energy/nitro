@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015-2016, Technische Universit√§t Dresden, Germany
+ * Copyright (c) 2015-2021, Technische Universit‰t Dresden, Germany
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without modification, are permitted
@@ -28,23 +28,49 @@
 
 #pragma once
 
+#include <iomanip>
+#include <sstream>
+#include <string>
+#include <vector>
+
 namespace nitro
 {
-namespace options
+namespace io
 {
-    class parser;
-    class arguments;
+    namespace terminal
+    {
 
-    class group;
+        inline std::ostream& format_padded(std::ostream& s, const std::string& in, int left_pad = 0,
+                                           int max_width = 80, int inital_indent = 0)
+        {
+            auto space = max_width - inital_indent;
 
-    struct parser_error;
-    struct parsing_error;
+            if (inital_indent <= left_pad)
+            {
+                s << std::setw(left_pad - inital_indent);
+                space = left_pad;
+            }
 
-    class base;
+            for (auto& word : nitro::lang::split(in, " "))
+            {
+                if (word.size() + 1 > static_cast<std::size_t>(max_width - left_pad) ||
+                    static_cast<int>(word.size() + 1) <= space)
+                {
+                    s << ' ' << word;
+                }
+                else
+                {
+                    s << std::endl << std::setw(left_pad) << ' ' << word;
+                    space = left_pad;
+                }
 
-    class option;
-    class multi_option;
-    class toggle;
+                space -= static_cast<int>(word.size()) + 1;
+            }
 
-} // namespace options
+            s << std::setw(0);
+
+            return s;
+        }
+    } // namespace terminal
+} // namespace io
 } // namespace nitro

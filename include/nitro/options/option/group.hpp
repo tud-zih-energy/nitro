@@ -33,6 +33,7 @@
 #include <iostream>
 #include <map>
 #include <string>
+#include <vector>
 
 namespace nitro
 {
@@ -75,6 +76,7 @@ namespace options
         std::map<std::string, options::option> options_;
         std::map<std::string, options::multi_option> multi_options_;
         std::map<std::string, options::toggle> toggles_;
+        std::vector<options::base*> order_;
     };
 } // namespace options
 } // namespace nitro

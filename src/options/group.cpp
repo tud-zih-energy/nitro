@@ -76,16 +76,8 @@ namespace options
             s << std::endl << description_ << std::endl << std::endl;
         }
 
-        std::map<std::string, const nitro::options::base&> print_options;
-        for (auto& it : options_)
-            print_options.emplace(it.first, it.second);
-        for (auto& it : multi_options_)
-            print_options.emplace(it.first, it.second);
-        for (auto& it : toggles_)
-            print_options.emplace(it.first, it.second);
-
-        for (auto& iter : print_options)
-            iter.second.format(s);
+        for (auto& option : order_)
+            option->format(s);
     }
 
     options::option& group::option(const std::string& name, const std::string& description)
@@ -95,10 +87,15 @@ namespace options
             raise<parser_error>("Trying to redefine option. Name: ", name);
         }
 
-        return options_
-            .emplace(std::piecewise_construct, std::forward_as_tuple(name),
-                     std::forward_as_tuple(name, description))
-            .first->second;
+        auto res = options_.emplace(std::piecewise_construct, std::forward_as_tuple(name),
+                                    std::forward_as_tuple(name, description));
+
+        if (res.second)
+        {
+            order_.push_back(&(res.first->second));
+        }
+
+        return res.first->second;
     }
 
     options::multi_option& group::multi_option(const std::string& name,
@@ -109,10 +106,14 @@ namespace options
             raise<parser_error>("Trying to redefine option. Name: ", name);
         }
 
-        return multi_options_
-            .emplace(std::piecewise_construct, std::forward_as_tuple(name),
-                     std::forward_as_tuple(name, description))
-            .first->second;
+        auto res = multi_options_.emplace(std::piecewise_construct, std::forward_as_tuple(name),
+                                          std::forward_as_tuple(name, description));
+
+        if (res.second)
+        {
+            order_.push_back(&(res.first->second));
+        }
+        return res.first->second;
     }
 
     options::toggle& group::toggle(const std::string& name, const std::string& description)
@@ -122,10 +123,15 @@ namespace options
             raise<parser_error>("Trying to redefine option. Name: ", name);
         }
 
-        return toggles_
-            .emplace(std::piecewise_construct, std::forward_as_tuple(name),
-                     std::forward_as_tuple(name, description))
-            .first->second;
+        auto res = toggles_.emplace(std::piecewise_construct, std::forward_as_tuple(name),
+                                    std::forward_as_tuple(name, description));
+
+        if (res.second)
+        {
+            order_.push_back(&(res.first->second));
+        }
+
+        return res.first->second;
     }
 
     const std::map<std::string, options::option>& group::get_options() const
