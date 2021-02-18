@@ -197,13 +197,13 @@ TEST_CASE("Usage descriptions work", "[options]")
         parser.option("opt_long",
                       "an option with an very very very very very very very very very "
                       "very very very very very very very very very very very very very "
-                      "very very very very very very very very long description_");
+                      "very very very very very very very very long description");
 
         parser
             .option("some_long_named_option",
                     "an option with an very very very very very very very very very "
                     "very very very very very very very very very very very very very "
-                    "very very very very very very very very long description_")
+                    "very very very very very very very very long description")
             .short_name("x")
             .default_value("some very long default parameter for this fucking thing");
 
@@ -219,41 +219,38 @@ about
 
 
 arguments:
-  --env-opt arg                           This is an option to set cool stuff.
-                                          Can be set using the environment
-                                          variable 'ENV_OPT'.
-  --env-opt-2 arg                         Can be set using the environment
-                                          variable 'ENV_OPT2'.
-  -m [ --mopt ] arg                       some multi opt
-  -o [ --opt ] arg                        some opt
-  --opt_long arg                          an option with an very very very very
-                                          very very very very very very very
-                                          very very very very very very very
-                                          very very very very very very very
-                                          very very very very very long
-                                          description_
-  --opt_nos [=default value]              some opt without a short, but a
-                                          default
-  --opt_nosd arg                          some opt without short and default
-  -d [ --opt_with_d ] [=default value]    some opt with a default
-  -x [ --some_long_named_option ] [=some very long default parameter for this fucking thing]
-                                          an option with an very very very very
-                                          very very very very very very very
-                                          very very very very very very very
-                                          very very very very very very very
-                                          very very very very very long
-                                          description_
-  -t [ --tog ]                            some toggle
-  -u [ --togg ]                           some other toggle
+  -t [ --tog ]                          some toggle
+  -u [ --togg ]                         some other toggle
+  -o [ --opt ] ARG                      some opt
+  -d [ --opt_with_d ] ARG [=default value] some opt with a default
+  --opt_nos ARG [=default value]        some opt without a short, but a default
+  --opt_nosd ARG                        some opt without short and default
+  --opt_long ARG                        an option with an very very very very
+                                        very very very very very very very very
+                                        very very very very very very very very
+                                        very very very very very very very very
+                                        very very long description
+  -x [ --some_long_named_option ] ARG [=some very long default parameter for this fucking thing]
+                                        an option with an very very very very
+                                        very very very very very very very very
+                                        very very very very very very very very
+                                        very very very very very very very very
+                                        very very long description
+  -m [ --mopt ] ARG                     some multi opt
+  --env-opt ARG                         This is an option to set cool stuff.
+                                        Can be set using the environment
+                                        variable 'ENV_OPT'.
+  --env-opt-2 ARG                       Can be set using the environment
+                                        variable 'ENV_OPT2'.
 )EXPECTED";
 
         std::stringstream s;
         parser.usage(s);
         auto actual = s.str();
 
-        CHECK(actual.size() == expected.size());
+        CHECK(expected.size() == actual.size());
 
-        REQUIRE(actual == expected);
+        REQUIRE(expected == actual);
     }
 }
 
@@ -286,12 +283,12 @@ TEST_CASE("Groups", "[options]")
         parser.group("group1").option(
             "opt_long", "an option with an very very very very very very very very very "
                         "very very very very very very very very very very very very very "
-                        "very very very very very very very very long description_");
+                        "very very very very very very very very long description");
 
         grp2.option("some_long_named_option",
                     "an option with an very very very very very very very very very "
                     "very very very very very very very very very very very very very "
-                    "very very very very very very very very long description_")
+                    "very very very very very very very very long description")
             .short_name("x")
             .default_value("some very long default parameter for this fucking thing");
 
@@ -305,6 +302,7 @@ TEST_CASE("Groups", "[options]")
         parser.usage(s);
 
         auto actual = s.str();
+
         std::string expected =
             R"EXPECTED(usage: app_name [-tu] --env-opt --env-opt-2 --opt --opt_long [--opt_nos] --opt_nosd [--opt_with_d] [--some_long_named_option] --mopt [command line ...]
 
@@ -315,42 +313,39 @@ group1:
 
 some text
 
-  -o [ --opt ] arg                        some opt
-  --opt_long arg                          an option with an very very very very
-                                          very very very very very very very
-                                          very very very very very very very
-                                          very very very very very very very
-                                          very very very very very long
-                                          description_
-  --opt_nos [=default value]              some opt without a short, but a
-                                          default
-  --opt_nosd arg                          some opt without short and default
-  -d [ --opt_with_d ] [=default value]    some opt with a default
-  -t [ --tog ]                            some toggle
-  -u [ --togg ]                           some other toggle
+  -t [ --tog ]                          some toggle
+  -u [ --togg ]                         some other toggle
+  -o [ --opt ] ARG                      some opt
+  -d [ --opt_with_d ] ARG [=default value] some opt with a default
+  --opt_nos ARG [=default value]        some opt without a short, but a default
+  --opt_nosd ARG                        some opt without short and default
+  --opt_long ARG                        an option with an very very very very
+                                        very very very very very very very very
+                                        very very very very very very very very
+                                        very very very very very very very very
+                                        very very long description
 
 group2:
-  --env-opt arg                           This is an option to set cool stuff.
-                                          Can be set using the environment
-                                          variable 'ENV_OPT'.
-  --env-opt-2 arg                         Can be set using the environment
-                                          variable 'ENV_OPT2'.
-  -m [ --mopt ] arg                       some multi opt
-  -x [ --some_long_named_option ] [=some very long default parameter for this fucking thing]
-                                          an option with an very very very very
-                                          very very very very very very very
-                                          very very very very very very very
-                                          very very very very very very very
-                                          very very very very very long
-                                          description_
+  -x [ --some_long_named_option ] ARG [=some very long default parameter for this fucking thing]
+                                        an option with an very very very very
+                                        very very very very very very very very
+                                        very very very very very very very very
+                                        very very very very very very very very
+                                        very very long description
+  -m [ --mopt ] ARG                     some multi opt
+  --env-opt ARG                         This is an option to set cool stuff.
+                                        Can be set using the environment
+                                        variable 'ENV_OPT'.
+  --env-opt-2 ARG                       Can be set using the environment
+                                        variable 'ENV_OPT2'.
 )EXPECTED";
 
-        CHECK(actual.size() == expected.size());
+        CHECK(expected.size() == actual.size());
 
-        REQUIRE(actual == expected);
+        REQUIRE(expected == actual);
     }
 
-    SECTION("Change name_ of default group should work")
+    SECTION("Change name of default group should work")
     {
         nitro::options::parser parser("app_name", "", "test arguments");
 
@@ -359,13 +354,12 @@ group2:
         parser.toggle("tog", "some toggle").short_name("t");
         parser.usage(s);
 
-        REQUIRE(s.str() ==
-                R"EXPECTED(usage: app_name [-t]
+        REQUIRE(R"EXPECTED(usage: app_name [-t]
 
 
 test arguments:
-  -t [ --tog ]                            some toggle
-)EXPECTED");
+  -t [ --tog ]                          some toggle
+)EXPECTED" == s.str());
     }
 
     SECTION("Getting group with same name")
@@ -408,7 +402,7 @@ SCENARIO("The help message is useful")
 
 
 arguments:
-  --[no-]tog [=no]                        some toggle
+  --[no-]tog [=no]                      some toggle
 )EXPECTED";
 
                 REQUIRE(usage == expected);
@@ -432,7 +426,104 @@ arguments:
 
 
 arguments:
-  --[no-]tog [=yes]                       some toggle
+  --[no-]tog [=yes]                     some toggle
+)EXPECTED";
+
+                REQUIRE(usage == expected);
+            }
+        }
+    }
+
+    GIVEN("A parser with on option")
+    {
+        nitro::options::parser parser;
+
+        parser.option("ab");
+
+        WHEN("Requesting the same option again")
+        {
+            parser.option("ab");
+
+            THEN("The usage should contain the option only once")
+            {
+                std::stringstream str;
+                parser.usage(str);
+                std::string usage = str.str();
+
+                std::string expected =
+                    R"EXPECTED(usage: main --ab
+
+
+arguments:
+  --ab ARG
+)EXPECTED";
+
+                REQUIRE(usage == expected);
+            }
+        }
+    }
+
+    GIVEN("A parser with several options")
+    {
+        nitro::options::parser parser;
+
+        parser.toggle("zz");
+        parser.option("ab");
+        parser.multi_option("aa");
+
+        WHEN("the usage is printed")
+        {
+            std::stringstream str;
+
+            parser.usage(str);
+
+            THEN("the options should be in the order of creation")
+            {
+                std::string usage = str.str();
+
+                std::string expected =
+                    R"EXPECTED(usage: main --ab --aa
+
+
+arguments:
+  --zz
+  --ab ARG
+  --aa ARG
+)EXPECTED";
+
+                REQUIRE(usage == expected);
+            }
+        }
+    }
+
+    GIVEN("A parser with several groups")
+    {
+        nitro::options::parser parser;
+
+        parser.group("abc").toggle("zz");
+        parser.group("aaa").option("ab");
+        parser.group("abc").multi_option("aa");
+
+        WHEN("the usage is printed")
+        {
+            std::stringstream str;
+
+            parser.usage(str);
+
+            THEN("the groups should be in the order of creation")
+            {
+                std::string usage = str.str();
+
+                std::string expected =
+                    R"EXPECTED(usage: main --ab --aa
+
+
+abc:
+  --zz
+  --aa ARG
+
+aaa:
+  --ab ARG
 )EXPECTED";
 
                 REQUIRE(usage == expected);
@@ -1094,7 +1185,7 @@ TEST_CASE("Toggles should work", "[options]")
 
 
 arguments:
-  -t [ --[no-]tog ] [=no]                 some toggle
+  -t [ --[no-]tog ] [=no]               some toggle
 )EXPECTED";
 
         REQUIRE(actual == expected);
@@ -1254,7 +1345,7 @@ about
 
 
 arguments:
-  --opt_nosd test                         some opt without short and default
+  --opt_nosd test                       some opt without short and default
 )EXPECTED");
     }
 
@@ -1275,7 +1366,7 @@ about
 
 
 arguments:
-  --mopt test                             some multi opt
+  --mopt test                           some multi opt
 )EXPECTED");
     }
 }

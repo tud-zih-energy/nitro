@@ -119,6 +119,7 @@ namespace options
         std::string about_;
 
         std::map<std::string, nitro::options::group> groups_;
+        std::vector<nitro::options::group*> group_order_;
 
         std::size_t allowed_positionals_ = 0;
         std::string positional_name_ = "args";

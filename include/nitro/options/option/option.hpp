@@ -78,13 +78,11 @@ namespace options
 
         virtual void format_value(std::ostream& s) const override
         {
+            s << " " << metavar();
+
             if (has_default())
             {
                 s << " [=" << get_default() << "]";
-            }
-            else
-            {
-                s << " " << metavar();
             }
         }
 

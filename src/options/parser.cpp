@@ -112,6 +112,11 @@ namespace options
         auto res = groups_.emplace(std::piecewise_construct, std::forward_as_tuple(name),
                                    std::forward_as_tuple(*this, name, description));
 
+        if (res.second)
+        {
+            group_order_.push_back(&(res.first->second));
+        }
+
         return res.first->second;
     }
 
@@ -271,9 +276,11 @@ namespace options
             s << about_ << std::endl << std::endl;
         }
 
-        for (const auto& grp : groups_)
+        group().usage(s);
+
+        for (const auto& grp : group_order_)
         {
-            grp.second.usage(s);
+            grp->usage(s);
         }
 
         return s;

@@ -32,6 +32,7 @@
 #include <nitro/options/fwd.hpp>
 #include <nitro/options/user_input.hpp>
 
+#include <nitro/io/terminal.hpp>
 #include <nitro/lang/optional.hpp>
 
 #include <iomanip>
@@ -99,11 +100,9 @@ namespace options
 
         virtual void format_value(std::ostream& s) const = 0;
 
-        std::ostream& format(std::ostream& s, std::streamsize left_padding = 2) const
+        std::ostream& format(std::ostream& s) const
         {
-            for (int i = 0; i < left_padding; ++i)
-                s << ' ';
-            s << std::left << std::setw(40 - left_padding);
+            s << "  ";
 
             std::stringstream str;
 
@@ -122,15 +121,6 @@ namespace options
 
             s << fmt;
 
-            if (fmt.size() > 38)
-            {
-                s << std::endl << std::setw(40) << ' ';
-            }
-
-            s << " ";
-
-            auto space = 38;
-
             std::stringstream dstr;
             dstr << description_;
 
@@ -143,21 +133,11 @@ namespace options
                 dstr << "Can be set using the environment variable '" << env_ << "'.";
             }
 
-            std::string word;
+            auto text = dstr.str();
 
-            while (std::getline(dstr, word, ' '))
+            if (!text.empty())
             {
-                if (word.size() + 1 > 38 || static_cast<int>(word.size() + 1) <= space)
-                {
-                    s << ' ' << word;
-                }
-                else
-                {
-                    s << std::endl << std::setw(40) << ' ' << "  " << word;
-                    space = 38;
-                }
-
-                space -= static_cast<int>(word.size()) + 1;
+                nitro::io::terminal::format_padded(s, std::move(text), 40, 80, fmt.size() + 2);
             }
 
             return s << std::endl;
@@ -208,7 +188,7 @@ namespace options
     protected:
         std::string short_ = "";
         std::string env_ = "";
-        std::string metavar_ = "arg";
+        std::string metavar_ = "ARG";
 
         bool dirty_ = false;
     };
