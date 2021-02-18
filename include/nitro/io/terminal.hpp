@@ -50,6 +50,10 @@ namespace io
                 s << std::setw(left_pad - inital_indent);
                 space = left_pad;
             }
+            else
+            {
+                space = 0;
+            }
 
             for (auto& word : nitro::lang::split(in, " "))
             {
