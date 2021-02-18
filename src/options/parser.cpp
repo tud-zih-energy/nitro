@@ -234,10 +234,12 @@ namespace options
 
         s << "usage: " << app_name_;
 
+        std::stringstream usage;
+
         if (!short_list.empty())
         {
             std::sort(short_list.begin(), short_list.end());
-            s << " [-" << short_list << "]";
+            usage << " [-" << short_list << "]";
         }
 
         for (auto& opt : get_all_options())
@@ -269,7 +271,19 @@ namespace options
             option_list += " [" + positional_name_ + " ...]";
         }
 
-        s << option_list << std::endl << std::endl;
+        usage << option_list;
+
+        auto out = usage.str();
+
+        if (!out.empty())
+        {
+            out = out.substr(1);
+
+            nitro::io::terminal::format_padded(s, out, 8 + app_name_.size(), 80,
+                                               7 + app_name_.size());
+        }
+
+        s << std::endl << std::endl;
 
         if (!about_.empty())
         {

@@ -213,7 +213,9 @@ TEST_CASE("Usage descriptions work", "[options]")
         parser.option("env-opt-2").env("ENV_OPT2");
 
         std::string expected =
-            R"EXPECTED(usage: app_name [-tu] --env-opt --env-opt-2 --opt --opt_long [--opt_nos] --opt_nosd [--opt_with_d] [--some_long_named_option] --mopt [command line ...]
+            R"EXPECTED(usage: app_name [-tu] --env-opt --env-opt-2 --opt --opt_long [--opt_nos]
+                --opt_nosd [--opt_with_d] [--some_long_named_option] --mopt
+                [command line ...]
 
 about
 
@@ -305,7 +307,9 @@ TEST_CASE("Groups", "[options]")
         auto actual = s.str();
 
         std::string expected =
-            R"EXPECTED(usage: app_name [-tu] --env-opt --env-opt-2 --opt --opt_long [--opt_nos] --opt_nosd [--opt_with_d] [--some_long_named_option] --mopt [command line ...]
+            R"EXPECTED(usage: app_name [-tu] --env-opt --env-opt-2 --opt --opt_long [--opt_nos]
+                --opt_nosd [--opt_with_d] [--some_long_named_option] --mopt
+                [command line ...]
 
 about
 

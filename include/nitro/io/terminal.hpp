@@ -43,16 +43,12 @@ namespace io
         inline std::ostream& format_padded(std::ostream& s, const std::string& in, int left_pad = 0,
                                            int max_width = 80, int inital_indent = 0)
         {
-            auto space = max_width - inital_indent;
+            int space = 0;
 
             if (inital_indent <= left_pad)
             {
                 s << std::setw(left_pad - inital_indent);
-                space = left_pad;
-            }
-            else
-            {
-                space = 0;
+                space = max_width - left_pad;
             }
 
             for (auto& word : nitro::lang::split(in, " "))
@@ -65,7 +61,7 @@ namespace io
                 else
                 {
                     s << std::endl << std::setw(left_pad) << ' ' << word;
-                    space = left_pad;
+                    space = max_width - left_pad;
                 }
 
                 space -= static_cast<int>(word.size()) + 1;
