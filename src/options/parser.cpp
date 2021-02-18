@@ -224,11 +224,17 @@ namespace options
         std::string short_list;
         std::string option_list;
 
+        std::set<options::toggle*> long_toggles;
+
         for (auto& toggle : get_all_toggles())
         {
             if (toggle.second->has_short_name())
             {
                 short_list += toggle.second->short_name();
+            }
+            else
+            {
+                long_toggles.insert(toggle.second);
             }
         }
 
@@ -240,6 +246,11 @@ namespace options
         {
             std::sort(short_list.begin(), short_list.end());
             usage << " [-" << short_list << "]";
+        }
+
+        for (auto toggle : long_toggles)
+        {
+            option_list += " --" + toggle->name();
         }
 
         for (auto& opt : get_all_options())
