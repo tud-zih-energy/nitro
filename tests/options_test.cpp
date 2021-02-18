@@ -404,7 +404,7 @@ SCENARIO("The help message is useful")
                 std::string usage = str.str();
 
                 std::string expected =
-                    R"EXPECTED(usage: main
+                    R"EXPECTED(usage: main --tog
 
 
 arguments:
@@ -428,7 +428,7 @@ arguments:
                 std::string usage = str.str();
 
                 std::string expected =
-                    R"EXPECTED(usage: main
+                    R"EXPECTED(usage: main --tog
 
 
 arguments:
@@ -488,7 +488,7 @@ arguments:
                 std::string usage = str.str();
 
                 std::string expected =
-                    R"EXPECTED(usage: main --ab --aa
+                    R"EXPECTED(usage: main --zz --ab --aa
 
 
 arguments:
@@ -521,7 +521,7 @@ arguments:
                 std::string usage = str.str();
 
                 std::string expected =
-                    R"EXPECTED(usage: main --ab --aa
+                    R"EXPECTED(usage: main --zz --ab --aa
 
 
 abc:
