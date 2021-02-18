@@ -222,7 +222,8 @@ arguments:
   -t [ --tog ]                          some toggle
   -u [ --togg ]                         some other toggle
   -o [ --opt ] ARG                      some opt
-  -d [ --opt_with_d ] ARG [=default value] some opt with a default
+  -d [ --opt_with_d ] ARG [=default value]
+                                        some opt with a default
   --opt_nos ARG [=default value]        some opt without a short, but a default
   --opt_nosd ARG                        some opt without short and default
   --opt_long ARG                        an option with an very very very very
@@ -316,7 +317,8 @@ some text
   -t [ --tog ]                          some toggle
   -u [ --togg ]                         some other toggle
   -o [ --opt ] ARG                      some opt
-  -d [ --opt_with_d ] ARG [=default value] some opt with a default
+  -d [ --opt_with_d ] ARG [=default value]
+                                        some opt with a default
   --opt_nos ARG [=default value]        some opt without a short, but a default
   --opt_nosd ARG                        some opt without short and default
   --opt_long ARG                        an option with an very very very very
