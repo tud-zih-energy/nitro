@@ -84,10 +84,25 @@ namespace options
         virtual void format_value(std::ostream& s) const override
         {
             s << " " << metavar();
+        }
 
+        virtual void format_synopsis(std::ostream& s) const override
+        {
+            s << "[";
+
+            if (has_short_name())
+            {
+                s << "-" << short_name() << "\u00A0<" << metavar() << "> | ";
+            }
+
+            s << format_name() << "\u00A0<" << metavar() << ">]";
+        }
+
+        virtual void format_default(std::ostream& s) const override
+        {
             if (has_default())
             {
-                s << " [=" << get_default() << "]";
+                s << "(default: " << get_default() << ")";
             }
         }
 

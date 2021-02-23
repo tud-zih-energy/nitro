@@ -222,7 +222,6 @@ namespace options
     std::ostream& parser::usage(std::ostream& s)
     {
         std::string short_list;
-        std::string option_list;
 
         std::set<options::toggle*> long_toggles;
 
@@ -231,6 +230,11 @@ namespace options
             if (toggle.second->has_short_name())
             {
                 short_list += toggle.second->short_name();
+
+                if (toggle.second->is_reversible())
+                {
+                    long_toggles.insert(toggle.second);
+                }
             }
             else
             {
@@ -250,39 +254,27 @@ namespace options
 
         for (auto toggle : long_toggles)
         {
-            option_list += " --" + toggle->name();
+            usage << " ";
+            toggle->format_synopsis(usage);
         }
 
         for (auto& opt : get_all_options())
         {
-            if (opt.second->has_default() || opt.second->is_optional())
-            {
-                option_list += " [--" + opt.second->name() + "]";
-            }
-            else
-            {
-                option_list += " --" + opt.second->name();
-            }
+            usage << " ";
+
+            opt.second->format_synopsis(usage);
         }
 
         for (auto& mopt : get_all_multi_options())
         {
-            if (mopt.second->has_default() || mopt.second->is_optional())
-            {
-                option_list += " [--" + mopt.second->name() + "]";
-            }
-            else
-            {
-                option_list += " --" + mopt.second->name();
-            }
+            usage << " ";
+            mopt.second->format_synopsis(usage);
         }
 
         if (allowed_positionals_)
         {
-            option_list += " [" + positional_name_ + " ...]";
+            usage << " [" << positional_name_ << " ...]";
         }
-
-        usage << option_list;
 
         auto out = usage.str();
 

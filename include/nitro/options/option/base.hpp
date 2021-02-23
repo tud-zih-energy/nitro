@@ -93,6 +93,9 @@ namespace options
             return "--" + name();
         }
 
+        virtual void format_synopsis(std::ostream& s) const = 0;
+        virtual void format_default(std::ostream& s) const = 0;
+
         virtual bool is_optional() const
         {
             return true;
@@ -108,7 +111,7 @@ namespace options
 
             if (has_short_name())
             {
-                str << "-" << short_name() << " [ " << format_name() << " ]";
+                str << "-" << short_name() << ", " << format_name();
             }
             else
             {
@@ -124,14 +127,17 @@ namespace options
             std::stringstream dstr;
             dstr << description_;
 
+            if (!description_.empty())
+            {
+                dstr << ' ';
+            }
+
             if (has_env())
             {
-                if (!description_.empty())
-                {
-                    dstr << ' ';
-                }
-                dstr << "Can be set using the environment variable '" << env_ << "'.";
+                dstr << "Can be set using the environment variable '" << env_ << "'. ";
             }
+
+            format_default(dstr);
 
             auto text = dstr.str();
 
