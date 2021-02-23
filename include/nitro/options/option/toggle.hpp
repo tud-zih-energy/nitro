@@ -79,6 +79,11 @@ namespace options
             return *this;
         }
 
+        bool is_reversible() const
+        {
+            return reversable_;
+        }
+
         std::string format_name() const override
         {
             if (reversable_)
@@ -92,28 +97,21 @@ namespace options
         }
 
     public:
-        virtual void format_value(std::ostream& s) const override
+        virtual void format_value(std::ostream&) const override
         {
-            if (!reversable_)
+        }
+
+        virtual void format_synopsis(std::ostream& s) const override
+        {
+            s << "[" << format_name() << "]";
+        }
+
+        virtual void format_default(std::ostream& s) const override
+        {
+            if (is_reversible())
             {
-                return;
+                s << "(default: " << (default_ ? "enabled" : "disabled") << ")";
             }
-
-            s << " [=";
-
-            switch (default_)
-            {
-            case 0:
-                s << "no";
-                break;
-            case 1:
-                s << "yes";
-                break;
-            default:
-                s << default_;
-            }
-
-            s << "]";
         }
 
         static bool parse_env_value(const std::string& env_value)

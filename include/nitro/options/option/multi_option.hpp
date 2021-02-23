@@ -87,14 +87,27 @@ namespace options
     public:
         virtual void format_value(std::ostream& s) const override
         {
+            s << " " << metavar();
+        }
+
+        virtual void format_synopsis(std::ostream& s) const override
+        {
+            s << "[";
+
+            if (has_short_name())
+            {
+                s << "-" << short_name() << "\u00A0<" << metavar() << "> | ";
+            }
+
+            s << format_name() << "\u00A0<" << metavar() << ">]";
+        }
+
+        virtual void format_default(std::ostream& s) const override
+        {
             if (has_default())
             {
-                s << " [=" << nitro::lang::join(get_default().begin(), get_default().end(), ", ")
-                  << "]";
-            }
-            else
-            {
-                s << " " << metavar();
+                s << "(default: "
+                  << nitro::lang::join(get_default().begin(), get_default().end(), ", ") << ")";
             }
         }
 
