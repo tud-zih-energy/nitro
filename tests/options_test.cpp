@@ -1,4 +1,3 @@
-#define CATCH_CONFIG_MAIN
 #include <catch2/catch.hpp>
 
 #include <nitro/options/parser.hpp>
@@ -364,7 +363,7 @@ group2:
 
 
 test arguments:
-  -t [ --tog ]                          some toggle
+  -t,  --tog                              some toggle
 )EXPECTED" == s.str());
     }
 
@@ -1334,7 +1333,7 @@ TEST_CASE("Reading the value from the ENV variables", "[options]")
 
 TEST_CASE("Usage metavar work")
 {
-    SECTION("metavar for arguments work")
+    SECTION("metavar for options work")
     {
         nitro::options::parser parser("app_name", "about");
 
@@ -1355,7 +1354,7 @@ arguments:
 )EXPECTED");
     }
 
-    SECTION("metavar for multi arguments work")
+    SECTION("metavar for multi options work")
     {
         nitro::options::parser parser("app_name", "about");
 
@@ -1366,7 +1365,7 @@ arguments:
         parser.usage(s);
 
         REQUIRE(s.str() ==
-                R"EXPECTED(usage: app_name --mopt
+                R"EXPECTED(usage: app_name [--mopt <test>]
 
 about
 
