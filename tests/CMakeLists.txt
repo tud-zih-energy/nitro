@@ -3,7 +3,7 @@ macro(NitroTest TEST)
 
     set(TEST_NAME "Nitro.${TEST_NAME}")
 
-    add_executable(${TEST_NAME} ${TEST})
+    add_executable(${TEST_NAME} ${TEST} $<TARGET_OBJECTS:nitro_test_main>)
     target_link_libraries(${TEST_NAME} Nitro::core Catch2::Catch2)
     if(CMAKE_C_COMPILER_ID MATCHES "MSVC")
         target_compile_options(${TEST_NAME} PRIVATE /W4)
@@ -18,6 +18,8 @@ add_library(catch2 INTERFACE)
 target_include_directories(catch2 SYSTEM INTERFACE ${CMAKE_CURRENT_SOURCE_DIR}/Catch/single_include)
 add_library(Catch2::Catch2 ALIAS catch2)
 
+add_library(nitro_test_main OBJECT catch_main.cpp)
+target_link_libraries(nitro_test_main PUBLIC Catch2::Catch2)
 
 if(NOT CMAKE_C_COMPILER_ID MATCHES "MSVC")
     add_library(nitro_test_lib SHARED nitro_test_lib.cpp)
