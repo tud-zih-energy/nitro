@@ -19,9 +19,9 @@ target_include_directories(catch2 SYSTEM INTERFACE ${CMAKE_CURRENT_SOURCE_DIR}/C
 add_library(Catch2::Catch2 ALIAS catch2)
 
 add_library(nitro_test_main OBJECT catch_main.cpp)
-target_link_libraries(nitro_test_main PUBLIC Catch2::Catch2)
+target_include_directories(nitro_test_main SYSTEM PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/Catch/single_include)
 target_compile_features(nitro_test_main
-    INTERFACE
+    PRIVATE
         cxx_auto_type
         cxx_constexpr
         cxx_decltype
