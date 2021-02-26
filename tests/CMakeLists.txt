@@ -20,6 +20,32 @@ add_library(Catch2::Catch2 ALIAS catch2)
 
 add_library(nitro_test_main OBJECT catch_main.cpp)
 target_link_libraries(nitro_test_main PUBLIC Catch2::Catch2)
+target_compile_features(nitro_test_main
+    INTERFACE
+        cxx_auto_type
+        cxx_constexpr
+        cxx_decltype
+        cxx_decltype_auto
+        cxx_defaulted_functions
+        cxx_defaulted_move_initializers
+        cxx_delegating_constructors
+        cxx_deleted_functions
+        cxx_explicit_conversions
+        cxx_generic_lambdas
+        cxx_inheriting_constructors
+        cxx_lambdas
+        cxx_lambda_init_captures
+        cxx_noexcept
+        cxx_nullptr
+        cxx_override
+        cxx_range_for
+        cxx_return_type_deduction
+        cxx_rvalue_references
+        cxx_trailing_return_types
+        cxx_user_literals
+        cxx_variadic_templates
+        cxx_template_template_parameters
+)
 
 if(NOT CMAKE_C_COMPILER_ID MATCHES "MSVC")
     add_library(nitro_test_lib SHARED nitro_test_lib.cpp)
