@@ -28,4 +28,4 @@
 
 #pragma once
 
-#define NITRO_LOG_FILE_TAG 
+#define NITRO_LOG_FILE_TAG
