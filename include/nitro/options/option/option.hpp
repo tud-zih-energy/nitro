@@ -53,7 +53,7 @@ namespace options
         const std::string& get_default() const;
 
         option& optional();
-        bool is_optional() const;
+        bool is_optional() const override;
 
         virtual void format_value(std::ostream& s) const override;
         virtual void format_synopsis(std::ostream& s) const override;
