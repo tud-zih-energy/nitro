@@ -57,7 +57,7 @@ namespace options
         const std::vector<std::string>& get_default() const;
 
         multi_option& optional();
-        bool is_optional() const;
+        bool is_optional() const override;
 
     public:
         virtual void format_value(std::ostream& s) const override;
