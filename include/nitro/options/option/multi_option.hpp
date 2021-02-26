@@ -49,77 +49,25 @@ namespace options
     class multi_option : public crtp_base<multi_option>
     {
     public:
-        multi_option(const std::string& name, const std::string& description)
-        : crtp_base(name, description)
-        {
-        }
+        multi_option(const std::string& name, const std::string& description);
 
     public:
-        multi_option& default_value(const std::vector<std::string>& new_default)
-        {
-            default_ = std::make_unique<std::vector<std::string>>(new_default);
+        multi_option& default_value(const std::vector<std::string>& new_default);
+        bool has_default() const;
+        const std::vector<std::string>& get_default() const;
 
-            return *this;
-        }
-
-        bool has_default() const
-        {
-            return static_cast<bool>(default_);
-        }
-
-        const std::vector<std::string>& get_default() const
-        {
-            return *default_;
-        }
-
-        multi_option& optional()
-        {
-            is_optional_ = true;
-
-            return *this;
-        }
-
-        bool is_optional() const
-        {
-            return is_optional_;
-        }
+        multi_option& optional();
+        bool is_optional() const;
 
     public:
-        virtual void format_value(std::ostream& s) const override
-        {
-            s << " " << metavar();
-        }
+        virtual void format_value(std::ostream& s) const override;
+        virtual void format_synopsis(std::ostream& s) const override;
+        virtual std::string format_default() const override;
 
-        virtual void format_synopsis(std::ostream& s) const override
-        {
-            s << "[";
-
-            if (has_short_name())
-            {
-                s << "-" << short_name() << "\u00A0<" << metavar() << "> | ";
-            }
-
-            s << format_name() << "\u00A0<" << metavar() << ">]";
-        }
-
-        virtual void format_default(std::ostream& s) const override
-        {
-            if (has_default())
-            {
-                s << "(default: "
-                  << nitro::lang::join(get_default().begin(), get_default().end(), ", ") << ")";
-            }
-        }
-
-        const std::string& get(std::size_t i) const
-        {
-            return value_[i];
-        }
-
-        const std::vector<std::string>& get_all() const
-        {
-            return value_;
-        }
+    public:
+        const std::string& get(std::size_t i) const;
+        const std::vector<std::string>& get_all() const;
+        std::size_t count() const;
 
         template <typename T>
         T as(std::size_t i) const
@@ -136,59 +84,10 @@ namespace options
             return result;
         }
 
-        std::size_t count() const
-        {
-            return value_.size();
-        }
-
     private:
-        void update_value(const user_input& arg) override
-        {
-            dirty_ = true;
-
-            value_.push_back(arg.value());
-        }
-
-        void prepare() override
-        {
-        }
-
-        void check() override
-        {
-            if (value_.empty())
-            {
-                if (has_env())
-                {
-                    auto env_value = nitro::env::get(env());
-
-                    if (!env_value.empty())
-                    {
-                        std::string element;
-                        std::stringstream str;
-                        str << env_value;
-
-                        while (std::getline(str, element, ';'))
-                        {
-                            update_value(element);
-                        }
-
-                        return;
-                    }
-                }
-
-                if (default_)
-                {
-                    value_ = *default_;
-
-                    return;
-                }
-
-                if (!is_optional_)
-                {
-                    raise<parsing_error>("missing value for required option: ", name());
-                }
-            }
-        }
+        void update_value(const user_input& arg) override;
+        void prepare() override;
+        void check() override;
 
         friend class parser;
 
