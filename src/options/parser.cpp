@@ -282,8 +282,7 @@ namespace options
         {
             out = out.substr(1);
 
-            nitro::io::terminal::format_padded(s, out, 8 + app_name_.size(), 80,
-                                               7 + app_name_.size());
+            nitro::io::terminal::format_padded(s, out, 8 + app_name_.size(), 80);
         }
 
         s << std::endl << std::endl;

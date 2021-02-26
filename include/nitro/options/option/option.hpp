@@ -28,13 +28,12 @@
 
 #pragma once
 
-#include <nitro/options/exception.hpp>
 #include <nitro/options/fwd.hpp>
+
 #include <nitro/options/option/base.hpp>
 
 #include <nitro/lang/optional.hpp>
 
-#include <memory>
 #include <sstream>
 #include <string>
 #include <type_traits>
@@ -46,71 +45,22 @@ namespace options
     class option : public crtp_base<option>
     {
     public:
-        option(const std::string& name, const std::string& description)
-        : crtp_base(name, description)
-        {
-        }
+        option(const std::string& name, const std::string& description);
 
     public:
-        option& default_value(const std::string& new_default)
-        {
-            default_ = new_default;
+        option& default_value(const std::string& new_default);
+        bool has_default() const;
+        const std::string& get_default() const;
 
-            return *this;
-        }
+        option& optional();
+        bool is_optional() const;
 
-        bool has_default() const
-        {
-            return static_cast<bool>(default_);
-        }
-
-        const std::string& get_default() const
-        {
-            return *default_;
-        }
-
-        option& optional()
-        {
-            is_optional_ = true;
-
-            return *this;
-        }
-
-        bool is_optional() const
-        {
-            return is_optional_;
-        }
-
-        virtual void format_value(std::ostream& s) const override
-        {
-            s << " " << metavar();
-        }
-
-        virtual void format_synopsis(std::ostream& s) const override
-        {
-            s << "[";
-
-            if (has_short_name())
-            {
-                s << "-" << short_name() << "\u00A0<" << metavar() << "> | ";
-            }
-
-            s << format_name() << "\u00A0<" << metavar() << ">]";
-        }
-
-        virtual void format_default(std::ostream& s) const override
-        {
-            if (has_default())
-            {
-                s << "(default: " << get_default() << ")";
-            }
-        }
+        virtual void format_value(std::ostream& s) const override;
+        virtual void format_synopsis(std::ostream& s) const override;
+        virtual std::string format_default() const override;
 
     public:
-        const std::string& get() const
-        {
-            return *value_;
-        }
+        const std::string& get() const;
 
         template <typename T>
         std::enable_if_t<!std::is_constructible<T, std::string>::value, T> as() const
@@ -134,47 +84,10 @@ namespace options
         }
 
     private:
-        void update_value(const user_input& arg) override
-        {
-            if (value_)
-            {
-                raise<parsing_error>("option was already given: ", name());
-            }
+        void update_value(const user_input& arg) override;
 
-            dirty_ = true;
-            value_ = arg.value();
-        }
-
-        void prepare() override
-        {
-        }
-
-        void check() override
-        {
-            if (!value_)
-            {
-                if (has_env())
-                {
-                    auto env_value = nitro::env::get(env());
-
-                    if (!env_value.empty())
-                    {
-                        update_value(env_value);
-
-                        return;
-                    }
-                }
-
-                if (default_)
-                {
-                    value_ = *default_;
-                }
-                else if (!is_optional_)
-                {
-                    raise<parsing_error>("missing value for required option: ", name());
-                }
-            }
-        }
+        void prepare() override;
+        void check() override;
 
         friend class parser;
 

@@ -32,6 +32,7 @@
 #include <nitro/options/fwd.hpp>
 #include <nitro/options/user_input.hpp>
 
+#include <nitro/format.hpp>
 #include <nitro/io/terminal.hpp>
 #include <nitro/lang/optional.hpp>
 
@@ -94,7 +95,7 @@ namespace options
         }
 
         virtual void format_synopsis(std::ostream& s) const = 0;
-        virtual void format_default(std::ostream& s) const = 0;
+        virtual std::string format_default() const = 0;
 
         virtual bool is_optional() const
         {
@@ -103,50 +104,43 @@ namespace options
 
         virtual void format_value(std::ostream& s) const = 0;
 
-        std::ostream& format(std::ostream& s) const
+        void format(std::ostream& o) const
         {
+            std::stringstream s;
             s << "  ";
-
-            std::stringstream str;
 
             if (has_short_name())
             {
-                str << "-" << short_name() << ", " << format_name();
+                s << "-" << short_name() << ", " << format_name();
             }
             else
             {
-                str << format_name();
+                s << format_name();
             }
 
-            format_value(str);
+            format_value(s);
 
-            auto fmt = str.str();
-
-            s << fmt;
-
-            std::stringstream dstr;
-            dstr << description_;
-
-            if (!description_.empty())
-            {
-                dstr << ' ';
-            }
+            std::vector<std::string> description;
+            description.push_back(description_);
 
             if (has_env())
             {
-                dstr << "Can be set using the environment variable '" << env_ << "'. ";
+                description.push_back(
+                    nitro::format("Can be set using the environment variable '{}'.") % env_);
             }
 
-            format_default(dstr);
+            description.push_back(format_default());
 
-            auto text = dstr.str();
+            auto text = nitro::lang::join(description);
 
             if (!text.empty())
             {
-                nitro::io::terminal::format_padded(s, std::move(text), 40, 80, fmt.size() + 2);
+                nitro::io::terminal::format_padded(s, text, 40, 80);
             }
 
-            return s << std::endl;
+            s << std::endl;
+
+            o << s.str();
         }
 
         virtual bool matches(const user_input& arg) const

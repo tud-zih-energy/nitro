@@ -3,6 +3,14 @@
 #include <nitro/options/parser.hpp>
 #include <nitro/options/user_input.hpp>
 
+void replace_white_space(std::string& str)
+{
+    nitro::lang::replace_all(str, " ", "#");
+    nitro::lang::replace_all(str, "\n", "@");
+    nitro::lang::replace_all(str, "\t", "&");
+    nitro::lang::replace_all(str, "\r", "%");
+}
+
 TEST_CASE("user_input class works as intended", "[options]")
 {
     SECTION("double dash gets parsed correctly")
@@ -212,33 +220,37 @@ TEST_CASE("Usage descriptions work", "[options]")
         parser.option("env-opt-2").env("ENV_OPT2");
 
         std::string expected =
-            R"EXPECTED(usage: app_name [-tu] --env-opt --env-opt-2 --opt --opt_long [--opt_nos]
-                --opt_nosd [--opt_with_d] [--some_long_named_option] --mopt
+            R"EXPECTED(usage: app_name [-tu] [--env-opt <ARG>] [--env-opt-2 <ARG>] [-o <ARG> |
+                --opt <ARG>] [--opt_long <ARG>] [--opt_nos <ARG>]
+                [--opt_nosd <ARG>] [-d <ARG> | --opt_with_d <ARG>] [-x <ARG> |
+                --some_long_named_option <ARG>] [-m <ARG> | --mopt <ARG>]
                 [command line ...]
 
 about
 
 
 arguments:
-  -t [ --tog ]                          some toggle
-  -u [ --togg ]                         some other toggle
-  -o [ --opt ] ARG                      some opt
-  -d [ --opt_with_d ] ARG [=default value]
-                                        some opt with a default
-  --opt_nos ARG [=default value]        some opt without a short, but a default
+  -t, --tog                             some toggle
+  -u, --togg                            some other toggle
+  -o, --opt ARG                         some opt
+  -d, --opt_with_d ARG                  some opt with a default (default:
+                                        default value)
+  --opt_nos ARG                         some opt without a short, but a default
+                                        (default: default value)
   --opt_nosd ARG                        some opt without short and default
   --opt_long ARG                        an option with an very very very very
                                         very very very very very very very very
                                         very very very very very very very very
                                         very very very very very very very very
                                         very very long description
-  -x [ --some_long_named_option ] ARG [=some very long default parameter for this fucking thing]
-                                        an option with an very very very very
+  -x, --some_long_named_option ARG      an option with an very very very very
                                         very very very very very very very very
                                         very very very very very very very very
                                         very very very very very very very very
-                                        very very long description
-  -m [ --mopt ] ARG                     some multi opt
+                                        very very long description (default:
+                                        some very long default parameter for
+                                        this fucking thing)
+  -m, --mopt ARG                        some multi opt
   --env-opt ARG                         This is an option to set cool stuff.
                                         Can be set using the environment
                                         variable 'ENV_OPT'.
@@ -306,8 +318,10 @@ TEST_CASE("Groups", "[options]")
         auto actual = s.str();
 
         std::string expected =
-            R"EXPECTED(usage: app_name [-tu] --env-opt --env-opt-2 --opt --opt_long [--opt_nos]
-                --opt_nosd [--opt_with_d] [--some_long_named_option] --mopt
+            R"EXPECTED(usage: app_name [-tu] [--env-opt <ARG>] [--env-opt-2 <ARG>] [-o <ARG> |
+                --opt <ARG>] [--opt_long <ARG>] [--opt_nos <ARG>]
+                [--opt_nosd <ARG>] [-d <ARG> | --opt_with_d <ARG>] [-x <ARG> |
+                --some_long_named_option <ARG>] [-m <ARG> | --mopt <ARG>]
                 [command line ...]
 
 about
@@ -317,12 +331,13 @@ group1:
 
 some text
 
-  -t [ --tog ]                          some toggle
-  -u [ --togg ]                         some other toggle
-  -o [ --opt ] ARG                      some opt
-  -d [ --opt_with_d ] ARG [=default value]
-                                        some opt with a default
-  --opt_nos ARG [=default value]        some opt without a short, but a default
+  -t, --tog                             some toggle
+  -u, --togg                            some other toggle
+  -o, --opt ARG                         some opt
+  -d, --opt_with_d ARG                  some opt with a default (default:
+                                        default value)
+  --opt_nos ARG                         some opt without a short, but a default
+                                        (default: default value)
   --opt_nosd ARG                        some opt without short and default
   --opt_long ARG                        an option with an very very very very
                                         very very very very very very very very
@@ -331,13 +346,14 @@ some text
                                         very very long description
 
 group2:
-  -x [ --some_long_named_option ] ARG [=some very long default parameter for this fucking thing]
-                                        an option with an very very very very
+  -x, --some_long_named_option ARG      an option with an very very very very
                                         very very very very very very very very
                                         very very very very very very very very
                                         very very very very very very very very
-                                        very very long description
-  -m [ --mopt ] ARG                     some multi opt
+                                        very very long description (default:
+                                        some very long default parameter for
+                                        this fucking thing)
+  -m, --mopt ARG                        some multi opt
   --env-opt ARG                         This is an option to set cool stuff.
                                         Can be set using the environment
                                         variable 'ENV_OPT'.
@@ -363,7 +379,7 @@ group2:
 
 
 test arguments:
-  -t,  --tog                              some toggle
+  -t, --tog                             some toggle
 )EXPECTED" == s.str());
     }
 
@@ -403,11 +419,11 @@ SCENARIO("The help message is useful")
                 std::string usage = str.str();
 
                 std::string expected =
-                    R"EXPECTED(usage: main --tog
+                    R"EXPECTED(usage: main [--[no-]tog]
 
 
 arguments:
-  --[no-]tog [=no]                      some toggle
+  --[no-]tog                            some toggle (default: disabled)
 )EXPECTED";
 
                 REQUIRE(usage == expected);
@@ -427,11 +443,11 @@ arguments:
                 std::string usage = str.str();
 
                 std::string expected =
-                    R"EXPECTED(usage: main --tog
+                    R"EXPECTED(usage: main [--[no-]tog]
 
 
 arguments:
-  --[no-]tog [=yes]                     some toggle
+  --[no-]tog                            some toggle (default: enabled)
 )EXPECTED";
 
                 REQUIRE(usage == expected);
@@ -456,7 +472,7 @@ arguments:
                 std::string usage = str.str();
 
                 std::string expected =
-                    R"EXPECTED(usage: main --ab
+                    R"EXPECTED(usage: main [--ab <ARG>]
 
 
 arguments:
@@ -487,7 +503,7 @@ arguments:
                 std::string usage = str.str();
 
                 std::string expected =
-                    R"EXPECTED(usage: main --zz --ab --aa
+                    R"EXPECTED(usage: main [--zz] [--ab <ARG>] [--aa <ARG>]
 
 
 arguments:
@@ -520,7 +536,7 @@ arguments:
                 std::string usage = str.str();
 
                 std::string expected =
-                    R"EXPECTED(usage: main --zz --ab --aa
+                    R"EXPECTED(usage: main [--zz] [--ab <ARG>] [--aa <ARG>]
 
 
 abc:
@@ -1186,11 +1202,11 @@ TEST_CASE("Toggles should work", "[options]")
         parser.usage(str);
         auto actual = str.str();
 
-        auto expected = R"EXPECTED(usage: app_name [-t]
+        auto expected = R"EXPECTED(usage: app_name [-t] [--[no-]tog]
 
 
 arguments:
-  -t [ --[no-]tog ] [=no]               some toggle
+  -t, --[no-]tog                        some toggle (default: disabled)
 )EXPECTED";
 
         REQUIRE(actual == expected);
@@ -1344,7 +1360,7 @@ TEST_CASE("Usage metavar work")
         parser.usage(s);
 
         REQUIRE(s.str() ==
-                R"EXPECTED(usage: app_name --opt_nosd
+                R"EXPECTED(usage: app_name [--opt_nosd <test>]
 
 about
 
@@ -1364,15 +1380,23 @@ arguments:
 
         parser.usage(s);
 
-        REQUIRE(s.str() ==
-                R"EXPECTED(usage: app_name [--mopt <test>]
+        auto actual = s.str();
+
+        std::string expected = R"EXPECTED(usage: app_name [--mopt <test>]
 
 about
 
 
 arguments:
   --mopt test                           some multi opt
-)EXPECTED");
+)EXPECTED";
+
+        replace_white_space(actual);
+        replace_white_space(expected);
+
+        CHECK(actual.size() == expected.size());
+
+        REQUIRE(actual == expected);
     }
 }
 

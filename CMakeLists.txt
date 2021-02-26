@@ -176,7 +176,10 @@ set_target_properties(nitro-env-static PROPERTIES
 set(NITRO_OPTIONS_SRCS
     src/options/parser.cpp
     src/options/group.cpp
-)
+    src/options/option.cpp
+    src/options/toggle.cpp
+    src/options/multi_option.cpp
+ )
 
 if(NOT WIN32)
     add_library(nitro-options SHARED ${NITRO_OPTIONS_SRCS})

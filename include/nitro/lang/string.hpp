@@ -51,12 +51,26 @@ namespace lang
 
         for (; it + 1 != end; ++it)
         {
-            s << *it << infix;
+            auto pos = s.tellp();
+
+            s << *it;
+
+            if (s.tellp() != pos)
+            {
+                s << infix;
+            }
         }
 
         s << *it;
 
-        return s.str();
+        auto str = s.str();
+
+        if (!str.empty() && str.back() == ' ')
+        {
+            return str.substr(0, str.size() - 1);
+        }
+
+        return str;
     }
 
     inline std::string join(const std::vector<std::string>& strs,
