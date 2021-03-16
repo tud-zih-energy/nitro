@@ -1141,7 +1141,6 @@ TEST_CASE("Toggles should work", "[options]")
 
         parser.toggle("opt2").short_name("o");
 
-
         auto options = parser.parse(argc, argv);
 
         REQUIRE(options.given("opt2") == 3);
