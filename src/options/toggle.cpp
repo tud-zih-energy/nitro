@@ -171,7 +171,14 @@ namespace options
                                      " at the same time.");
             }
 
-            ++given_;
+            if (arg.is_short())
+            {
+                given_ += arg.as_short_list().count(short_name());
+            }
+            else
+            {
+                given_++;
+            }
         }
 
         dirty_ = true;

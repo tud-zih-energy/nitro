@@ -27,7 +27,7 @@ TEST_CASE("user_input class works as intended", "[options]")
         REQUIRE(!arg.is_double_dash());
     }
 
-    SECTION("double dash does not get confised with a short")
+    SECTION("double dash does not get confused with a short")
     {
         nitro::options::user_input arg("-v");
 
@@ -1126,6 +1126,21 @@ TEST_CASE("Toggles should work", "[options]")
         nitro::options::parser parser;
 
         parser.toggle("opt2").short_name("o");
+
+        auto options = parser.parse(argc, argv);
+
+        REQUIRE(options.given("opt2") == 3);
+    }
+
+    SECTION("given multiple times as one argument")
+    {
+        int argc = 2;
+        const char* argv[] = { "", "-ooo" };
+
+        nitro::options::parser parser;
+
+        parser.toggle("opt2").short_name("o");
+
 
         auto options = parser.parse(argc, argv);
 
