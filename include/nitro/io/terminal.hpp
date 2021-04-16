@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015-2018, Technische Universit√§t Dresden, Germany
+ * Copyright (c) 2015-2021, Technische Universit‰t Dresden, Germany
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without modification, are permitted
@@ -28,29 +28,52 @@
 
 #pragma once
 
-#include <nitro/except/exception.hpp>
+#include <iomanip>
+#include <sstream>
+#include <string>
+#include <vector>
 
 namespace nitro
 {
-namespace broken_options
+namespace io
 {
-    /**
-     * This exception will be thrown, if the parser is build wrongly.
-     * This exceptions might as well be assertions only triggering during development.
-     */
-    struct parser_error : nitro::except::exception
+    namespace terminal
     {
-        using base = nitro::except::exception;
-        using base::base;
-    };
 
-    /**
-     * This exception is thrown, if the user input is not valid according to the built parser
-     */
-    struct parsing_error : nitro::except::exception
-    {
-        using base = nitro::except::exception;
-        using base::base;
-    };
-} // namespace broken_options
+        inline std::ostream& format_padded(std::ostream& s, const std::string& in, int left_pad = 0,
+                                           int max_width = 80)
+        {
+            int space = 0;
+            auto initial_indent = s.tellp();
+
+            if (initial_indent <= left_pad)
+            {
+                s << std::setw(left_pad - initial_indent);
+                space = max_width - left_pad;
+            }
+
+            for (auto word : nitro::lang::split(in, " "))
+            {
+                nitro::lang::replace_all(word, "\t", " ");
+
+                if (word.size() + 1 > static_cast<std::size_t>(max_width - left_pad) ||
+                    static_cast<int>(word.size() + 1) <= space)
+                {
+                    s << ' ' << word;
+                }
+                else
+                {
+                    s << std::endl << std::setw(left_pad) << ' ' << word;
+                    space = max_width - left_pad;
+                }
+
+                space -= static_cast<int>(word.size()) + 1;
+            }
+
+            s << std::setw(0);
+
+            return s;
+        }
+    } // namespace terminal
+} // namespace io
 } // namespace nitro

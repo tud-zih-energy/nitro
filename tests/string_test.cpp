@@ -1,6 +1,5 @@
 #include <nitro/lang/string.hpp>
 
-#define CATCH_CONFIG_MAIN
 #include <catch2/catch.hpp>
 
 TEST_CASE("String join works", "[lang]")
@@ -17,6 +16,16 @@ TEST_CASE("String join works", "[lang]")
     SECTION("using the iterator overload")
     {
         REQUIRE(nitro::lang::join(str.begin(), str.end()) == "Hello World");
+    }
+
+    SECTION("joining empty strings gives an empty string")
+    {
+        REQUIRE(nitro::lang::join({ std::string(), std::string() }) == std::string());
+    }
+
+    SECTION("joining an empty string at last doesn't give a string with a dangling space")
+    {
+        REQUIRE(nitro::lang::join({ "Hello", std::string() }) == std::string("Hello"));
     }
 
     SECTION("joining an empty vector gives an empty string")

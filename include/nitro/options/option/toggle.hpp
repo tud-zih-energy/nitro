@@ -26,23 +26,54 @@
  * WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef INCLUDE_NITRO_BROKEN_OPTIONS_FWD_HPP
-#define INCLUDE_NITRO_BROKEN_OPTIONS_FWD_HPP
+#pragma once
+
+#include <nitro/options/fwd.hpp>
+#include <nitro/options/option/base.hpp>
+
+#include <ios>
+#include <string>
 
 namespace nitro
 {
-namespace broken_options
+namespace options
 {
-    class parser;
-    class options;
+    class toggle : public crtp_base<toggle>
+    {
+    public:
+        toggle(const std::string& name, const std::string& description);
 
-    struct parser_error;
+    public:
+        int given() const;
 
-    class option;
-    class multi_option;
-    class toggle;
+        toggle& default_value(bool def);
+        toggle& default_value(int def);
 
-} // namespace broken_options
+        toggle& allow_reverse();
+        bool is_reversible() const;
+
+    public:
+        std::string format_name() const override;
+        virtual void format_value(std::ostream&) const override;
+        virtual void format_synopsis(std::ostream& s) const override;
+        virtual std::string format_default() const override;
+
+        static bool parse_env_value(const std::string& env_value);
+
+    private:
+        virtual void update_value(const user_input& arg) override;
+        virtual void prepare() override;
+        virtual void check() override;
+        bool matches(const user_input& arg) const override;
+
+        friend class parser;
+
+    private:
+        std::string name_;
+        std::string description_;
+        int given_;
+        int default_ = 0;
+        bool reversable_ = false;
+    };
+} // namespace options
 } // namespace nitro
-
-#endif // INCLUDE_NITRO_BROKEN_OPTIONS_OPTION_HPP

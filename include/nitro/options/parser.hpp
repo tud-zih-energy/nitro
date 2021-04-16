@@ -26,99 +26,103 @@
  * WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef INCLUDE_NITRO_BROKEN_OPTIONS_PARSER_HPP
-#define INCLUDE_NITRO_BROKEN_OPTIONS_PARSER_HPP
+#pragma once
 
-#include <nitro/broken_options/argument.hpp>
-#include <nitro/broken_options/exception.hpp>
-#include <nitro/broken_options/option/group.hpp>
-#include <nitro/broken_options/option/multi_option.hpp>
-#include <nitro/broken_options/option/option.hpp>
-#include <nitro/broken_options/option/toggle.hpp>
-#include <nitro/broken_options/options.hpp>
+#include <nitro/options/fwd.hpp>
 
-#include <nitro/except/raise.hpp>
+#include <nitro/options/option/group.hpp>
+#include <nitro/options/option/multi_option.hpp>
+#include <nitro/options/option/option.hpp>
+#include <nitro/options/option/toggle.hpp>
+
+#include <nitro/options/arguments.hpp>
 
 #include <deque>
 #include <iostream>
 #include <map>
 #include <string>
+#include <vector>
 
 namespace nitro
 {
-namespace broken_options
+namespace options
 {
 
     class parser
     {
     public:
         parser(const std::string& app_name = std::string("main"),
-               const std::string& about = std::string(""))
-        : app_name_(app_name), about_(about),
-          groups_({ nitro::broken_options::group(all_argument_names_, 0, "arguments") }),
-          default_group_(groups_.front())
-        {
-        }
+               const std::string& about = std::string(""),
+               const std::string& group = std::string("arguments"));
 
-        auto parse(int argc, const char* const argv[]) -> options;
+        auto parse(int argc, const char* const argv[]) -> arguments;
+        auto parse(const std::vector<options::user_input>& args) -> arguments;
 
     public:
-        nitro::broken_options::group& group(const std::string& name,
-                                            const std::string& description = std::string(""));
-        nitro::broken_options::group&
-        default_group(const std::string& name = std::string(""),
-                      const std::string& description = std::string(""));
+        nitro::options::group& group(const std::string& name,
+                                     const std::string& description = std::string(""));
+
+        nitro::options::group& group();
 
         auto option(const std::string& name, const std::string& description = std::string(""))
-            -> broken_options::option&;
+            -> options::option&;
         auto multi_option(const std::string& name, const std::string& description = std::string(""))
-            -> broken_options::multi_option&;
+            -> options::multi_option&;
         auto toggle(const std::string& name, const std::string& description = std::string(""))
-            -> broken_options::toggle&;
+            -> options::toggle&;
 
         void accept_positionals(std::size_t amount = std::numeric_limits<std::size_t>::max());
-        void positional_name(const std::string& name);
+        void positional_metavar(const std::string& name);
 
     public:
-        std::ostream& usage(std::ostream& s = std::cout, bool print_default_group = true);
+        std::ostream& usage(std::ostream& s = std::cout);
 
     private:
-        void check_consistency();
+        void check_parser_consistency();
 
-        std::map<std::string, nitro::broken_options::option&> get_all_options();
-        std::map<std::string, nitro::broken_options::multi_option&> get_all_multi_options();
-        std::map<std::string, nitro::broken_options::toggle&> get_all_toggles();
+        std::map<std::string, nitro::options::option*> get_all_options() const;
+        std::map<std::string, nitro::options::multi_option*> get_all_multi_options() const;
+        std::map<std::string, nitro::options::toggle*> get_all_toggles() const;
 
-        template <typename Iter>
-        bool parse_options(Iter& it, Iter end);
+        template <typename Options, typename Iter>
+        bool try_parse_as_option(Options&& options, Iter& it, Iter end);
+        bool try_parse_as_toggle(const user_input&);
 
-        template <typename Iter>
-        bool parse_multi_options(Iter& it, Iter end);
-
-        template <typename Iter>
-        bool parse_toggles(Iter& it, Iter end);
-
-        void prepare();
-        void validate();
+        void prepare_options();
+        void validate_options();
 
         template <typename F>
-        void for_each_option(F f);
+        void for_each_option(F f)
+        {
+            for (auto& option : get_all_options())
+            {
+                f(*option.second);
+            }
+
+            for (auto& option : get_all_multi_options())
+            {
+                f(*option.second);
+            }
+
+            for (auto& option : get_all_toggles())
+            {
+                f(*option.second);
+            }
+        }
+
+        bool has_option_with_name(const std::string& name) const;
+
+        friend class options::group;
 
     private:
         std::string app_name_;
         std::string about_;
 
-        std::set<std::string> all_argument_names_;
-        std::deque<nitro::broken_options::group> groups_;
-
-        nitro::broken_options::group& default_group_;
+        std::map<std::string, nitro::options::group> groups_;
+        std::vector<nitro::options::group*> group_order_;
 
         std::size_t allowed_positionals_ = 0;
         std::string positional_name_ = "args";
     };
-} // namespace broken_options
+} // namespace options
 } // namespace nitro
-
-#include <nitro/broken_options/parser.ipp>
-
-#endif // INCLUDE_NITRO_BROKEN_OPTIONS_PARSER_HPP

@@ -28,9 +28,12 @@
 
 #pragma once
 
-#include <nitro/broken_options/exception.hpp>
-#include <nitro/broken_options/fwd.hpp>
+#include <nitro/options/exception.hpp>
+#include <nitro/options/fwd.hpp>
+#include <nitro/options/user_input.hpp>
 
+#include <nitro/format.hpp>
+#include <nitro/io/terminal.hpp>
 #include <nitro/lang/optional.hpp>
 
 #include <iomanip>
@@ -38,10 +41,11 @@
 #include <sstream>
 #include <string>
 #include <type_traits>
+#include <vector>
 
 namespace nitro
 {
-namespace broken_options
+namespace options
 {
 
     class base
@@ -52,14 +56,17 @@ namespace broken_options
         {
         }
 
+        base(const base&) = delete;
+        base& operator=(const base&) = delete;
+
         bool has_short_name() const
         {
-            return static_cast<bool>(short_);
+            return !short_.empty();
         }
 
         const std::string& short_name() const
         {
-            return *short_;
+            return short_;
         }
 
         const std::string& name() const
@@ -69,88 +76,74 @@ namespace broken_options
 
         bool has_env() const
         {
-            return static_cast<bool>(env_);
+            return !env_.empty();
         }
 
         const std::string& env() const
         {
-            return *env_;
+            return env_;
         }
 
         const std::string& metavar() const
         {
-            return arg_name_;
+            return metavar_;
+        }
+
+        virtual std::string format_name() const
+        {
+            return "--" + name();
+        }
+
+        virtual void format_synopsis(std::ostream& s) const = 0;
+        virtual std::string format_default() const = 0;
+
+        virtual bool is_optional() const
+        {
+            return true;
         }
 
         virtual void format_value(std::ostream& s) const = 0;
 
-        std::ostream& format(std::ostream& s, int left_padding = 2) const
+        void format(std::ostream& o) const
         {
-            for (int i = 0; i < left_padding; ++i)
-                s << ' ';
-            s << std::left << std::setw(40 - left_padding);
-
-            std::stringstream str;
+            std::stringstream s;
+            s << "  ";
 
             if (has_short_name())
             {
-                str << "-" << short_name() << " [ --" << name() << " ]";
+                s << "-" << short_name() << ", " << format_name();
             }
             else
             {
-                str << "--" << name();
+                s << format_name();
             }
 
-            format_value(str);
+            format_value(s);
 
-            auto fmt = str.str();
-
-            s << fmt;
-
-            if (fmt.size() > 38)
-            {
-                s << std::endl << std::setw(40) << ' ' << " ";
-            }
-            else
-            {
-                s << " ";
-            }
-
-            auto space = 38;
-
-            std::stringstream dstr;
-            dstr << description_;
+            std::vector<std::string> description;
+            description.push_back(description_);
 
             if (has_env())
             {
-                if (!description_.empty())
-                {
-                    dstr << ' ';
-                }
-                dstr << "Can be set using the environment variable '" << *env_ << "'.";
+                description.push_back(
+                    nitro::format("Can be set using the environment variable '{}'.") % env_);
             }
 
-            std::string word;
+            description.push_back(format_default());
 
-            while (std::getline(dstr, word, ' '))
+            auto text = nitro::lang::join(description);
+
+            if (!text.empty())
             {
-                if (word.size() + 1 > 38 || static_cast<int>(word.size() + 1) <= space)
-                {
-                    s << ' ' << word;
-                }
-                else
-                {
-                    s << std::endl << std::setw(40) << ' ' << "  " << word;
-                    space = 38;
-                }
-
-                space -= word.size() + 1;
+                nitro::io::terminal::format_padded(s, text, 40, 80);
             }
 
-            return s << std::endl;
+            s << std::endl;
+
+            o << s.str();
         }
 
-        virtual bool matches(const argument& arg) const
+        virtual bool matches(const user_input& arg) const
         {
             if (!arg.is_argument())
             {
@@ -176,8 +169,13 @@ namespace broken_options
             return false;
         }
 
+        bool has_non_default() const
+        {
+            return dirty_;
+        }
+
     private:
-        virtual void update_value(const argument& data) = 0;
+        virtual void update_value(const user_input& data) = 0;
         virtual void prepare() = 0;
         virtual void check() = 0;
 
@@ -188,9 +186,11 @@ namespace broken_options
         std::string description_;
 
     protected:
-        nitro::lang::optional<std::string> short_;
-        nitro::lang::optional<std::string> env_;
-        std::string arg_name_ = "arg";
+        std::string short_ = "";
+        std::string env_ = "";
+        std::string metavar_ = "ARG";
+
+        bool dirty_ = false;
     };
 
     template <typename Option>
@@ -202,23 +202,29 @@ namespace broken_options
         using base::metavar;
         using base::short_name;
 
-        Option& metavar(const std::string& arg_name)
+        Option& metavar(const std::string& metavar)
         {
-            if (arg_name.empty())
+            if (metavar.empty())
             {
                 raise<parser_error>("Trying to assign empty string to metavar");
             }
 
-            arg_name_ = arg_name;
+            metavar_ = metavar;
 
             return *static_cast<Option*>(this);
         }
 
         Option& short_name(const std::string& short_name)
         {
-            if (short_ && *short_ != short_name)
+            if (!short_.empty() && short_ != short_name)
             {
-                raise<parser_error>("Trying to redefine short name");
+                raise<parser_error>("Trying to redefine short_name for ", name());
+            }
+
+            if (short_name.size() != 1)
+            {
+                raise<parser_error>("Trying to define short_name for ", name(),
+                                    " that isn't one character.");
             }
 
             short_ = short_name;
@@ -238,5 +244,5 @@ namespace broken_options
             return *static_cast<Option*>(this);
         }
     };
-} // namespace broken_options
+} // namespace options
 } // namespace nitro

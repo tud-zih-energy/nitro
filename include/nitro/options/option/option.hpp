@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015-2019, Technische Universität Dresden, Germany
+ * Copyright (c) 2015-2018, Technische Universität Dresden, Germany
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without modification, are permitted
@@ -28,41 +28,74 @@
 
 #pragma once
 
-#include <nitro/broken_options/argument.hpp>
+#include <nitro/options/fwd.hpp>
+
+#include <nitro/options/option/base.hpp>
+
+#include <nitro/lang/optional.hpp>
+
+#include <sstream>
+#include <string>
+#include <type_traits>
 
 namespace nitro
 {
-namespace broken_options
+namespace options
 {
-    class argument_parser
+    class option : public crtp_base<option>
     {
     public:
-        argument_parser(int argc, const char* const argv[])
+        option(const std::string& name, const std::string& description);
+
+    public:
+        option& default_value(const std::string& new_default);
+        bool has_default() const;
+        const std::string& get_default() const;
+
+        option& optional();
+        bool is_optional() const override;
+
+        virtual void format_value(std::ostream& s) const override;
+        virtual void format_synopsis(std::ostream& s) const override;
+        virtual std::string format_default() const override;
+
+    public:
+        const std::string& get() const;
+
+        template <typename T>
+        std::enable_if_t<!std::is_constructible<T, std::string>::value, T> as() const
         {
-            for (int i = 1; i < argc; i++)
-            {
-                arguments_.emplace_back(argv[i]);
-            }
+            std::stringstream str;
+            str << *value_;
+
+            T result;
+
+            str >> result;
+
+            // TODO error handling
+
+            return result;
         }
 
-        auto begin() const
+        template <typename T>
+        std::enable_if_t<std::is_constructible<T, std::string>::value, T> as() const
         {
-            return arguments_.begin();
-        }
-
-        auto end() const
-        {
-            return arguments_.end();
-        }
-
-        auto size() const
-        {
-            return arguments_.size();
+            return T(*value_);
         }
 
     private:
-        std::vector<argument> arguments_;
-    };
+        void update_value(const user_input& arg) override;
 
-} // namespace broken_options
+        void prepare() override;
+        void check() override;
+
+        friend class parser;
+
+    private:
+        nitro::lang::optional<std::string> default_;
+        nitro::lang::optional<std::string> value_;
+
+        bool is_optional_ = false;
+    };
+} // namespace options
 } // namespace nitro
