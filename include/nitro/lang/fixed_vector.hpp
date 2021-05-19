@@ -46,6 +46,7 @@ namespace lang
         using const_pointer = const value_type*;
         using reference = value_type&;
         using const_reference = const value_type&;
+        using move = value_type&&;
         using size_type = std::size_t;
         using iterator = value_type*;
         using const_iterator = const value_type*;
@@ -198,7 +199,7 @@ namespace lang
             return size_ - 1;
         }
 
-        constexpr size_type insert(reference& value)
+        constexpr size_type insert(move value)
         {
             if (size_ >= capacity_)
                 raise("No capacity left!");
@@ -281,42 +282,42 @@ namespace lang
             return &data_[-1];
         }
 
-        constexpr const iterator begin() const noexcept
+        constexpr const_iterator begin() const noexcept
         {
             return &data_[0];
         }
 
-        constexpr const iterator rbegin() const noexcept
+        constexpr const_iterator rbegin() const noexcept
         {
             return &data_[size_ - 1];
         }
 
-        constexpr const iterator end() const noexcept
+        constexpr const_iterator end() const noexcept
         {
             return &data_[size_];
         }
 
-        constexpr const iterator rend() const noexcept
+        constexpr const_iterator rend() const noexcept
         {
             return &data_[-1];
         }
 
-        constexpr const iterator cbegin() const noexcept
+        constexpr const_iterator cbegin() const noexcept
         {
             return &data_[0];
         }
 
-        constexpr const iterator crbegin() const noexcept
+        constexpr const_iterator crbegin() const noexcept
         {
             return &data_[size_ - 1];
         }
 
-        constexpr const iterator cend() const noexcept
+        constexpr const_iterator cend() const noexcept
         {
             return &data_[size_];
         }
 
-        constexpr const iterator crend() const noexcept
+        constexpr const_iterator crend() const noexcept
         {
             return &data_[-1];
         }
