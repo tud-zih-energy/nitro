@@ -52,13 +52,13 @@ namespace lang
         using reverse_iterator = std::reverse_iterator<iterator>;
         using const_reverse_iterator = std::reverse_iterator<const_iterator>;
 
-        constexpr fixed_vector(std::size_t capacity)
+        constexpr fixed_vector(size_type capacity)
         : capacity_(capacity), data_(std::make_unique<value_type[]>(capacity))
         {
         }
 
         template <typename Iterabel>
-        constexpr fixed_vector(std::size_t capacity, const Iterabel& array)
+        constexpr fixed_vector(size_type capacity, const Iterabel& array)
         : capacity_(capacity), data_(std::make_unique<value_type[]>(capacity))
         {
             insert(this->begin(), array.begin(), array.end());
@@ -101,22 +101,22 @@ namespace lang
             return size_ == 0;
         }
 
-        constexpr std::size_t size() const
+        constexpr size_type size() const
         {
             return size_;
         }
 
-        constexpr std::size_t capacity() const
+        constexpr size_type capacity() const
         {
             return capacity_;
         }
 
-        constexpr value_type& operator[](const std::size_t& key)
+        constexpr reference operator[](const size_type& key)
         {
             return data_[key];
         }
 
-        constexpr value_type& at(const std::size_t& key)
+        constexpr reference at(const size_type& key)
         {
             if (key >= capacity_)
                 raise("Key is larger than capacity");
@@ -127,12 +127,12 @@ namespace lang
             return data_[key];
         }
 
-        constexpr const value_type& operator[](const std::size_t& key) const
+        constexpr const_reference operator[](const size_type& key) const
         {
             return data_[key];
         }
 
-        constexpr const value_type& at(const std::size_t& key) const
+        constexpr const_reference at(const size_type& key) const
         {
             if (key >= capacity_)
                 raise("Key is larger than capacity!");
@@ -143,28 +143,28 @@ namespace lang
             return data_[key];
         }
 
-        constexpr value_type& front() noexcept
+        constexpr reference front() noexcept
         {
             return data_[0];
         }
 
-        constexpr const value_type& front() const noexcept
+        constexpr const_reference front() const noexcept
         {
             return data_[0];
         }
 
-        constexpr value_type& back() noexcept
+        constexpr reference back() noexcept
         {
             return data_[size_ - 1];
         }
 
-        constexpr const value_type& back() const noexcept
+        constexpr const_reference back() const noexcept
         {
             return data_[size_ - 1];
         }
 
         template <class... Args>
-        constexpr void emplace(value_type* const pos, Args&&... args)
+        constexpr void emplace(pointer const pos, Args&&... args)
         {
             auto key = std::distance(begin(), pos);
 
@@ -176,7 +176,7 @@ namespace lang
         }
 
         template <class... Args>
-        constexpr std::size_t emplace_back(Args&&... args)
+        constexpr size_type emplace_back(Args&&... args)
         {
             if (size_ >= capacity_)
                 raise("No capacity left!");
@@ -187,7 +187,7 @@ namespace lang
             return size_ - 1;
         }
 
-        constexpr std::size_t insert(const value_type& value)
+        constexpr size_type insert(const_reference value)
         {
             if (size_ >= capacity_)
                 raise("No capacity left!");
@@ -198,7 +198,7 @@ namespace lang
             return size_ - 1;
         }
 
-        constexpr std::size_t insert(value_type&& value)
+        constexpr size_type insert(reference& value)
         {
             if (size_ >= capacity_)
                 raise("No capacity left!");
@@ -210,9 +210,9 @@ namespace lang
         }
 
         template <typename Iter>
-        constexpr void insert(value_type* const pos, Iter start, Iter end)
+        constexpr void insert(iterator const pos, Iter start, Iter end)
         {
-            std::size_t key = std::distance(begin(), pos);
+            size_type key = std::distance(begin(), pos);
             if (key > size_)
                 raise("Key larger than size!");
 
@@ -231,12 +231,12 @@ namespace lang
             }
         }
 
-        constexpr void insert(value_type* const pos, std::initializer_list<value_type>& list)
+        constexpr void insert(iterator const pos, std::initializer_list<value_type>& list)
         {
             insert(pos, list.begin(), list.end());
         }
 
-        constexpr std::size_t push_back(const value_type& value)
+        constexpr size_type push_back(const_reference value)
         {
             if (size_ >= capacity_)
                 raise("No capacity left!");
@@ -261,69 +261,69 @@ namespace lang
             --size_;
         }
 
-        constexpr value_type* begin() noexcept
+        constexpr iterator begin() noexcept
         {
             return &data_[0];
         }
 
-        constexpr value_type* rbegin() noexcept
+        constexpr iterator rbegin() noexcept
         {
             return &data_[size_ - 1];
         }
 
-        constexpr value_type* end() noexcept
+        constexpr iterator end() noexcept
         {
             return &data_[size_];
         }
 
-        constexpr value_type* rend() noexcept
+        constexpr iterator rend() noexcept
         {
             return &data_[-1];
         }
 
-        constexpr const value_type* begin() const noexcept
+        constexpr const iterator begin() const noexcept
         {
             return &data_[0];
         }
 
-        constexpr const value_type* rbegin() const noexcept
+        constexpr const iterator rbegin() const noexcept
         {
             return &data_[size_ - 1];
         }
 
-        constexpr const value_type* end() const noexcept
+        constexpr const iterator end() const noexcept
         {
             return &data_[size_];
         }
 
-        constexpr const value_type* rend() const noexcept
+        constexpr const iterator rend() const noexcept
         {
             return &data_[-1];
         }
 
-        constexpr const value_type* cbegin() const noexcept
+        constexpr const iterator cbegin() const noexcept
         {
             return &data_[0];
         }
 
-        constexpr const value_type* crbegin() const noexcept
+        constexpr const iterator crbegin() const noexcept
         {
             return &data_[size_ - 1];
         }
 
-        constexpr const value_type* cend() const noexcept
+        constexpr const iterator cend() const noexcept
         {
             return &data_[size_];
         }
 
-        constexpr const value_type* crend() const noexcept
+        constexpr const iterator crend() const noexcept
         {
             return &data_[-1];
         }
 
-        constexpr void erase(value_type* pos)
+        constexpr void erase(iterator pos)
         {
-            std::size_t key = std::distance(begin(), pos);
+            size_type key = std::distance(begin(), pos);
 
             if (key >= size_)
                 raise("Key does not exsist!");
@@ -336,19 +336,19 @@ namespace lang
             --size_;
         }
 
-        constexpr value_type* data() noexcept
+        constexpr pointer data() noexcept
         {
             return data_.get();
         }
 
-        constexpr const value_type* data() const noexcept
+        constexpr const_pointer data() const noexcept
         {
             return data_.get();
         }
 
     private:
-        std::size_t size_ = 0;
-        std::size_t capacity_ = 0;
+        size_type size_ = 0;
+        size_type capacity_ = 0;
 
         std::unique_ptr<value_type[]> data_;
 
