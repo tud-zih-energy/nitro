@@ -46,7 +46,7 @@ TEST_CASE("fixed vector erase", "[lang]")
 
 TEST_CASE("fixed vector array assignment", "[lang]")
 {
-    
+
     constexpr int SIZE = 10;
     constexpr std::array<std::int64_t, 10> INIT_VALUES = { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9 };
 
@@ -125,7 +125,7 @@ TEST_CASE("fixed vector merge two vectors", "[lang]")
 
 TEST_CASE("fixed vector init with init list", "[lang]")
 {
-    nitro::lang::fixed_vector<std::int64_t> v = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12};
+    nitro::lang::fixed_vector<std::int64_t> v = { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12 };
 
     REQUIRE(v.size() == 12);
 }
