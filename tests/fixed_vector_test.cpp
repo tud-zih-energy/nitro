@@ -13,6 +13,28 @@ TEST_CASE("fixed vector init", "[lang]")
     REQUIRE(v.capacity() == 10);
 }
 
+TEST_CASE("fixed vector copy", "[lang]")
+{
+    constexpr int SIZE = 10;
+
+    nitro::lang::fixed_vector<std::int64_t> v(SIZE);
+    nitro::lang::fixed_vector<std::int64_t> w = v;
+
+    REQUIRE(v.size() == 0);
+    REQUIRE(v.capacity() == 10);
+}
+
+TEST_CASE("fixed vector move", "[lang]")
+{
+    constexpr int SIZE = 10;
+
+    nitro::lang::fixed_vector<std::int64_t> v(SIZE);
+    nitro::lang::fixed_vector<std::int64_t> w = std::move(v);
+
+    REQUIRE(v.size() == 0);
+    REQUIRE(v.capacity() == 10);
+}
+
 TEST_CASE("fixed vector read and write", "[lang]")
 {
     constexpr int SIZE = 10;
