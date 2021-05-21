@@ -46,7 +46,6 @@ namespace lang
         using const_pointer = const value_type*;
         using reference = value_type&;
         using const_reference = const value_type&;
-        using move = value_type&&;
         using size_type = std::size_t;
         using iterator = value_type*;
         using const_iterator = const value_type*;
@@ -199,7 +198,7 @@ namespace lang
             return size_ - 1;
         }
 
-        constexpr size_type insert(move value)
+        constexpr size_type insert(value_type&& value)
         {
             if (size_ >= capacity_)
                 raise("No capacity left!");
