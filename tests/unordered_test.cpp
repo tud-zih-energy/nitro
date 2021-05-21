@@ -1,3 +1,5 @@
+#if __cplusplus >= 201703L
+
 #include <catch2/catch.hpp>
 
 #include <nitro/lang/unordered.hpp>
@@ -68,3 +70,5 @@ TEST_CASE("Test Hashing")
         REQUIRE(test.size() == 3);
     }
 }
+
+#endif
