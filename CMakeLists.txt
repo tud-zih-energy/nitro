@@ -89,10 +89,6 @@ endif()
 option(NITRO_POSITION_INDEPENDENT_CODE "Whether to build Nitro libraries with position independent code" OFF)
 
 add_library(nitro-core INTERFACE)
-target_include_directories(nitro-core INTERFACE
-    $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
-    $<INSTALL_INTERFACE:include>
-)
 target_compile_features(nitro-core
     INTERFACE
         cxx_auto_type
@@ -127,6 +123,10 @@ if(NOT ${CMAKE_CXX_COMPILER_ID} STREQUAL "Intel")
         INTERFACE
             cxx_generalized_initializers
     )
+endif()
+
+if(MSVC)
+    target_compile_options(nitro-core INTERFACE /Zc:__cplusplus)
 endif()
 
 add_library(nitro-dl INTERFACE)
@@ -200,7 +200,16 @@ add_library(Nitro::broken-options ALIAS nitro-broken-options)
 
 if(CMAKE_CURRENT_SOURCE_DIR STREQUAL CMAKE_SOURCE_DIR)
     # build Debug with all warnings
-    target_compile_options(nitro INTERFACE $<$<CONFIG:Debug>:-Wall -pedantic -Wextra>)
+    if(MSVC)
+        target_compile_options(nitro INTERFACE $<$<CONFIG:Debug>:/W4>)
+    else()
+        target_compile_options(nitro INTERFACE $<$<CONFIG:Debug>:-Wall -pedantic -Wextra>)
+    endif()
+
+    target_include_directories(nitro-core INTERFACE
+        $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
+        $<INSTALL_INTERFACE:include>
+    )
 
     install(DIRECTORY
         ${CMAKE_CURRENT_SOURCE_DIR}/include/nitro
@@ -254,6 +263,11 @@ if(CMAKE_CURRENT_SOURCE_DIR STREQUAL CMAKE_SOURCE_DIR)
     include(CTest)
     add_subdirectory(tests)
 else()
+    target_include_directories(nitro-core SYSTEM INTERFACE
+        $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
+        $<INSTALL_INTERFACE:include>
+    )
+
     if(WIN32)
         set_target_properties(nitro-env-static PROPERTIES EXCLUDE_FROM_ALL TRUE)
     else()

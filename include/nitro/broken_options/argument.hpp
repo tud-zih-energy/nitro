@@ -34,7 +34,9 @@
 
 #include <nitro/except/raise.hpp>
 #include <nitro/lang/optional.hpp>
+#include <nitro/lang/string.hpp>
 
+#include <regex>
 #include <set>
 #include <string>
 
@@ -57,52 +59,86 @@ namespace broken_options
             {
                 name_ = arg_;
             }
+
+            if (!is_value() && !is_double_dash())
+            {
+                if (!std::regex_match(arg, std::regex("-{1,2}[^-=]+[^=]*=?.*")))
+                {
+                    raise<parsing_error>("The argument couldn't be parsed.");
+                }
+            }
         }
 
     public:
-        bool is_value() const
+        bool is_value() const noexcept
         {
             return name_[0] != '-';
         }
 
-        bool is_double_dash() const
+        bool is_double_dash() const noexcept
         {
             return arg_ == "--";
         }
 
-        bool is_short() const
+        bool is_short() const noexcept
         {
             return name_.size() > 1 && name_[0] == '-' && name_[1] != '-';
         }
 
-        bool is_named() const
+        bool is_named() const noexcept
         {
             return name_.size() > 2 && name_[0] == '-' && name_[1] == '-' && name_[2] != '-';
         }
 
-        bool is_argument() const
+        bool is_argument() const noexcept
         {
             return is_short() || is_named();
         }
 
-    public:
-        const std::string& data() const
-        {
-            return arg_;
-        }
-
-        const std::string& name() const
-        {
-            return name_;
-        }
-
-        bool has_value() const
+        bool has_value() const noexcept
         {
             return is_value() || static_cast<bool>(value_);
         }
 
+        bool has_prefix() const
+        {
+            return nitro::lang::starts_with(name_, "--no-");
+        }
+
+    public:
+        const std::string& data() const noexcept
+        {
+            return arg_;
+        }
+
+        std::string name_without_prefix() const
+        {
+            if (!has_prefix())
+            {
+                raise<parser_error>(
+                    "Trying to get the name without prefix but prefix is not given.");
+            }
+            return name().substr(5);
+        }
+
+        const std::string& name() const
+        {
+            if (is_value())
+            {
+                raise<parser_error>("Trying to get the name of a pure value argument.");
+            }
+
+            return name_;
+        }
+
         const std::string& value() const
         {
+            if (!has_value())
+            {
+                raise<parser_error>(
+                    "Trying to read the value of an argument that does not have a value.");
+            }
+
             if (is_value())
             {
                 return arg_;
@@ -115,7 +151,7 @@ namespace broken_options
         {
             if (!is_short())
             {
-                raise<parsing_error>(
+                raise<parser_error>(
                     "Trying to interpret argument as short options list, but it ain't.");
             }
 
@@ -133,7 +169,7 @@ namespace broken_options
         {
             if (!is_named())
             {
-                raise<parsing_error>("Trying to interpret argument as named option, but it ain't.");
+                raise<parser_error>("Trying to interpret argument as named option, but it ain't.");
             }
 
             return { name_.begin() + 2, name_.end() };
