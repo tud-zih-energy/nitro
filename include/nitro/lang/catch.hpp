@@ -68,7 +68,7 @@ namespace lang
                 {
                     return f(args...);
                 }
-                catch (E& e)
+                catch (E&)
                 {
                     using T = decltype(f(args...));
 

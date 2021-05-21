@@ -26,62 +26,76 @@
  * WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef INCLUDE_NITRO_EXCEPT_EXCEPTION_HPP
-#define INCLUDE_NITRO_EXCEPT_EXCEPTION_HPP
+#pragma once
 
+#include <nitro/options/exception.hpp>
+#include <nitro/options/fwd.hpp>
+#include <nitro/options/option/base.hpp>
+
+#include <nitro/env/get.hpp>
+#include <nitro/except/raise.hpp>
+#include <nitro/lang/optional.hpp>
+#include <nitro/lang/string.hpp>
+
+#include <memory>
 #include <sstream>
-#include <stdexcept>
 #include <string>
+#include <vector>
 
 namespace nitro
 {
-namespace except
+namespace options
 {
-
-    namespace detail
-    {
-
-        template <typename Arg, typename... Args>
-        class make_exception
-        {
-        public:
-            void operator()(std::stringstream& msg, Arg&& arg, Args&&... args)
-            {
-                msg << std::forward<Arg>(arg);
-                make_exception<Args...>()(msg, std::forward<Args>(args)...);
-            }
-        };
-
-        template <typename Arg>
-        class make_exception<Arg>
-        {
-        public:
-            void operator()(std::stringstream& msg, Arg&& arg)
-            {
-                msg << std::forward<Arg>(arg);
-            }
-        };
-
-        template <typename... Args>
-        inline std::string make_string(Args&&... args)
-        {
-            std::stringstream msg;
-
-            detail::make_exception<Args...>()(msg, std::forward<Args>(args)...);
-            return msg.str();
-        }
-    } // namespace detail
-
-    class exception : public std::runtime_error
+    class multi_option : public crtp_base<multi_option>
     {
     public:
-        template <typename... Args>
-        explicit exception(Args&&... args)
-        : std::runtime_error(detail::make_string(std::forward<Args>(args)...))
-        {
-        }
-    };
-} // namespace except
-} // namespace nitro
+        multi_option(const std::string& name, const std::string& description);
 
-#endif // INCLUDE_NITRO_EXCEPT_EXCEPTION_HPP
+    public:
+        multi_option& default_value(const std::vector<std::string>& new_default);
+        bool has_default() const;
+        const std::vector<std::string>& get_default() const;
+
+        multi_option& optional();
+        bool is_optional() const override;
+
+    public:
+        virtual void format_value(std::ostream& s) const override;
+        virtual void format_synopsis(std::ostream& s) const override;
+        virtual std::string format_default() const override;
+
+    public:
+        const std::string& get(std::size_t i) const;
+        const std::vector<std::string>& get_all() const;
+        std::size_t count() const;
+
+        template <typename T>
+        T as(std::size_t i) const
+        {
+            std::stringstream str;
+            str << value_[i];
+
+            T result{};
+
+            str >> result;
+
+            // TODO error handling
+
+            return result;
+        }
+
+    private:
+        void update_value(const user_input& arg) override;
+        void prepare() override;
+        void check() override;
+
+        friend class parser;
+
+    private:
+        std::unique_ptr<std::vector<std::string>> default_;
+        std::vector<std::string> value_;
+
+        bool is_optional_ = false;
+    };
+} // namespace options
+} // namespace nitro

@@ -10,7 +10,7 @@ Collection of various, modern C++ libraries and helpers.
 
 Currently the following modules are available:
 
-*   `nitro::broken_options` - Yet another library for argument parsing
+*   `nitro::options` - Yet another library for argument parsing
 *   `nitro::dl` - A type-safe wrapper for `dlopen()`
 *   `nitro::env` - A platform-dependent library for getting information about the environment, e.g., hostname
 *   `nitro::lang` - A collection of various classes used to supplement the standard library
@@ -24,32 +24,19 @@ With the exception of the `dl` and `env` module, which are platform dependent, e
 The currently tested compilers are:
 
 On Linux:
-*   gcc 4.9
-*   gcc 5
-*   gcc 6
 *   gcc 7
-*   gcc 8
 *   gcc 9
-*   clang 3.6
-*   clang 3.7
-*   clang 3.8
-*   clang 3.9
-*   clang 4.0
-*   clang 5.0
-*   clang 6.0
-*   clang 8
+*   gcc 10
 *   clang 9
+*   clang 10
+*   clang 11
 
 On MacOS:
-*   XCode 7.3
-*   XCode 8.3
-*   XCode 9.3
-*   XCode 10.3
-*   XCode 11.5
-*   XCode 12.0
+*   XCode 10
+*   XCode 11
+*   XCode 12
 
 On Windows:
-*   Visual Studio 2015<sup>1</sup>
 *   Visual Studio 2017<sup>1</sup>
 *   Visual Studio 2019<sup>1</sup>
 
