@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015-2018, Technische Universität Dresden, Germany
+ * Copyright (c) 2015-2016, Technische Universität Dresden, Germany
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without modification, are permitted
@@ -28,29 +28,23 @@
 
 #pragma once
 
-#include <nitro/except/exception.hpp>
-
 namespace nitro
 {
-namespace broken_options
+namespace options
 {
-    /**
-     * This exception will be thrown, if the parser is build wrongly.
-     * This exceptions might as well be assertions only triggering during development.
-     */
-    struct parser_error : nitro::except::exception
-    {
-        using base = nitro::except::exception;
-        using base::base;
-    };
+    class parser;
+    class arguments;
 
-    /**
-     * This exception is thrown, if the user input is not valid according to the built parser
-     */
-    struct parsing_error : nitro::except::exception
-    {
-        using base = nitro::except::exception;
-        using base::base;
-    };
-} // namespace broken_options
+    class group;
+
+    struct parser_error;
+    struct parsing_error;
+
+    class base;
+
+    class option;
+    class multi_option;
+    class toggle;
+
+} // namespace options
 } // namespace nitro

@@ -3,7 +3,7 @@ macro(NitroTest TEST)
 
     set(TEST_NAME "Nitro.${TEST_NAME}")
 
-    add_executable(${TEST_NAME} ${TEST})
+    add_executable(${TEST_NAME} ${TEST} $<TARGET_OBJECTS:nitro_test_main>)
     target_link_libraries(${TEST_NAME} Nitro::core Catch2::Catch2)
     if(CMAKE_C_COMPILER_ID MATCHES "MSVC")
         target_compile_options(${TEST_NAME} PRIVATE /W4)
@@ -18,6 +18,34 @@ add_library(catch2 INTERFACE)
 target_include_directories(catch2 SYSTEM INTERFACE ${CMAKE_CURRENT_SOURCE_DIR}/Catch/single_include)
 add_library(Catch2::Catch2 ALIAS catch2)
 
+add_library(nitro_test_main OBJECT catch_main.cpp)
+target_include_directories(nitro_test_main SYSTEM PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/Catch/single_include)
+target_compile_features(nitro_test_main
+    PRIVATE
+        cxx_auto_type
+        cxx_constexpr
+        cxx_decltype
+        cxx_decltype_auto
+        cxx_defaulted_functions
+        cxx_defaulted_move_initializers
+        cxx_delegating_constructors
+        cxx_deleted_functions
+        cxx_explicit_conversions
+        cxx_generic_lambdas
+        cxx_inheriting_constructors
+        cxx_lambdas
+        cxx_lambda_init_captures
+        cxx_noexcept
+        cxx_nullptr
+        cxx_override
+        cxx_range_for
+        cxx_return_type_deduction
+        cxx_rvalue_references
+        cxx_trailing_return_types
+        cxx_user_literals
+        cxx_variadic_templates
+        cxx_template_template_parameters
+)
 
 if(NOT CMAKE_C_COMPILER_ID MATCHES "MSVC")
     add_library(nitro_test_lib SHARED nitro_test_lib.cpp)
@@ -32,10 +60,9 @@ NitroTest(env_get_test.cpp)
 target_link_libraries(Nitro.env_get_test Nitro::env)
 set_tests_properties(Nitro.env_get_test PROPERTIES ENVIRONMENT "TEST_1=THIS_WAS_SET")
 
-NitroTest(broken_options_test.cpp)
-target_link_libraries(Nitro.broken_options_test Nitro::broken-options)
-set_tests_properties(Nitro.broken_options_test PROPERTIES ENVIRONMENT "OPT1=OPT1_VALUE;OPT2=TRUE;OPT3=FALSE;OPT4=OPT4_VALUE0\;OPT4_VALUE1")
-
+NitroTest(options_test.cpp)
+target_link_libraries(Nitro.options_test Nitro::options)
+set_tests_properties(Nitro.options_test PROPERTIES ENVIRONMENT "OPT1=OPT1_VALUE;OPT2=TRUE;OPT3=FALSE;OPT4=OPT4_VALUE0\;OPT4_VALUE1")
 
 NitroTest(tuple_operators_test.cpp)
 

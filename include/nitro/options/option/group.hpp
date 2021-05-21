@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015-2016, Technische Universität Dresden, Germany
+ * Copyright (c) 2015-2020, Technische Universität Dresden, Germany
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without modification, are permitted
@@ -26,62 +26,57 @@
  * WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef INCLUDE_NITRO_EXCEPT_EXCEPTION_HPP
-#define INCLUDE_NITRO_EXCEPT_EXCEPTION_HPP
+#pragma once
 
-#include <sstream>
-#include <stdexcept>
+#include <nitro/options/fwd.hpp>
+
+#include <iostream>
+#include <map>
 #include <string>
+#include <vector>
 
 namespace nitro
 {
-namespace except
+namespace options
 {
-
-    namespace detail
-    {
-
-        template <typename Arg, typename... Args>
-        class make_exception
-        {
-        public:
-            void operator()(std::stringstream& msg, Arg&& arg, Args&&... args)
-            {
-                msg << std::forward<Arg>(arg);
-                make_exception<Args...>()(msg, std::forward<Args>(args)...);
-            }
-        };
-
-        template <typename Arg>
-        class make_exception<Arg>
-        {
-        public:
-            void operator()(std::stringstream& msg, Arg&& arg)
-            {
-                msg << std::forward<Arg>(arg);
-            }
-        };
-
-        template <typename... Args>
-        inline std::string make_string(Args&&... args)
-        {
-            std::stringstream msg;
-
-            detail::make_exception<Args...>()(msg, std::forward<Args>(args)...);
-            return msg.str();
-        }
-    } // namespace detail
-
-    class exception : public std::runtime_error
+    class group
     {
     public:
-        template <typename... Args>
-        explicit exception(Args&&... args)
-        : std::runtime_error(detail::make_string(std::forward<Args>(args)...))
-        {
-        }
-    };
-} // namespace except
-} // namespace nitro
+        group(const options::parser& parser, const std::string& name,
+              const std::string& description = std::string(""));
 
-#endif // INCLUDE_NITRO_EXCEPT_EXCEPTION_HPP
+        group(group&&) = default;
+
+        group(const group&) = delete;
+        group& operator=(const group&) = delete;
+
+        auto option(const std::string& name, const std::string& description = std::string(""))
+            -> options::option&;
+        auto multi_option(const std::string& name, const std::string& description = std::string(""))
+            -> options::multi_option&;
+        auto toggle(const std::string& name, const std::string& description = std::string(""))
+            -> options::toggle&;
+
+        const std::map<std::string, options::option>& get_options() const;
+        const std::map<std::string, options::multi_option>& get_multi_options() const;
+        const std::map<std::string, options::toggle>& get_toggles() const;
+
+        const std::string& name() const;
+        const std::string& description() const;
+
+        bool empty() const;
+
+        void usage(std::ostream& s) const;
+
+    private:
+        const parser& parser_;
+        std::string name_;
+        std::string description_;
+
+        std::map<std::string, options::option> options_;
+        std::map<std::string, options::multi_option> multi_options_;
+        std::map<std::string, options::toggle> toggles_;
+        std::vector<options::base*> order_;
+    };
+} // namespace options
+} // namespace nitro

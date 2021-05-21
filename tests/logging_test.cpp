@@ -2,7 +2,6 @@
 #error "NITRO_LOG_MIN_SEVERITY should be set by the build system, but isn't!"
 #endif
 
-#define CATCH_CONFIG_RUNNER
 #include <catch2/catch.hpp>
 
 #ifdef NITRO_LOG_MIN_SEVERITY
@@ -57,6 +56,14 @@ using log_filter = nitro::log::filter::severity_filter<Record>;
 
 using logging =
     nitro::log::logger<detail::record, detail::log_formater, detail::Sink, detail::log_filter>;
+
+struct StaticInit
+{
+    StaticInit()
+    {
+        nitro::log::sink::Logfile::log_file() = "test_log.txt";
+    }
+} init_me;
 
 TEST_CASE("Without tag works", "[log]")
 {
@@ -241,11 +248,4 @@ TEST_CASE("Logging lambdas works", "[log]")
 
         CHECK(i == 4);
     }
-}
-
-int main(int argc, char** argv)
-{
-    nitro::log::sink::Logfile::log_file() = "test_log.txt";
-    int result = Catch::Session().run(argc, argv);
-    return result;
 }
