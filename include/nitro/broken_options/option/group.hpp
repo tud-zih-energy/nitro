@@ -41,9 +41,8 @@ namespace broken_options
     class group
     {
     public:
-        group(std::set<std::string>& all_arguments, const std::string& name,
-              const std::string& description = std::string(""))
-        : name_(name), description_(description), all_arguments_(all_arguments)
+        group(const std::string& name, const std::string& description = std::string(""))
+        : name_(name), description_(description)
         {
         }
 
@@ -69,12 +68,7 @@ namespace broken_options
     private:
         std::string name_;
         std::string description_;
-
-        std::set<std::string>& all_arguments_;
-
-        std::map<std::string, broken_options::option> options_;
-        std::map<std::string, broken_options::multi_option> multi_options_;
-        std::map<std::string, broken_options::toggle> toggles_;
+        std::map<std::string, std::reference_wrapper<base>> options_;
     };
 } // namespace broken_options
 } // namespace nitro
