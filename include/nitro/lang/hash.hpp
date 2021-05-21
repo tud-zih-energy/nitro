@@ -99,13 +99,13 @@ namespace lang
 
 #if __cplusplus > 201402L
         template <std::size_t I, typename T>
-        inline typename std::enable_if<(I == std::variant_size<T>::value), void>::type
+        inline typename std::enable_if_t<(I == std::variant_size<T>::value), void>
         hash_combine_variant(std::size_t&, const T&)
         {
         }
 
         template <std::size_t I, typename T>
-        inline typename std::enable_if<(I < std::variant_size<T>::value), void>::type
+        inline typename std::enable_if_t<(I < std::variant_size<T>::value), void>
         hash_combine_variant(std::size_t& seed, const T& v)
         {
             if (auto x = std::get_if<I>(&v))
