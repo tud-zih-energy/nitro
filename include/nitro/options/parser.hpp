@@ -72,6 +72,7 @@ namespace options
         auto toggle(const std::string& name, const std::string& description = std::string(""))
             -> options::toggle&;
 
+        void greedy_postionals(bool enabled = true);
         void accept_positionals(std::size_t amount = std::numeric_limits<std::size_t>::max());
         void positional_metavar(const std::string& name);
 
@@ -123,6 +124,7 @@ namespace options
         std::vector<nitro::options::group*> group_order_;
 
         std::size_t allowed_positionals_ = 0;
+        bool greedy_positionals_ = false;
         std::string positional_name_ = "args";
     };
 } // namespace options

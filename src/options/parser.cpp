@@ -136,6 +136,11 @@ namespace options
         return group().toggle(name, description);
     }
 
+    void parser::greedy_postionals(bool enabled)
+    {
+        greedy_positionals_ = enabled;
+    }
+
     void parser::accept_positionals(std::size_t amount)
     {
         allowed_positionals_ = amount;
@@ -175,6 +180,11 @@ namespace options
                 {
                     raise<parsing_error>("Received unexcepted positional argument: '", it->data(),
                                          "'");
+                }
+
+                if (greedy_positionals_)
+                {
+                    only_positionals_mode = true;
                 }
 
                 positionals.push_back(it->data());
