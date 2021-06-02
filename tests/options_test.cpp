@@ -959,7 +959,6 @@ TEST_CASE("positional arguments should work", "[options]")
         parser.accept_positionals();
         parser.multi_option("opt1");
 
-
         WHEN("provided an argument, followed by a positional and another argument")
         {
             const char* argv[] = { "", "--opt1", "value1", "positional0", "--opt1", "value2" };
