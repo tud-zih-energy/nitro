@@ -30,5 +30,6 @@
 
 build
 .clang_complete
+.vscode
 cmake_build_debug
 Testing

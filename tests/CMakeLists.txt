@@ -85,7 +85,11 @@ NitroTest(format_test.cpp)
 
 NitroTest(string_test.cpp)
 
+
 if(cxx_std_17 IN_LIST CMAKE_CXX_COMPILE_FEATURES)
     NitroTest(unordered_test.cpp)
     target_compile_features(Nitro.unordered_test PUBLIC cxx_std_17)
 endif()
+
+NitroTest(fixed_vector_test.cpp)
+

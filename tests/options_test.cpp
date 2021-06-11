@@ -403,107 +403,108 @@ test arguments:
 
 SCENARIO("The help message is useful")
 {
-    GIVEN("A parser with a reversable toggle")
+    GIVEN("A parser")
     {
         nitro::options::parser parser;
-        auto& tog = parser.toggle("tog", "some toggle").allow_reverse();
 
-        WHEN("the default is false")
+        AND_GIVEN("a reversable toggle")
         {
-            THEN("the usage should hint that the default is false")
+            auto& tog = parser.toggle("tog", "some toggle").allow_reverse();
+
+            WHEN("the default is false")
             {
-                std::stringstream str;
+                THEN("the usage should hint that the default is false")
+                {
+                    std::stringstream str;
 
-                parser.usage(str);
+                    parser.usage(str);
 
-                std::string usage = str.str();
+                    std::string usage = str.str();
 
-                std::string expected =
-                    R"EXPECTED(usage: main [--[no-]tog]
+                    std::string expected =
+                        R"EXPECTED(usage: main [--[no-]tog]
 
 
 arguments:
   --[no-]tog                            some toggle (default: disabled)
 )EXPECTED";
 
-                REQUIRE(usage == expected);
+                    REQUIRE(usage == expected);
+                }
             }
-        }
 
-        WHEN("the default is true")
-        {
-            tog.default_value(true);
-
-            THEN("the usage should hint that the default is true")
+            WHEN("the default is true")
             {
-                std::stringstream str;
+                tog.default_value(true);
 
-                parser.usage(str);
+                THEN("the usage should hint that the default is true")
+                {
+                    std::stringstream str;
 
-                std::string usage = str.str();
+                    parser.usage(str);
 
-                std::string expected =
-                    R"EXPECTED(usage: main [--[no-]tog]
+                    std::string usage = str.str();
+
+                    std::string expected =
+                        R"EXPECTED(usage: main [--[no-]tog]
 
 
 arguments:
   --[no-]tog                            some toggle (default: enabled)
 )EXPECTED";
 
-                REQUIRE(usage == expected);
+                    REQUIRE(usage == expected);
+                }
             }
         }
-    }
 
-    GIVEN("A parser with on option")
-    {
-        nitro::options::parser parser;
-
-        parser.option("ab");
-
-        WHEN("Requesting the same option again")
+        AND_GIVEN("an option")
         {
             parser.option("ab");
 
-            THEN("The usage should contain the option only once")
+            WHEN("Requesting the same option again")
             {
-                std::stringstream str;
-                parser.usage(str);
-                std::string usage = str.str();
+                parser.option("ab");
 
-                std::string expected =
-                    R"EXPECTED(usage: main [--ab <ARG>]
+                THEN("The usage should contain the option only once")
+                {
+                    std::stringstream str;
+                    parser.usage(str);
+                    std::string usage = str.str();
+
+                    std::string expected =
+                        R"EXPECTED(usage: main [--ab <ARG>]
 
 
 arguments:
   --ab ARG
 )EXPECTED";
 
-                REQUIRE(usage == expected);
+                    REQUIRE(usage == expected);
+                }
             }
         }
-    }
 
-    GIVEN("A parser with several options")
-    {
-        nitro::options::parser parser;
-
-        parser.toggle("zz");
-        parser.option("ab");
-        parser.multi_option("aa");
-
-        WHEN("the usage is printed")
+        AND_GIVEN("several options")
         {
-            std::stringstream str;
+            nitro::options::parser parser;
 
-            parser.usage(str);
+            parser.toggle("zz");
+            parser.option("ab");
+            parser.multi_option("aa");
 
-            THEN("the options should be in the order of creation")
+            WHEN("the usage is printed")
             {
-                std::string usage = str.str();
+                std::stringstream str;
 
-                std::string expected =
-                    R"EXPECTED(usage: main [--zz] [--ab <ARG>] [--aa <ARG>]
+                parser.usage(str);
+
+                THEN("the options should be in the order of creation")
+                {
+                    std::string usage = str.str();
+
+                    std::string expected =
+                        R"EXPECTED(usage: main [--zz] [--ab <ARG>] [--aa <ARG>]
 
 
 arguments:
@@ -512,31 +513,29 @@ arguments:
   --aa ARG
 )EXPECTED";
 
-                REQUIRE(usage == expected);
+                    REQUIRE(usage == expected);
+                }
             }
         }
-    }
 
-    GIVEN("A parser with several groups")
-    {
-        nitro::options::parser parser;
-
-        parser.group("abc").toggle("zz");
-        parser.group("aaa").option("ab");
-        parser.group("abc").multi_option("aa");
-
-        WHEN("the usage is printed")
+        AND_GIVEN("several groups")
         {
-            std::stringstream str;
+            parser.group("abc").toggle("zz");
+            parser.group("aaa").option("ab");
+            parser.group("abc").multi_option("aa");
 
-            parser.usage(str);
-
-            THEN("the groups should be in the order of creation")
+            WHEN("the usage is printed")
             {
-                std::string usage = str.str();
+                std::stringstream str;
 
-                std::string expected =
-                    R"EXPECTED(usage: main [--zz] [--ab <ARG>] [--aa <ARG>]
+                parser.usage(str);
+
+                THEN("the groups should be in the order of creation")
+                {
+                    std::string usage = str.str();
+
+                    std::string expected =
+                        R"EXPECTED(usage: main [--zz] [--ab <ARG>] [--aa <ARG>]
 
 
 abc:
@@ -547,7 +546,8 @@ aaa:
   --ab ARG
 )EXPECTED";
 
-                REQUIRE(usage == expected);
+                    REQUIRE(usage == expected);
+                }
             }
         }
     }
@@ -950,6 +950,38 @@ TEST_CASE("positional arguments should work", "[options]")
         REQUIRE(options.positionals().size() == 1);
 
         CHECK(options.get(0) == "--");
+    }
+
+    GIVEN("A parser with greedy position parsing and a multi_option")
+    {
+        nitro::options::parser parser;
+        parser.greedy_postionals();
+        parser.accept_positionals();
+        parser.multi_option("opt1");
+
+        WHEN("provided an argument, followed by a positional and another argument")
+        {
+            const char* argv[] = { "", "--opt1", "value1", "positional0", "--opt1", "value2" };
+            int argc = 6;
+
+            THEN("the option should only have one value")
+            {
+                auto options = parser.parse(argc, argv);
+
+                REQUIRE(options.count("opt1") == 1);
+                REQUIRE(options.get("opt1", 0) == "value1");
+            }
+
+            AND_THEN("there should be three positionals")
+            {
+                auto options = parser.parse(argc, argv);
+
+                REQUIRE(options.positionals().size() == 3);
+                REQUIRE(options.get(0) == "positional0");
+                REQUIRE(options.get(1) == "--opt1");
+                REQUIRE(options.get(2) == "value2");
+            }
+        }
     }
 }
 
