@@ -36,6 +36,10 @@
 #include <type_traits>
 #include <utility>
 
+#if __cplusplus >= 201703L
+#include <variant>
+#endif
+
 namespace nitro
 {
 namespace lang
@@ -45,6 +49,11 @@ namespace lang
     class hashable
     {
     };
+
+#if __cplusplus >= 201703L
+    template <typename... T>
+    inline auto hash(const std::variant<T...>& t);
+#endif
 
     template <typename... T>
     inline auto hash(const std::tuple<T...>& t);
@@ -87,6 +96,36 @@ namespace lang
             hash_combine_impl(seed, hash(std::get<I>(v)));
             hash_combine_tuple<I + 1>(seed, v);
         }
+
+#if __cplusplus >= 201703L
+        template <std::size_t I, typename T>
+        inline typename std::enable_if_t<(I == std::variant_size<T>::value), void>
+        hash_combine_variant(std::size_t&, const T&)
+        {
+        }
+
+        template <std::size_t I, typename T>
+        inline typename std::enable_if_t<(I < std::variant_size<T>::value), void>
+        hash_combine_variant(std::size_t& seed, const T& v)
+        {
+            if (auto x = std::get_if<I>(&v))
+            {
+                hash_combine_impl(seed, hash(*x));
+            }
+            else
+            {
+                hash_combine_variant<I + 1>(seed, v);
+            }
+        }
+        template <typename T, typename... U>
+        inline void hash_combine_variant(std::size_t& seed, const std::variant<U...>& v)
+        {
+            if (auto x = std::get_if<T>(&v))
+            {
+                hash_combine_impl(seed, hash(*x));
+            }
+        }
+#endif
     } // namespace detail
 
     template <typename... T>
@@ -104,6 +143,18 @@ namespace lang
         detail::hash_combine_impl(seed, hash(t.second));
         return seed;
     }
+
+#if __cplusplus >= 201703L
+    template <typename... T>
+    inline auto hash(const std::variant<T...>& t)
+    {
+        std::size_t seed = 0;
+
+        detail::hash_combine_variant<0>(seed, t);
+
+        return seed;
+    }
+#endif
 
     template <typename T>
     inline auto hash(const std::unique_ptr<T>& p)

@@ -45,7 +45,7 @@ if(TARGET Nitro::nitro)
     endif()
 else()
 
-cmake_minimum_required(VERSION 3.2)
+cmake_minimum_required(VERSION 3.3)
 
 project(Nitro VERSION 1.0.0)
 
@@ -131,6 +131,10 @@ if(NOT ${CMAKE_CXX_COMPILER_ID} STREQUAL "Intel")
         INTERFACE
             cxx_generalized_initializers
     )
+endif()
+
+if(MSVC)
+    target_compile_options(nitro-core INTERFACE /Zc:__cplusplus)
 endif()
 
 add_library(nitro-dl INTERFACE)
