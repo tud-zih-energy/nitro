@@ -35,11 +35,11 @@ jobs:
           - os: macos-latest
             xcode: 10.3
           - os: macos-latest
-            compiler: g++-8
-          - os: macos-latest
             compiler: g++-9
           - os: macos-latest
             compiler: g++-10
+          - os: macos-latest
+            compiler: g++-11
           - os: windows-2016
           - os: windows-2019
 
