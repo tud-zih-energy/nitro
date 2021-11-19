@@ -47,7 +47,7 @@ else()
 
 cmake_minimum_required(VERSION 3.3)
 
-project(Nitro VERSION 1.0.0)
+project(Nitro VERSION 2.0.0)
 
 if(MSVC)
     if(CMAKE_CXX_COMPILER_VERSION VERSION_GREATER_EQUAL 19.14)
@@ -57,8 +57,7 @@ if(MSVC)
 endif()
 
 include(cmake/GitSubmoduleUpdate.cmake)
-git_submodule_update()
-
+find_package(Git)
 if(Git_FOUND)
     _is_git(${CMAKE_CURRENT_SOURCE_DIR} IN_GIT)
 endif()
@@ -97,41 +96,8 @@ option(NITRO_POSITION_INDEPENDENT_CODE "Whether to build Nitro libraries with po
 option(NITRO_BUILD_TESTING  "Whether to build Nitro tests" ON)
 
 add_library(nitro-core INTERFACE)
-target_compile_features(nitro-core
-    INTERFACE
-        cxx_auto_type
-        cxx_constexpr
-        cxx_decltype
-        cxx_decltype_auto
-        cxx_defaulted_functions
-        cxx_defaulted_move_initializers
-        cxx_delegating_constructors
-        cxx_deleted_functions
-        cxx_explicit_conversions
-        cxx_generic_lambdas
-        cxx_inheriting_constructors
-        cxx_lambdas
-        cxx_lambda_init_captures
-        cxx_noexcept
-        cxx_nullptr
-        cxx_override
-        cxx_range_for
-        cxx_return_type_deduction
-        cxx_rvalue_references
-        cxx_trailing_return_types
-        cxx_user_literals
-        cxx_variadic_templates
-        cxx_template_template_parameters
-)
+target_compile_features(nitro-core INTERFACE cxx_std_17)
 
-if(NOT ${CMAKE_CXX_COMPILER_ID} STREQUAL "Intel")
-    # This compile feature test is broken on Intel. So we only check on other compilers.
-    # See https://gitlab.kitware.com/cmake/cmake/issues/17829
-    target_compile_features(nitro-core
-        INTERFACE
-            cxx_generalized_initializers
-    )
-endif()
 
 if(MSVC)
     target_compile_options(nitro-core INTERFACE /Zc:__cplusplus)

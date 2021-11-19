@@ -34,13 +34,12 @@
 #include <nitro/log/detail/set_attribute.hpp>
 #include <nitro/log/severity.hpp>
 
-#include <nitro/lang/string_ref.hpp>
-
 #include <nitro/meta/callable.hpp>
 
 #include <chrono>
 #include <memory>
 #include <sstream>
+#include <string_view>
 #include <type_traits>
 
 namespace nitro
@@ -65,7 +64,7 @@ namespace log
         class set_tag_attribute
         {
         public:
-            void operator()(Record&, lang::string_ref)
+            void operator()(Record&, std::string_view)
             {
             }
         };
@@ -74,9 +73,9 @@ namespace log
         class set_tag_attribute<Record, true>
         {
         public:
-            void operator()(Record& r, lang::string_ref tag)
+            void operator()(Record& r, std::string_view tag)
             {
-                if (tag)
+                if (!tag.empty())
                 {
                     r.tag() = tag;
                 }
@@ -84,7 +83,7 @@ namespace log
         };
 
         template <typename Record>
-        void set_tag(Record& r, lang::string_ref tag)
+        void set_tag(Record& r, std::string_view tag)
         {
             set_tag_attribute<Record, detail::has_attribute<tag_attribute, Record>::value>()(r,
                                                                                              tag);
@@ -97,7 +96,7 @@ namespace log
             typedef nitro::log::logger<Record, Formatter, Sink, Filter> logger;
 
         public:
-            smart_stream(lang::string_ref tag) : r(new Record), s()
+            smart_stream(std::string_view tag) : r(new Record), s()
             {
                 detail::set_tag(*r, tag);
                 detail::set_severity<Record>()(*r, Severity);
@@ -209,7 +208,7 @@ namespace log
         class null_stream
         {
         public:
-            null_stream(lang::string_ref)
+            null_stream(std::string_view)
             {
             }
         };

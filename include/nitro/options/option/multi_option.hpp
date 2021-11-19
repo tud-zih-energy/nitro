@@ -34,7 +34,6 @@
 
 #include <nitro/env/get.hpp>
 #include <nitro/except/raise.hpp>
-#include <nitro/lang/optional.hpp>
 #include <nitro/lang/string.hpp>
 
 #include <memory>

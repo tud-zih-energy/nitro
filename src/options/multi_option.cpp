@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015-2016, Technische Universität Dresden, Germany
+ * Copyright (c) 2015-2016, Technische Universitï¿½t Dresden, Germany
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without modification, are permitted
@@ -33,7 +33,6 @@
 #include <nitro/env/get.hpp>
 #include <nitro/except/raise.hpp>
 #include <nitro/format.hpp>
-#include <nitro/lang/optional.hpp>
 #include <nitro/lang/string.hpp>
 
 #include <memory>

@@ -34,7 +34,6 @@
 
 #include <nitro/format.hpp>
 #include <nitro/io/terminal.hpp>
-#include <nitro/lang/optional.hpp>
 
 #include <iomanip>
 #include <memory>
@@ -55,6 +54,8 @@ namespace options
         : name_(name), description_(description)
         {
         }
+
+        virtual ~base() = default;
 
         base(const base&) = delete;
         base& operator=(const base&) = delete;

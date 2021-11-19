@@ -1,7 +1,7 @@
 #include <catch2/catch.hpp>
 
 #include <nitro/except/raise.hpp>
-#include <nitro/format/format.hpp>
+#include <nitro/format.hpp>
 
 #include <sstream>
 

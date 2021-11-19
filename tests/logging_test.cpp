@@ -14,7 +14,6 @@
 #include <nitro/log/filter/severity_filter.hpp>
 #include <nitro/log/log.hpp>
 #include <nitro/log/sink/logfile.hpp>
-#include <nitro/log/sink/sequence.hpp>
 #include <nitro/log/sink/stderr.hpp>
 #include <nitro/log/sink/stdout.hpp>
 
@@ -23,8 +22,16 @@
 namespace detail
 {
 
-using Sink = nitro::log::sink::sequence<nitro::log::sink::StdOut, nitro::log::sink::StdErr,
-                                        nitro::log::sink::Logfile>;
+class Sink
+{
+public:
+    void sink(nitro::log::severity_level lvl, const std::string& msg)
+    {
+        nitro::log::sink::StdOut().sink(lvl, msg);
+        nitro::log::sink::StdErr().sink(lvl, msg);
+        nitro::log::sink::Logfile().sink(lvl, msg);
+    }
+};
 
 typedef nitro::log::record<nitro::log::tag_attribute, nitro::log::message_attribute,
                            nitro::log::severity_attribute,

@@ -37,7 +37,7 @@
 #include <nitro/options/user_input.hpp>
 
 #include <nitro/except/raise.hpp>
-#include <nitro/format/format.hpp>
+#include <nitro/format.hpp>
 
 #include <set>
 #include <string>

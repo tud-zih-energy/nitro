@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015-2021, Technische Universität Dresden, Germany
+ * Copyright (c) 2015-2021, Technische Universitï¿½t Dresden, Germany
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without modification, are permitted
@@ -32,7 +32,6 @@
 #include <nitro/options/fwd.hpp>
 
 #include <nitro/env/get.hpp>
-#include <nitro/lang/optional.hpp>
 
 #include <ios>
 #include <memory>

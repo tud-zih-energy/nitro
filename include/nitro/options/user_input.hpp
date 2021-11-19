@@ -32,9 +32,9 @@
 #include <nitro/options/fwd.hpp>
 
 #include <nitro/except/raise.hpp>
-#include <nitro/lang/optional.hpp>
 #include <nitro/lang/string.hpp>
 
+#include <optional>
 #include <regex>
 #include <set>
 #include <string>
@@ -177,7 +177,7 @@ namespace options
     private:
         std::string arg_;
         std::string name_;
-        lang::optional<std::string> value_;
+        std::optional<std::string> value_;
     };
 } // namespace options
 } // namespace nitro

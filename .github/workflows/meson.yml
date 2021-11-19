@@ -1,0 +1,78 @@
+name: Build
+
+on: [push, pull_request]
+
+jobs:
+  build:
+    strategy:
+      fail-fast: false
+      matrix:
+        build: [debug, release]
+        os: [ubuntu-20.04]
+        compiler: [g++-9, g++-10, clang++-10, clang++-11, clang++-12]
+        include:
+          - os: ubuntu-16.04
+            compiler: g++-5
+          - os: ubuntu-16.04
+            compiler: g++-9
+          - os: ubuntu-16.04
+            compiler: clang++-9
+          - os: ubuntu-18.04
+            compiler: g++-7
+          - os: ubuntu-18.04
+            compiler: g++-9
+          - os: ubuntu-18.04
+            compiler: g++-10
+          - os: ubuntu-18.04
+            compiler: clang++-9
+          - os: macos-latest
+            xcode: default
+          - os: macos-latest
+            xcode: 11.7
+          - os: macos-latest
+            xcode: 10.3
+          - os: macos-latest
+            compiler: g++-9
+          - os: macos-latest
+            compiler: g++-10
+          - os: macos-latest
+            compiler: g++-11
+          - os: windows-2016
+          - os: windows-2019
+
+    runs-on: ${{ matrix.os }}
+
+    steps:
+    - uses: actions/checkout@v2
+
+    - name: Select XCode
+      run: sudo xcode-select -s /Applications/Xcode_${{ matrix.xcode }}.app/Contents/Developer
+      if: startsWith( matrix.os, 'macos') && matrix.xcode && matrix.xcode != 'default'
+
+    - name: Create Build Environment
+      run: mkdir ${{runner.workspace}}/build
+
+    - name: Configure Meson
+      # Use a bash shell so we can use the same syntax for environment variable
+      # access regardless of the host operating system
+      shell: bash
+      env:
+        CXX: ${{ matrix.compiler }}
+      # Note the current convention is to use the -S and -B options here to specify source 
+      # and build directories, but this is only available with CMake 3.13 and higher.  
+      # The CMake binaries on the Github Actions machines are (as of this writing) 3.12
+      run: meson build -Dbuildtype=${{ matrix.build }} -Dwarning_level=3 -Dwerror=true
+
+    - uses: ammaraskar/msvc-problem-matcher@master
+      if: ${{ startsWith( matrix.os, 'windows' ) }}
+    - uses: ammaraskar/gcc-problem-matcher@master
+      if: ${{ startsWith( matrix.compiler, 'g++') }}
+
+    - name: Build
+      working-directory: ${{runner.workspace}}/build
+      shell: bash
+      run: ninja -C build
+
+    - name: Test
+      working-directory: ${{runner.workspace}}/build
+      run: ninja -C build test

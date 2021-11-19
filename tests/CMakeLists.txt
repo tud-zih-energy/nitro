@@ -14,38 +14,21 @@ macro(NitroTest TEST)
     add_test(${TEST_NAME} ${TEST_NAME})
 endmacro()
 
-add_library(catch2 INTERFACE)
-target_include_directories(catch2 SYSTEM INTERFACE ${CMAKE_CURRENT_SOURCE_DIR}/Catch/single_include)
-add_library(Catch2::Catch2 ALIAS catch2)
+include(FetchContent)
+
+FetchContent_Declare(
+    Catch2
+    GIT_REPOSITORY https://github.com/catchorg/Catch2.git
+    GIT_TAG        v2.13.4
+)
+FetchContent_GetProperties(Catch2)
+if(NOT Catch2_POPULATED)
+    FetchContent_Populate(Catch2)
+    add_subdirectory(${catch2_SOURCE_DIR} ${catch2_BINARY_DIR} EXCLUDE_FROM_ALL)
+endif()
 
 add_library(nitro_test_main OBJECT catch_main.cpp)
-target_include_directories(nitro_test_main SYSTEM PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/Catch/single_include)
-target_compile_features(nitro_test_main
-    PRIVATE
-        cxx_auto_type
-        cxx_constexpr
-        cxx_decltype
-        cxx_decltype_auto
-        cxx_defaulted_functions
-        cxx_defaulted_move_initializers
-        cxx_delegating_constructors
-        cxx_deleted_functions
-        cxx_explicit_conversions
-        cxx_generic_lambdas
-        cxx_inheriting_constructors
-        cxx_lambdas
-        cxx_lambda_init_captures
-        cxx_noexcept
-        cxx_nullptr
-        cxx_override
-        cxx_range_for
-        cxx_return_type_deduction
-        cxx_rvalue_references
-        cxx_trailing_return_types
-        cxx_user_literals
-        cxx_variadic_templates
-        cxx_template_template_parameters
-)
+target_link_libraries(nitro_test_main PRIVATE Catch2::Catch2)
 
 if(NOT CMAKE_C_COMPILER_ID MATCHES "MSVC")
     add_library(nitro_test_lib SHARED nitro_test_lib.cpp)
@@ -64,7 +47,6 @@ NitroTest(options_test.cpp)
 target_link_libraries(Nitro.options_test Nitro::options)
 set_tests_properties(Nitro.options_test PROPERTIES ENVIRONMENT "OPT1=OPT1_VALUE;OPT2=TRUE;OPT3=FALSE;OPT4=OPT4_VALUE0\;OPT4_VALUE1")
 
-NitroTest(tuple_operators_test.cpp)
 
 NitroTest(reverse_test.cpp)
 
@@ -73,23 +55,8 @@ NitroTest(enumerate_test.cpp)
 NitroTest(logging_test.cpp)
 target_link_libraries(Nitro.logging_test Nitro::log)
 
-NitroTest(string_ref_test.cpp)
-
-NitroTest(catch_test.cpp)
-
-NitroTest(quaint_ptr_test.cpp)
-
 NitroTest(is_callable_test.cpp)
 
 NitroTest(format_test.cpp)
 
 NitroTest(string_test.cpp)
-
-
-if(cxx_std_17 IN_LIST CMAKE_CXX_COMPILE_FEATURES)
-    NitroTest(unordered_test.cpp)
-    target_compile_features(Nitro.unordered_test PUBLIC cxx_std_17)
-endif()
-
-NitroTest(fixed_vector_test.cpp)
-

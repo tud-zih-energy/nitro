@@ -32,7 +32,7 @@
 #include <nitro/log/severity.hpp>
 #include <nitro/log/stream.hpp>
 
-#include <nitro/lang/string_ref.hpp>
+#include <string_view>
 
 namespace nitro
 {
@@ -76,32 +76,32 @@ namespace log
             instance().Sink::sink(s, instance().Formater<Record>::format(r));
         }
 
-        static actual_stream_t<severity_level::trace> trace(lang::string_ref tag = nullptr)
+        static actual_stream_t<severity_level::trace> trace(std::string_view tag = {})
         {
             return actual_stream_t<severity_level::trace>(tag);
         }
 
-        static actual_stream_t<severity_level::debug> debug(lang::string_ref tag = nullptr)
+        static actual_stream_t<severity_level::debug> debug(std::string_view tag = {})
         {
             return actual_stream_t<severity_level::debug>(tag);
         }
 
-        static actual_stream_t<severity_level::info> info(lang::string_ref tag = nullptr)
+        static actual_stream_t<severity_level::info> info(std::string_view tag = {})
         {
             return actual_stream_t<severity_level::info>(tag);
         }
 
-        static actual_stream_t<severity_level::warn> warn(lang::string_ref tag = nullptr)
+        static actual_stream_t<severity_level::warn> warn(std::string_view tag = {})
         {
             return actual_stream_t<severity_level::warn>(tag);
         }
 
-        static actual_stream_t<severity_level::error> error(lang::string_ref tag = nullptr)
+        static actual_stream_t<severity_level::error> error(std::string_view tag = {})
         {
             return actual_stream_t<severity_level::error>(tag);
         }
 
-        static actual_stream_t<severity_level::fatal> fatal(lang::string_ref tag = nullptr)
+        static actual_stream_t<severity_level::fatal> fatal(std::string_view tag = {})
         {
             return actual_stream_t<severity_level::fatal>(tag);
         }

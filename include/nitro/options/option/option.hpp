@@ -32,8 +32,6 @@
 
 #include <nitro/options/option/base.hpp>
 
-#include <nitro/lang/optional.hpp>
-
 #include <sstream>
 #include <string>
 #include <type_traits>
@@ -92,8 +90,8 @@ namespace options
         friend class parser;
 
     private:
-        nitro::lang::optional<std::string> default_;
-        nitro::lang::optional<std::string> value_;
+        std::optional<std::string> default_;
+        std::optional<std::string> value_;
 
         bool is_optional_ = false;
     };
