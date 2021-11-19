@@ -7,9 +7,9 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        build: [debug, release]
         os: [ubuntu-20.04]
         compiler: [g++-9, g++-10, clang++-10, clang++-11, clang++-12]
+        build: [debug, release]
         include:
           - os: ubuntu-18.04
             compiler: g++-9
