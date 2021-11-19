@@ -1,4 +1,4 @@
-name: Build
+name: Build with Meson
 
 on: [push, pull_request]
 
@@ -70,9 +70,7 @@ jobs:
       if: ${{ startsWith( matrix.compiler, 'g++') }}
 
     - name: Build
-      working-directory: ${{runner.workspace}}/build
       run: ninja -C build
 
     - name: Test
-      working-directory: ${{runner.workspace}}/build
       run: ninja -C build test
