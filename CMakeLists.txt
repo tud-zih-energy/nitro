@@ -57,7 +57,6 @@ if(MSVC)
 endif()
 
 include(cmake/GitSubmoduleUpdate.cmake)
-git_submodule_update()
 
 if(Git_FOUND)
     _is_git(${CMAKE_CURRENT_SOURCE_DIR} IN_GIT)

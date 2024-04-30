@@ -14,12 +14,15 @@ macro(NitroTest TEST)
     add_test(${TEST_NAME} ${TEST_NAME})
 endmacro()
 
-add_library(catch2 INTERFACE)
-target_include_directories(catch2 SYSTEM INTERFACE ${CMAKE_CURRENT_SOURCE_DIR}/Catch/single_include)
-add_library(Catch2::Catch2 ALIAS catch2)
+include(FetchContent)
+FetchContent_Declare(Catch2
+    GIT_REPOSITORY https://github.com/catchorg/Catch2.git
+    GIT_TAG v2.13.10
+    FIND_PACKAGE_ARGS
+)
+FetchContent_MakeAvailable(Catch2)
 
 add_library(nitro_test_main OBJECT catch_main.cpp)
-target_include_directories(nitro_test_main SYSTEM PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/Catch/single_include)
 target_compile_features(nitro_test_main
     PRIVATE
         cxx_auto_type
@@ -46,6 +49,7 @@ target_compile_features(nitro_test_main
         cxx_variadic_templates
         cxx_template_template_parameters
 )
+target_link_libraries(nitro_test_main PUBLIC Catch2::Catch2)
 
 if(NOT CMAKE_C_COMPILER_ID MATCHES "MSVC")
     add_library(nitro_test_lib SHARED nitro_test_lib.cpp)
