@@ -2,7 +2,7 @@
 #error "NITRO_LOG_MIN_SEVERITY should be set by the build system, but isn't!"
 #endif
 
-#include <catch2/catch.hpp>
+#include <catch2/catch_test_macros.hpp>
 
 #ifdef NITRO_LOG_MIN_SEVERITY
 #undef NITRO_LOG_MIN_SEVERITY
@@ -206,42 +206,48 @@ TEST_CASE("Logging lambdas works", "[log]")
     {
         int i = 0;
 
-        logging::fatal() << [&i]() {
+        logging::fatal() << [&i]()
+        {
             ++i;
             return "test 37";
         };
 
         CHECK(i == 1);
 
-        logging::error() << [&i]() {
+        logging::error() << [&i]()
+        {
             ++i;
             return "test 38";
         };
 
         CHECK(i == 2);
 
-        logging::warn() << [&i]() {
+        logging::warn() << [&i]()
+        {
             ++i;
             return "test 39";
         };
 
         CHECK(i == 3);
 
-        logging::info() << [&i]() {
+        logging::info() << [&i]()
+        {
             ++i;
             return "test 40";
         };
 
         CHECK(i == 4);
 
-        logging::debug() << [&i]() {
+        logging::debug() << [&i]()
+        {
             ++i;
             return "test 41";
         };
 
         CHECK(i == 4);
 
-        logging::trace() << [&i]() {
+        logging::trace() << [&i]()
+        {
             ++i;
             return "test 42";
         };

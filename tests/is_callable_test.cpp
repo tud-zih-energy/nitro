@@ -1,4 +1,4 @@
-#include <catch2/catch.hpp>
+#include <catch2/catch_test_macros.hpp>
 
 #include <nitro/meta/callable.hpp>
 
@@ -37,7 +37,8 @@ TEST_CASE("is_callable trait works", "[meta]")
     SECTION("with conversions")
     {
         int x;
-        auto fool = [&x](double) {
+        auto fool = [&x](double)
+        {
             (void)x;
             return "hello";
         };

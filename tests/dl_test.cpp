@@ -1,4 +1,4 @@
-#include <catch2/catch.hpp>
+#include <catch2/catch_test_macros.hpp>
 
 #include <nitro/dl/dl.hpp>
 
@@ -38,8 +38,8 @@ TEST_CASE("self binary symbols can be loaded and used", "[dl]")
 
     SECTION("nitro_binary_cos is loadable")
     {
-        REQUIRE_NOTHROW(
-            [&]() { auto cos = test_library.load<double(double)>("nitro_binary_cos"); }());
+        REQUIRE_NOTHROW([&]()
+                        { auto cos = test_library.load<double(double)>("nitro_binary_cos"); }());
     }
 
     SECTION("nitro_binary_cos is callable")

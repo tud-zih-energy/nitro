@@ -3,27 +3,8 @@ macro(NitroTest TEST)
 
     set(TEST_NAME "Nitro.${TEST_NAME}")
 
-    add_executable(${TEST_NAME} ${TEST} $<TARGET_OBJECTS:nitro_test_main>)
-    target_link_libraries(${TEST_NAME} Nitro::core Catch2::Catch2)
-    if(CMAKE_C_COMPILER_ID MATCHES "MSVC")
-        target_compile_options(${TEST_NAME} PRIVATE /W4)
-    else()
-        target_compile_options(${TEST_NAME} PRIVATE -Wall -Wextra -pedantic)
-    endif()
-
-    add_test(${TEST_NAME} ${TEST_NAME})
-endmacro()
-
-include(FetchContent)
-FetchContent_Declare(Catch2
-    GIT_REPOSITORY https://github.com/catchorg/Catch2.git
-    GIT_TAG v2.13.10
-    FIND_PACKAGE_ARGS
-)
-FetchContent_MakeAvailable(Catch2)
-
-add_library(nitro_test_main OBJECT catch_main.cpp)
-target_compile_features(nitro_test_main
+    add_executable(${TEST_NAME} ${TEST})
+    target_compile_features(${TEST_NAME}
     PRIVATE
         cxx_auto_type
         cxx_constexpr
@@ -49,13 +30,35 @@ target_compile_features(nitro_test_main
         cxx_variadic_templates
         cxx_template_template_parameters
 )
-target_link_libraries(nitro_test_main PUBLIC Catch2::Catch2)
+    target_link_libraries(${TEST_NAME} Nitro::core Catch2::Catch2WithMain)
+    if(CMAKE_C_COMPILER_ID MATCHES "MSVC")
+        target_compile_options(${TEST_NAME} PRIVATE /W4)
+    else()
+        target_compile_options(${TEST_NAME} PRIVATE -Wall -Wextra -pedantic)
+    endif()
+
+    add_test(${TEST_NAME} ${TEST_NAME})
+endmacro()
+
+include(FetchContent)
+FetchContent_Declare(Catch2
+    GIT_REPOSITORY https://github.com/catchorg/Catch2.git
+    GIT_TAG v3.12.0
+    FIND_PACKAGE_ARGS "3...<4" 
+)
+FetchContent_MakeAvailable(Catch2)
 
 if(NOT CMAKE_C_COMPILER_ID MATCHES "MSVC")
     add_library(nitro_test_lib SHARED nitro_test_lib.cpp)
 
     NitroTest(dl_test.cpp)
     target_sources(Nitro.dl_test PRIVATE dl_test_other.cpp)
+
+    # Linux requires -export-dynamic at link, otherwise the symbol we want to
+    # load to test nitro::dl does not appear in the dynamic symbol table.
+    if(${CMAKE_SYSTEM_NAME} STREQUAL "Linux")
+        target_link_options(Nitro.dl_test PRIVATE "-Wl,-export-dynamic")
+    endif()
     set_tests_properties(Nitro.dl_test PROPERTIES ENVIRONMENT "LD_LIBRARY_PATH=${CMAKE_CURRENT_BINARY_DIR}:$ENV{LD_LIBRARY_PATH}")
     target_link_libraries(Nitro.dl_test Nitro::dl)
 endif()
