@@ -46,9 +46,8 @@ namespace log
         public:
             void sink(severity_level sev, const std::string& formatted_record)
             {
-                lang::tuple_foreach(sinks, [&sev, &formatted_record](auto& sink) {
-                    sink.sink(sev, formatted_record);
-                });
+                lang::tuple_foreach(sinks, [&sev, &formatted_record](auto& sink)
+                                    { sink.sink(sev, formatted_record); });
             }
         };
 

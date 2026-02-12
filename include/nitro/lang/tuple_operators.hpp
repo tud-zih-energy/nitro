@@ -48,7 +48,7 @@ namespace lang
             template <typename T>
             void operator()(T& t)
             {
-                ar& t;
+                ar & t;
             }
 
             Archive& ar;

@@ -218,12 +218,14 @@ namespace options
 
         std::set<std::string> provided;
 
-        for_each_option([&provided](auto& option) {
-            if (option.has_non_default())
+        for_each_option(
+            [&provided](auto& option)
             {
-                provided.insert(option.name());
-            }
-        });
+                if (option.has_non_default())
+                {
+                    provided.insert(option.name());
+                }
+            });
 
         return arguments(get_all_options(), get_all_multi_options(), get_all_toggles(), positionals,
                          provided);
@@ -379,19 +381,21 @@ namespace options
     {
         std::set<std::string> short_names;
 
-        for_each_option([&short_names](auto& arg) {
-            if (arg.has_short_name())
+        for_each_option(
+            [&short_names](auto& arg)
             {
-                auto res = short_names.emplace(arg.short_name());
-
-                if (!res.second)
+                if (arg.has_short_name())
                 {
-                    raise<parser_error>(
-                        nitro::format("redefinition of short name_ '{}' from option '{}'") %
-                        arg.short_name() % arg.name());
+                    auto res = short_names.emplace(arg.short_name());
+
+                    if (!res.second)
+                    {
+                        raise<parser_error>(
+                            nitro::format("redefinition of short name_ '{}' from option '{}'") %
+                            arg.short_name() % arg.name());
+                    }
                 }
-            }
-        });
+            });
     }
 
 } // namespace options

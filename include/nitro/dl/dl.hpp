@@ -74,12 +74,14 @@ namespace dl
          * }
          */
         explicit dl(const std::string& filename)
-        : handle(dlopen(filename.c_str(), RTLD_NOW), [](void* handle) {
-              if (handle != nullptr)
-              {
-                  dlclose(handle);
-              }
-          })
+        : handle(dlopen(filename.c_str(), RTLD_NOW),
+                 [](void* handle)
+                 {
+                     if (handle != nullptr)
+                     {
+                         dlclose(handle);
+                     }
+                 })
         {
             if (handle == nullptr)
             {
@@ -98,13 +100,15 @@ namespace dl
          * }
          */
         explicit dl(self_tag)
-        : handle(dlopen(NULL, RTLD_NOW), [](void* handle) {
-              (void)nitro::dl::self;
-              if (handle != nullptr)
-              {
-                  dlclose(handle);
-              }
-          })
+        : handle(dlopen(NULL, RTLD_NOW),
+                 [](void* handle)
+                 {
+                     (void)nitro::dl::self;
+                     if (handle != nullptr)
+                     {
+                         dlclose(handle);
+                     }
+                 })
         {
             if (handle == nullptr)
             {
