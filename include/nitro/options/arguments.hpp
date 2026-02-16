@@ -28,6 +28,7 @@
 
 #pragma once
 
+#include <nitro/options/exception.hpp>
 #include <nitro/options/option/multi_option.hpp>
 #include <nitro/options/option/option.hpp>
 #include <nitro/options/option/toggle.hpp>
@@ -60,40 +61,96 @@ namespace options
     public:
         const std::string& get(const std::string& name) const
         {
-            return options_.at(name)->get();
+            try
+            {
+                return options_.at(name)->get();
+            }
+            catch (std::out_of_range& e)
+            {
+                throw no_such_argument_error("Can not get value of option --", name,
+                                             ": No such option exists!");
+            }
         }
 
         template <typename T>
         T as(const std::string& name) const
         {
-            return options_.at(name)->as<T>();
+            try
+            {
+                return options_.at(name)->as<T>();
+            }
+            catch (std::out_of_range& e)
+            {
+                throw no_such_argument_error("Can not get value of option --", name,
+                                             ": No such option exists!");
+            }
         }
 
     public:
         int given(const std::string& name) const
         {
-            return toggles_.at(name)->given();
+            try
+            {
+                return toggles_.at(name)->given();
+            }
+            catch (std::out_of_range& e)
+            {
+                throw no_such_argument_error("Can not get number of times toggle --", name,
+                                             " was given: No such toggle exists!");
+            }
         }
 
         std::size_t count(const std::string& name) const
         {
-            return multi_options_.at(name)->count();
+            try
+            {
+                return multi_options_.at(name)->count();
+            }
+            catch (std::out_of_range& e)
+            {
+                throw no_such_argument_error("Can not get number of times multi-option --", name,
+                                             " was given: No such multi-option exists!");
+            }
         }
 
         const std::string& get(const std::string& name, std::size_t i) const
         {
-            return multi_options_.at(name)->get(i);
+            try
+            {
+                return multi_options_.at(name)->get(i);
+            }
+            catch (std::out_of_range& e)
+            {
+                throw no_such_argument_error("Can not get value for multi-option --", name,
+                                             ": No such multi-option exists!");
+            }
         }
 
         const std::vector<std::string>& get_all(const std::string& name) const
         {
-            return multi_options_.at(name)->get_all();
+            try
+            {
+                return multi_options_.at(name)->get_all();
+            }
+            catch (std::out_of_range& e)
+            {
+                throw no_such_argument_error("Can not get all value for multi-option --", name,
+                                             ": No such multi-option exists!");
+            }
         }
 
         template <typename T>
         T as(const std::string& name, std::size_t i) const
         {
-            return multi_options_.at(name)->as<T>(i);
+            try
+            {
+                return multi_options_.at(name)->as<T>(i);
+            }
+            catch (std::out_of_range& e)
+            {
+                throw no_such_argument_error("Can not get value of multi-option --", name,
+                                             ": No such multi-option exists!");
+            }
         }
 
     public:
@@ -104,7 +161,16 @@ namespace options
                 // if you ever manage to have more than 2^31 positionals, I owe you a beer.
                 i += static_cast<int>(positionals_.size());
             }
-            return positionals_.at(i);
+            try
+            {
+                return positionals_.at(i);
+            }
+            catch (std::out_of_range& e)
+            {
+                throw no_such_argument_error("Can not get ", std::to_string(i),
+                                             "th positional, there are only ",
+                                             std::to_string(positionals_.size()), " positionals");
+            }
         }
 
         const std::string& operator[](int i) const
