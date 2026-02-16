@@ -562,6 +562,24 @@ TEST_CASE("Check if short option names are unique", "[options]")
     REQUIRE_THROWS_AS(parser.parse(0, nullptr), nitro::options::parser_error);
 }
 
+TEST_CASE("Getting non-existent argument throws correctly")
+{
+    int argc = 1;
+    const char* argv[] = { "foobar" };
+    nitro::options::parser parser;
+
+    nitro::options::arguments options;
+    REQUIRE_NOTHROW(options = parser.parse(argc, argv));
+
+    REQUIRE_THROWS_AS(options.get("test"), nitro::options::no_such_argument_error);
+    REQUIRE_THROWS_AS(options.as<int>("test"), nitro::options::no_such_argument_error);
+    REQUIRE_THROWS_AS(options.given("test"), nitro::options::no_such_argument_error);
+    REQUIRE_THROWS_AS(options.count("test"), nitro::options::no_such_argument_error);
+    REQUIRE_THROWS_AS(options.get("test", 0), nitro::options::no_such_argument_error);
+    REQUIRE_THROWS_AS(options.get_all("test"), nitro::options::no_such_argument_error);
+    REQUIRE_THROWS_AS(options.get(42), nitro::options::no_such_argument_error);
+}
+
 TEST_CASE("Simple named arguments can get parsed from command line", "[options]")
 {
     SECTION("Trying to parse unknown arguments will throw")
