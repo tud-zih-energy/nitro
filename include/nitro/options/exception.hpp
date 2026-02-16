@@ -52,15 +52,5 @@ namespace options
         using base = nitro::except::exception;
         using base::base;
     };
-
-    /**
-     * This exception is thrown if you try to access an option [name], but
-     * no such option exists
-     */
-    struct no_such_argument_error : nitro::except::exception
-    {
-        using base = nitro::except::exception;
-        using base::base;
-    };
 } // namespace options
 } // namespace nitro
