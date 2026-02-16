@@ -685,6 +685,23 @@ TEST_CASE("Simple named arguments can get parsed from command line", "[options]"
     }
 }
 
+TEST_CASE("get_all_option_names() returns all declared options")
+{
+    nitro::options::parser parser;
+
+    parser.option("opt1");
+    parser.multi_option("opt2");
+    parser.multi_option("opt3");
+    parser.option("opt4");
+
+    auto names = parser.get_all_option_names();
+    REQUIRE(names.size() == 4);
+    REQUIRE(names.count("opt1") == 1);
+    REQUIRE(names.count("opt2") == 1);
+    REQUIRE(names.count("opt3") == 1);
+    REQUIRE(names.count("opt4") == 1);
+}
+
 TEST_CASE("Short-cut arguments can get parsed from command line", "[options]")
 {
     SECTION("Simple string short named values work")
