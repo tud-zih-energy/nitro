@@ -79,6 +79,28 @@ namespace options
     public:
         std::ostream& usage(std::ostream& s = std::cout);
 
+        std::set<std::string> get_all_option_names() const
+        {
+            std::set<std::string> res;
+
+            for (const auto& option : get_all_options())
+            {
+                res.emplace(option.first);
+            }
+
+            for (const auto& multi_option : get_all_multi_options())
+            {
+                res.emplace(multi_option.first);
+            }
+
+            for (const auto& toggle : get_all_toggles())
+            {
+                res.emplace(toggle.first);
+            }
+
+            return res;
+        }
+
     private:
         void check_parser_consistency();
 
