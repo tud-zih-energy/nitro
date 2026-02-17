@@ -185,6 +185,13 @@ namespace options
 
         bool provided(const std::string& name) const
         {
+            if (options_.count(name) == 0 && multi_options_.count(name) == 0 &&
+                toggles_.count(name) == 0)
+            {
+                throw no_such_argument_error("Can not get if --", name,
+                                             " was provided: No such option exists!");
+            }
+
             return provided_.count(name);
         }
 

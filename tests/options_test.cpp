@@ -578,6 +578,7 @@ TEST_CASE("Getting non-existent argument throws correctly")
     REQUIRE_THROWS_AS(options.get("test", 0), nitro::options::no_such_argument_error);
     REQUIRE_THROWS_AS(options.get_all("test"), nitro::options::no_such_argument_error);
     REQUIRE_THROWS_AS(options.get(42), nitro::options::no_such_argument_error);
+    REQUIRE_THROWS_AS(options.provided("test"), nitro::options::no_such_argument_error);
 }
 
 TEST_CASE("Simple named arguments can get parsed from command line", "[options]")
